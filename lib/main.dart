@@ -11,13 +11,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
     return ChangeNotifierProvider(
       create: (context) => AppState(),
       child: MaterialApp(
         title: 'Kanban Flutter',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: appState.defineColorScheme()),
         ),
         home: MyHomePage(),
       ),
@@ -29,7 +31,27 @@ class AppState extends ChangeNotifier {
   var current = WordPair.random();
 
   var boardsList = <String>[];
-  var settingsList = <String>[];
+  final List<String> themeSettingsList = <String>['Light', 'Dark', 'System'];
+
+  int? colorSchemeState = 0;
+
+  updateColorScheme(int? value) {
+    colorSchemeState = value;
+    notifyListeners();
+  }
+
+  MaterialColor defineColorScheme() {
+    switch (colorSchemeState) {
+      case 0:
+        return Colors.green;
+      case 1:
+        return Colors.indigo;
+      case 2:
+        return Colors.amber;
+      default:
+        return Colors.green;
+    }
+  }
 
   addBoard() {
     boardsList.add(WordPair.random().toString());
@@ -72,11 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 extended: constraints.maxWidth >= 600,
                 destinations: [
                   NavigationRailDestination(
-                    icon: Icon(Icons.description),
+                    icon: Icon(Icons.splitscreen_outlined),
                     label: Text('Boards'),
                   ),
                   NavigationRailDestination(
-                    icon: Icon(Icons.settings_rounded),
+                    icon: Icon(Icons.settings_outlined),
                     label: Text('Settings'),
                   ),
                 ],
@@ -116,6 +138,7 @@ class BoardsPage extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(50.0)),
           ),
+          foregroundColor: Theme.of(context).colorScheme.primaryContainer,
           backgroundColor: Theme.of(context).colorScheme.surface,
           onPressed: () {
             appState.addBoard();
@@ -131,15 +154,10 @@ class BoardsPage extends StatelessWidget {
         shrinkWrap: true,
         children: [
           for (var board in appState.boardsList)
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: TextButton(
-                onPressed: appState.doSomething(),
-                child: ListTile(
-                  leading: Icon(Icons.description),
-                  title: Text(board.toString()),
-                ),
-              ),
+            ListTile(
+              onTap: appState.doSomething(),
+              leading: Icon(Icons.description),
+              title: Text(board.toString()),
             ),
         ],
       ),
@@ -147,6 +165,7 @@ class BoardsPage extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
+        foregroundColor: Theme.of(context).colorScheme.primaryContainer,
         backgroundColor: Theme.of(context).colorScheme.surface,
         onPressed: () {
           appState.addBoard();
@@ -161,21 +180,49 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
+    int _value = 42;
 
-    if (appState.settingsList.isEmpty) {
-      return Center(
-        child: Text('No settings yet.'),
-      );
-    }
-
-    return ListView(
-      children: [
-        for (var settings in appState.settingsList)
-          ListTile(
-            leading: Icon(Icons.settings_rounded),
-            title: Text(settings),
-          ),
-      ],
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Text('Theme'),
+                  SizedBox(width: 10),
+                  DropdownButton(
+                    value: _value,
+                    items: <DropdownMenuItem<int>>[
+                      DropdownMenuItem(
+                        value: 0,
+                        child: Text('Green'),
+                      ),
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text('Indigo'),
+                      ),
+                    ],
+                    onChanged: (int? value) {
+                      appState.updateColorScheme(value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('System'),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('About'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
