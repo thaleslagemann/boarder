@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  SettingsPage({super.key});
+
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final List<String> _themeOptions = [
+    'System',
+    'Light',
+    'Dark',
+  ];
+  String? selectedTheme = 'System';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(50.0)),
-        ),
-        foregroundColor: Theme.of(context).colorScheme.primaryContainer,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        onPressed: () {
-          currentTheme.switchTheme();
-        },
-        child: Icon(Icons.mobile_screen_share_sharp),
-      ),
       body: SafeArea(
         child: SettingsList(
           sections: [
@@ -31,11 +35,57 @@ class SettingsPage extends StatelessWidget {
                   onPressed: (BuildContext context) {},
                 ),
                 SettingsTile(
-                  title: Text('Use System Theme'),
+                  title: Text('Theme'),
                   leading: Icon(Icons.brightness_high_sharp),
-                  onPressed: (value) {
-                    currentTheme.switchTheme();
-                  },
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: true,
+                      hint: Text(
+                        selectedTheme!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                      items: _themeOptions
+                          .map((String item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                      value: selectedTheme,
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedTheme = value;
+                          if (value == 'System theme') {
+                            currentTheme.switchTheme(0);
+                            print('Switching theme to');
+                          }
+                          if (value == 'Light theme') {
+                            currentTheme.switchTheme(1);
+                          }
+                          if (value == 'Dark theme') {
+                            currentTheme.switchTheme(2);
+                          }
+                        });
+                      },
+                      buttonStyleData: const ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        width: 140,
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                      ),
+                    ),
+                  ),
+                  onPressed: (value) {},
                 ),
               ],
             ),

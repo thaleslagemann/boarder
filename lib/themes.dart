@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 
 class MyTheme with ChangeNotifier {
-  static bool _isDark = true;
+  int _theme = 0;
 
   ThemeMode currentTheme() {
-    return _isDark ? ThemeMode.dark : ThemeMode.light;
+    switch (_theme) {
+      case 0:
+        return ThemeMode.system;
+      case 1:
+        return ThemeMode.light;
+      case 2:
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
   }
 
-  void switchTheme() {
-    _isDark = !_isDark;
+  void switchTheme(int value) {
+    _theme = value;
     print('Changed system theme');
     notifyListeners();
   }

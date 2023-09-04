@@ -1,5 +1,6 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_flt/settings_page.dart';
+import 'package:kanban_flt/themes.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/home_page.dart';
 import 'package:kanban_flt/config.dart';
@@ -8,26 +9,42 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    currentTheme.addListener(() {
+      print('And the theme changes!');
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => AppState(),
+      create: (context) => ConfigState(),
       child: MaterialApp(
         title: 'Kanban Flutter',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
-            secondary: Colors.green,
+          colorScheme:
+              ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
+            secondary: Colors.blue,
             brightness: Brightness.light,
           ),
         ),
         darkTheme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
-            secondary: Colors.green,
+          colorScheme:
+              ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
+            secondary: Colors.blue,
             brightness: Brightness.dark,
           ),
         ),
@@ -35,19 +52,5 @@ class MyApp extends StatelessWidget {
         home: HomePage(),
       ),
     );
-  }
-}
-
-class AppState extends ChangeNotifier {
-  var current = WordPair.random();
-  var boardsList = <String>[];
-
-  addBoard() {
-    boardsList.add(WordPair.random().toString());
-    notifyListeners();
-  }
-
-  doSomething() {
-    print('Button was clicked.');
   }
 }

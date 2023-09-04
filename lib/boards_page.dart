@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kanban_flt/main.dart';
+import 'package:kanban_flt/config.dart';
 
 class BoardsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<AppState>();
+    var configState = context.watch<ConfigState>();
 
-    if (appState.boardsList.isEmpty) {
+    if (configState.boardsList.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         body: Center(
@@ -20,7 +20,7 @@ class BoardsPage extends StatelessWidget {
           foregroundColor: Theme.of(context).colorScheme.primaryContainer,
           backgroundColor: Theme.of(context).colorScheme.surface,
           onPressed: () {
-            appState.addBoard();
+            configState.addBoard();
           },
           child: Icon(Icons.add),
         ),
@@ -32,9 +32,9 @@ class BoardsPage extends StatelessWidget {
       body: ListView(
         shrinkWrap: true,
         children: [
-          for (var board in appState.boardsList)
+          for (var board in configState.boardsList)
             ListTile(
-              onTap: appState.doSomething(),
+              onTap: configState.doSomething(),
               leading: Icon(Icons.description),
               title: Text(board.toString()),
             ),
@@ -47,7 +47,7 @@ class BoardsPage extends StatelessWidget {
         foregroundColor: Theme.of(context).colorScheme.primaryContainer,
         backgroundColor: Theme.of(context).colorScheme.surface,
         onPressed: () {
-          appState.addBoard();
+          configState.addBoard();
         },
         child: Icon(Icons.add),
       ),
