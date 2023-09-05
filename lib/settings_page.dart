@@ -63,16 +63,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       onChanged: (String? value) {
                         setState(() {
                           selectedTheme = value;
-                          if (value == 'System theme') {
-                            currentTheme.switchTheme(0);
-                            print('Switching theme to');
+                          print('Attempting to switch theme to $selectedTheme');
+                          if (value == 'System') {
+                            globalAppTheme.switchTheme(0);
                           }
-                          if (value == 'Light theme') {
-                            currentTheme.switchTheme(1);
+                          if (value == 'Light') {
+                            globalAppTheme.switchTheme(1);
                           }
-                          if (value == 'Dark theme') {
-                            currentTheme.switchTheme(2);
+                          if (value == 'Dark') {
+                            globalAppTheme.switchTheme(2);
                           }
+                          print(globalAppTheme.currentTheme());
                         });
                       },
                       buttonStyleData: const ButtonStyleData(

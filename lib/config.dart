@@ -4,7 +4,7 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/themes.dart';
 
-MyTheme currentTheme = MyTheme();
+MyTheme globalAppTheme = MyTheme();
 
 class ConfigState extends ChangeNotifier {
   var current = WordPair.random();

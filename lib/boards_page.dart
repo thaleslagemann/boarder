@@ -9,7 +9,7 @@ class BoardsPage extends StatelessWidget {
 
     if (configState.boardsList.isEmpty) {
       return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Text('No boards yet.'),
         ),
@@ -28,7 +28,7 @@ class BoardsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: ListView(
         shrinkWrap: true,
         children: [

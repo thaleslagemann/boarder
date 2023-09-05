@@ -19,6 +19,7 @@ class MyTheme with ChangeNotifier {
   void switchTheme(int value) {
     _theme = value;
     print('Changed system theme');
+    print('Value $value');
     notifyListeners();
   }
 }
