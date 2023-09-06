@@ -31,23 +31,7 @@ class _AppState extends State<MyApp> {
       child: MaterialApp(
         title: 'Kanban Flutter',
         theme: ThemeData.light(),
-        // (
-        //   useMaterial3: true,
-        //   colorScheme:
-        //       ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
-        //     secondary: Colors.blue,
-        //     brightness: Brightness.light,
-        //   ),
-        // ),
         darkTheme: ThemeData.dark(),
-        // (
-        //   useMaterial3: true,
-        //   colorScheme:
-        //       ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
-        //     secondary: Colors.blue,
-        //     brightness: Brightness.dark,
-        //   ),
-        // ),
         themeMode: globalAppTheme.currentTheme(),
         home: HomePage(),
       ),

@@ -16,7 +16,13 @@ class _SettingsPageState extends State<SettingsPage> {
     'Light',
     'Dark',
   ];
+  final List<String> _languageOptions = [
+    'English',
+    'Portuguese',
+  ];
+
   String? selectedTheme = 'System';
+  String? selectedLanguage = 'English';
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +36,54 @@ class _SettingsPageState extends State<SettingsPage> {
               tiles: [
                 SettingsTile(
                   title: Text('Language'),
-                  description: Text('English'),
+                  description: Text(selectedLanguage!),
                   leading: Icon(Icons.language),
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: true,
+                      hint: Text(
+                        selectedLanguage!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                      items: _languageOptions
+                          .map((String item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                      value: selectedLanguage,
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedLanguage = value;
+                          print(
+                              'Attempting to switch theme to $selectedLanguage');
+                          if (value == 'English') {
+                            print('Language English.');
+                          }
+                          if (value == 'Portuguese') {
+                            print('Language Portuguese.');
+                          }
+                        });
+                      },
+                      buttonStyleData: const ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        width: 120,
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                      ),
+                    ),
+                  ),
                   onPressed: (BuildContext context) {},
                 ),
                 SettingsTile(
@@ -79,7 +131,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       buttonStyleData: const ButtonStyleData(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         height: 40,
-                        width: 140,
+                        width: 120,
                       ),
                       menuItemStyleData: const MenuItemStyleData(
                         height: 40,
