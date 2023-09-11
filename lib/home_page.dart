@@ -1,67 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/boards_page.dart';
-import 'package:kanban_flt/settings_page.dart';
+import 'package:kanban_flt/board_screen.dart';
+import 'package:kanban_flt/config.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
+  HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  var selectedIndex = 0;
-
+class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = BoardsPage();
-        break;
-      case 1:
-        page = SettingsPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
+    var configState = context.watch<ConfigState>();
 
-    return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
-                selectedIconTheme: IconThemeData(
-                  color: Colors.white,
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Column(
+        children: [
+          ListView(
+            shrinkWrap: true,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.bookmark_sharp),
+                    Text(
+                      'Bookmarked Boards',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ],
                 ),
-                backgroundColor: Theme.of(context).colorScheme.background,
-                extended: constraints.maxWidth >= 600,
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.splitscreen_outlined),
-                    label: Text('Boards'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.settings_outlined),
-                    label: Text('Settings'),
-                  ),
-                ],
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
-                },
               ),
-            ),
-            Expanded(
-              child: Scaffold(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                body: page,
-              ),
-            ),
-          ],
-        ),
-      );
-    });
+              for (var board in configState.favoriteBoardsList)
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BoardScreen(boardName: board)),
+                    );
+                  },
+                  trailing: Icon(Icons.keyboard_arrow_right_sharp),
+                  title: Text(board.toString()),
+                  selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+                ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

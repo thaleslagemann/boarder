@@ -7,22 +7,29 @@ class SettingsPage extends StatefulWidget {
   SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> {
   final List<String> _themeOptions = [
     'System',
     'Light',
     'Dark',
   ];
-  final List<String> _languageOptions = [
-    'English',
-    'Portuguese',
-  ];
 
-  String? selectedTheme = 'System';
-  String? selectedLanguage = 'English';
+  String? selectedTheme = globalAppTheme.currentThemeString();
+
+  var _encryptionSwitch = true;
+
+  Icon encryptionIconSwitch() {
+    switch (_encryptionSwitch) {
+      case true:
+        return Icon(Icons.lock_outline);
+      case false:
+        return Icon(Icons.lock_open);
+    }
+    return Icon(Icons.lock_open);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,58 +41,6 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsSection(
               title: Text('System'),
               tiles: [
-                SettingsTile(
-                  title: Text('Language'),
-                  description: Text(selectedLanguage!),
-                  leading: Icon(Icons.language),
-                  trailing: DropdownButtonHideUnderline(
-                    child: DropdownButton2<String>(
-                      isExpanded: true,
-                      hint: Text(
-                        selectedLanguage!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      items: _languageOptions
-                          .map((String item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(context).hintColor,
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                      value: selectedLanguage,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedLanguage = value;
-                          print(
-                              'Attempting to switch theme to $selectedLanguage');
-                          if (value == 'English') {
-                            print('Language English.');
-                          }
-                          if (value == 'Portuguese') {
-                            print('Language Portuguese.');
-                          }
-                        });
-                      },
-                      buttonStyleData: const ButtonStyleData(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        height: 40,
-                        width: 120,
-                      ),
-                      menuItemStyleData: const MenuItemStyleData(
-                        height: 40,
-                      ),
-                    ),
-                  ),
-                  onPressed: (BuildContext context) {},
-                ),
                 SettingsTile(
                   title: Text('Theme'),
                   leading: Icon(Icons.brightness_high_sharp),
@@ -116,15 +71,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         setState(() {
                           selectedTheme = value;
                           print('Attempting to switch theme to $selectedTheme');
-                          if (value == 'System') {
-                            globalAppTheme.switchTheme(0);
-                          }
-                          if (value == 'Light') {
-                            globalAppTheme.switchTheme(1);
-                          }
-                          if (value == 'Dark') {
-                            globalAppTheme.switchTheme(2);
-                          }
+                          globalAppTheme.switchTheme(
+                              _themeOptions.indexOf(selectedTheme!));
                           print(globalAppTheme.currentTheme());
                         });
                       },
@@ -145,18 +93,20 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsSection(
               title: Text('Security'),
               tiles: [
-                SettingsTile(
-                  title: Text('Security'),
-                  description: Text('Fingerprint'),
-                  leading: Icon(Icons.lock),
-                  onPressed: (BuildContext context) {},
-                ),
                 SettingsTile.switchTile(
-                  initialValue: true,
-                  title: Text('Use fingerprint'),
-                  leading: Icon(Icons.fingerprint),
-                  onPressed: (value) {},
-                  onToggle: (value) {},
+                  initialValue: _encryptionSwitch,
+                  title: Text('Encrypt data'),
+                  leading: encryptionIconSwitch(),
+                  onPressed: (value) {
+                    setState((() {
+                      _encryptionSwitch = !_encryptionSwitch;
+                    }));
+                  },
+                  onToggle: (value) {
+                    setState((() {
+                      _encryptionSwitch = !_encryptionSwitch;
+                    }));
+                  },
                 ),
               ],
             ),

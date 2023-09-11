@@ -16,6 +16,19 @@ class MyTheme with ChangeNotifier {
     }
   }
 
+  String currentThemeString() {
+    switch (_theme) {
+      case 0:
+        return 'System';
+      case 1:
+        return 'Light';
+      case 2:
+        return 'Dark';
+      default:
+        return 'System';
+    }
+  }
+
   void switchTheme(int value) {
     _theme = value;
     print('Changed system theme');

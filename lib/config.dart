@@ -9,9 +9,19 @@ MyTheme globalAppTheme = MyTheme();
 class ConfigState extends ChangeNotifier {
   var current = WordPair.random();
   var boardsList = <String>[];
+  var favoriteBoardsList = <String>[];
 
   addBoard() {
     boardsList.add(WordPair.random().toString());
+    notifyListeners();
+  }
+
+  toggleFavBoard(value) {
+    if (!favoriteBoardsList.contains(value)) {
+      favoriteBoardsList.add(value);
+    } else {
+      favoriteBoardsList.remove(value);
+    }
     notifyListeners();
   }
 

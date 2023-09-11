@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kanban_flt/home_page.dart';
+import 'package:kanban_flt/app_body.dart';
 import 'package:kanban_flt/config.dart';
 
 void main() {
@@ -11,10 +11,10 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _AppState createState() => _AppState();
+  AppState createState() => AppState();
 }
 
-class _AppState extends State<MyApp> {
+class AppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
@@ -33,7 +33,7 @@ class _AppState extends State<MyApp> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         themeMode: globalAppTheme.currentTheme(),
-        home: HomePage(),
+        home: AppBody(),
       ),
     );
   }
