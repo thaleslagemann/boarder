@@ -3,7 +3,6 @@ library config.globals;
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/themes.dart';
-import 'package:kanban_flt/new_board_form.dart';
 
 MyTheme globalAppTheme = MyTheme();
 
