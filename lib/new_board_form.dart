@@ -40,7 +40,9 @@ class NewBoardFormState extends State<NewBoardForm> {
                     padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                     child: Column(
                       children: [
-                        Align(alignment: Alignment.centerLeft, child: Text('New board\'s name:')),
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('New board\'s name:')),
                         TextFormField(
                           autofocus: true,
                           controller: newBoardController,
@@ -50,31 +52,38 @@ class NewBoardFormState extends State<NewBoardForm> {
                             }
                             return null;
                           },
-                          onChanged: (String value){_newBoardName=value;},
+                          onChanged: (String value) {
+                            _newBoardName = value;
+                          },
                           onFieldSubmitted: (value) {
                             if (_newBoardKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Creating board')),
-                                  );
-                                  print('New Board Name: $_newBoardName');
-                                  configState.addBoard(_newBoardName);
-                                  Navigator.pop(context);
-                                }
+                              print('New Board Name: $_newBoardName');
+                              configState.addBoard(_newBoardName);
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Board created')),
+                              );
+                            }
                           },
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Align(
-                            alignment: Alignment.centerLeft, 
+                            alignment: Alignment.centerLeft,
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_newBoardKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Creating board')),
-                                  );
                                   print('New Board Name: $_newBoardName');
                                   configState.addBoard(_newBoardName);
                                   Navigator.pop(context);
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Board created')),
+                                  );
                                 }
                               },
                               child: const Text('Submit'),

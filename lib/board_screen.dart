@@ -51,6 +51,16 @@ class BoardScreenState extends State<BoardScreen> {
                     icon: bookmarkIconSwitch(),
                     onPressed: () {
                       configState.toggleFavBoard(widget.boardName);
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      if (!_bookmarkSwitch) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Board bookmarked')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Board unbookmarked')),
+                        );
+                      }
                     },
                   ),
                 ),
