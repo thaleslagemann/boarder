@@ -19,10 +19,10 @@ class BoardsPageState extends State<BoardsPage> {
     if (configState.boardsList.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
@@ -35,23 +35,31 @@ class BoardsPageState extends State<BoardsPage> {
                   ],
                 ),
               ),
-              Center(
-                child: Column(
-                  children: [
-                    Text('You have no boards yet.'),
-                    Text('Try adding a new board by tapping the [+] button.')
-                  ],
-                ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('You have no boards yet.'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Try adding a new board by pressing the ['),
+                      Icon(Icons.add_circle_outline_sharp, size: 14),
+                      Text(' add button ].'),
+                    ],
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(50.0)),
           ),
-          foregroundColor: Colors.lightBlue[300],
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          foregroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Color(0xFF4FC3F7),
           onPressed: () {
             Navigator.push(
               context,
@@ -99,8 +107,8 @@ class BoardsPageState extends State<BoardsPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
-        foregroundColor: Colors.lightBlue[300],
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Color(0xFF4FC3F7),
         onPressed: () {
           Navigator.push(
             context,

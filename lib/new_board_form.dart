@@ -32,23 +32,49 @@ class NewBoardFormState extends State<NewBoardForm> {
         body: SafeArea(
           child: Column(
             children: [
-              Align(alignment: Alignment.topRight, child: CloseButton()),
               Align(
                 alignment: Alignment.center,
                 child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                    child: Column(
-                      children: [
-                        Align(
+                  child: Column(
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [CloseButton()]),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Create a new board',
+                                  style: TextStyle(fontSize: 24)),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text('New board\'s name:')),
-                        TextFormField(
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: TextFormField(
                           autofocus: true,
                           controller: newBoardController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
+                            }
+                            if (configState.boardsList.contains(value)) {
+                              return 'Board called $value already exists.';
                             }
                             return null;
                           },
@@ -68,10 +94,13 @@ class NewBoardFormState extends State<NewBoardForm> {
                             }
                           },
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_newBoardKey.currentState!.validate()) {
@@ -90,8 +119,8 @@ class NewBoardFormState extends State<NewBoardForm> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

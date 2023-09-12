@@ -18,6 +18,7 @@ class ConfigState extends ChangeNotifier {
 
   deletedBoard(value) {
     boardsList.remove(value);
+    if (favoriteBoardsList.contains(value)) favoriteBoardsList.remove(value);
     notifyListeners();
   }
 

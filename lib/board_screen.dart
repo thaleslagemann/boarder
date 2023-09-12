@@ -37,23 +37,32 @@ class BoardScreenState extends State<BoardScreen> {
           return AlertDialog(
             title: Text('Delete the board?'),
             actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.check_circle_sharp),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
                   configState.deletedBoard(boardName);
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Board deleted')),
-                  );
+                  if (!configState.boardsList.contains(boardName)) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Board deleted')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('An error occured on board deletion')),
+                    );
+                  }
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
+                child: Text('delete'),
               ),
-              IconButton(
-                icon: Icon(Icons.cancel_rounded),
+              TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
+                child: Text('cancel'),
               ),
             ],
           );
@@ -73,11 +82,31 @@ class BoardScreenState extends State<BoardScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Align(alignment: Alignment.topRight, child: CloseButton()),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: bookmarkIconSwitch(),
+                    onPressed: () {
+                      configState.toggleFavBoard(boardName);
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      if (!_bookmarkSwitch) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Added bookmark')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Removed bookmark')),
+                        );
+                      }
+                    },
+                  ),
+                ),
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
@@ -86,33 +115,32 @@ class BoardScreenState extends State<BoardScreen> {
                         showAlert(context);
                       }),
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: bookmarkIconSwitch(),
-                    onPressed: () {
-                      configState.toggleFavBoard(boardName);
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      if (!_bookmarkSwitch) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Board bookmarked')),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Board unbookmarked')),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                Align(alignment: Alignment.topRight, child: CloseButton()),
               ],
             ),
-            Align(
-              alignment: Alignment.center,
-              child: Text('This is a board called [$boardName]'),
-            ),
-            Container()
+            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text('This is a board called:'),
+                  ),
+                ],
+              ),
+              // SizedBox(
+              //   height: 10,
+              // ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text('$boardName', style: TextStyle(fontSize: 30)),
+                  ),
+                ],
+              ),
+            ]),
           ],
         ),
       ),
