@@ -15,6 +15,37 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
 
+    if(configState.favoriteBoardsList.isEmpty) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Column(
+          children: [
+            ListView(
+              shrinkWrap: true,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.bookmark_sharp),
+                      Text(
+                        'Bookmarked Boards',
+                        style:
+                            TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                Center(
+                  child: Text('You have no bookmarks yet.'),
+                )
+              ],
+            )
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Column(

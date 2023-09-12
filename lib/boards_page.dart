@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
+import 'package:kanban_flt/new_board_form.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/config.dart';
 
@@ -28,7 +29,11 @@ class BoardsPageState extends State<BoardsPage> {
           foregroundColor: Colors.lightBlue[300],
           backgroundColor: Theme.of(context).colorScheme.surface,
           onPressed: () {
-            configState.addBoard();
+            Navigator.push(
+                   context,
+                   MaterialPageRoute(
+                       builder: (context) => NewBoardForm()),
+                 );
           },
           child: Icon(Icons.add),
         ),
@@ -74,12 +79,11 @@ class BoardsPageState extends State<BoardsPage> {
         foregroundColor: Colors.lightBlue[300],
         backgroundColor: Theme.of(context).colorScheme.surface,
         onPressed: () {
-          // configState.addBoard();
-          // Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //             builder: (context) => NewBoardForm()),
-          //       );
+           Navigator.push(
+                   context,
+                   MaterialPageRoute(
+                       builder: (context) => NewBoardForm()),
+                 );
         },
         child: Icon(Icons.add),
       ),
