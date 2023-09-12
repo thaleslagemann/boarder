@@ -43,8 +43,8 @@ class BoardScreenState extends State<BoardScreen> {
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Align(alignment: Alignment.topRight, child: CloseButton()),
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
@@ -54,6 +54,7 @@ class BoardScreenState extends State<BoardScreen> {
                     },
                   ),
                 ),
+                Align(alignment: Alignment.topRight, child: CloseButton()),
               ],
             ),
             Align(
