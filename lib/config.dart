@@ -16,6 +16,11 @@ class ConfigState extends ChangeNotifier {
     notifyListeners();
   }
 
+  deletedBoard(value) {
+    boardsList.remove(value);
+    notifyListeners();
+  }
+
   toggleFavBoard(value) {
     if (!favoriteBoardsList.contains(value)) {
       favoriteBoardsList.add(value);

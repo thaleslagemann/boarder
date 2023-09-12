@@ -19,8 +19,32 @@ class BoardsPageState extends State<BoardsPage> {
     if (configState.boardsList.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Center(
-          child: Text('No boards yet.'),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.space_dashboard_sharp),
+                    Text(
+                      'Boards',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              Center(
+                child: Column(
+                  children: [
+                    Text('You have no boards yet.'),
+                    Text('Try adding a new board by tapping the [+] button.')
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           shape: RoundedRectangleBorder(
@@ -30,10 +54,9 @@ class BoardsPageState extends State<BoardsPage> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           onPressed: () {
             Navigator.push(
-                   context,
-                   MaterialPageRoute(
-                       builder: (context) => NewBoardForm()),
-                 );
+              context,
+              MaterialPageRoute(builder: (context) => NewBoardForm()),
+            );
           },
           child: Icon(Icons.add),
         ),
@@ -79,11 +102,10 @@ class BoardsPageState extends State<BoardsPage> {
         foregroundColor: Colors.lightBlue[300],
         backgroundColor: Theme.of(context).colorScheme.surface,
         onPressed: () {
-           Navigator.push(
-                   context,
-                   MaterialPageRoute(
-                       builder: (context) => NewBoardForm()),
-                 );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewBoardForm()),
+          );
         },
         child: Icon(Icons.add),
       ),

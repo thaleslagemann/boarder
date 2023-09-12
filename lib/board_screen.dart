@@ -13,6 +13,7 @@ class BoardScreen extends StatefulWidget {
 
 class BoardScreenState extends State<BoardScreen> {
   var _bookmarkSwitch;
+  var boardName;
 
   Icon bookmarkIconSwitch() {
     switch (_bookmarkSwitch) {
@@ -27,9 +28,41 @@ class BoardScreenState extends State<BoardScreen> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
+    boardName = widget.boardName;
+
+    showAlert(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete the board?'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.check_circle_sharp),
+                onPressed: () {
+                  configState.deletedBoard(boardName);
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Board deleted')),
+                  );
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.cancel_rounded),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     checkBookmarkState() {
-      if (configState.favoriteBoardsList.contains(widget.boardName)) {
+      if (configState.favoriteBoardsList.contains(boardName)) {
         _bookmarkSwitch = true;
       } else {
         _bookmarkSwitch = false;
@@ -46,11 +79,19 @@ class BoardScreenState extends State<BoardScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                      icon: Icon(Icons.delete_outline_sharp),
+                      onPressed: () {
+                        showAlert(context);
+                      }),
+                ),
+                Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
                     icon: bookmarkIconSwitch(),
                     onPressed: () {
-                      configState.toggleFavBoard(widget.boardName);
+                      configState.toggleFavBoard(boardName);
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       if (!_bookmarkSwitch) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +110,7 @@ class BoardScreenState extends State<BoardScreen> {
             ),
             Align(
               alignment: Alignment.center,
-              child: Text('This is a board called [${widget.boardName}]'),
+              child: Text('This is a board called [$boardName]'),
             ),
             Container()
           ],
