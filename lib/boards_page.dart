@@ -16,7 +16,7 @@ class BoardsPageState extends State<BoardsPage> {
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
 
-    if (configState.boardsList.isEmpty) {
+    if (configState.boards[0].isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
@@ -88,17 +88,20 @@ class BoardsPageState extends State<BoardsPage> {
               ],
             ),
           ),
-          for (var board in configState.boardsList)
+          for (var board in configState.boards)
             ListTile(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => BoardScreen(boardName: board)),
+                      builder: (context) => BoardScreen(
+                            boardName: board[0],
+                            boardDescription: board[1],
+                          )),
                 );
               },
               trailing: Icon(Icons.keyboard_arrow_right_sharp),
-              title: Text(board.toString()),
+              title: Text(board[0].toString()),
               selectedColor: Theme.of(context).colorScheme.surfaceVariant,
             ),
         ],

@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:provider/provider.dart';
 
-class NewBoardForm extends StatefulWidget {
-  const NewBoardForm({super.key});
+class UpdateBoardForm extends StatefulWidget {
+  const UpdateBoardForm(
+      {super.key, required this.boardName, required this.boardDescription});
+
+  final String boardName;
+  final String boardDescription;
 
   @override
-  NewBoardFormState createState() {
-    return NewBoardFormState();
+  UpdateBoardFormState createState() {
+    return UpdateBoardFormState();
   }
 }
 
-class NewBoardFormState extends State<NewBoardForm> {
-  final _newBoardKey = GlobalKey<FormState>();
-  final newBoardNameController = TextEditingController();
-  final newBoardDescriptionController = TextEditingController();
+class UpdateBoardFormState extends State<UpdateBoardForm> {
+  final _updateBoardKey = GlobalKey<FormState>();
+  final updateBoardController = TextEditingController();
 
   @override
   void dispose() {
-    newBoardNameController.dispose();
-    newBoardDescriptionController.dispose();
+    updateBoardController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
-    var _newBoardName;
-    var _newBoardDescription;
+    var _updateBoardName;
+    var currentBoardName = widget.boardName;
+    String _boardDescription = widget.boardDescription;
 
     return Form(
-      key: _newBoardKey,
+      key: _updateBoardKey,
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -52,7 +56,7 @@ class NewBoardFormState extends State<NewBoardForm> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Create a new board',
+                              Text('Update board',
                                   style: TextStyle(fontSize: 24)),
                             ],
                           ),
@@ -65,63 +69,40 @@ class NewBoardFormState extends State<NewBoardForm> {
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Text('New board\'s name:')),
+                            child: Text('Board\'s new name:')),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: TextFormField(
                           autofocus: true,
-                          controller: newBoardNameController,
+                          controller: updateBoardController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            if (configState.boardsList.contains(value)) {
+                            if (value == currentBoardName) {
+                              return 'Please choose a different name';
+                            }
+                            if (configState.boards[0].contains(value)) {
                               return 'Board called $value already exists.';
                             }
                             return null;
                           },
                           onChanged: (String value) {
-                            _newBoardName = value;
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('New board\'s description:')),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: TextFormField(
-                          autofocus: true,
-                          minLines: 1,
-                          maxLines: 8,
-                          controller: newBoardDescriptionController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            }
-                            return null;
-                          },
-                          onChanged: (String value) {
-                            _newBoardDescription = value;
+                            _updateBoardName = value;
                           },
                           onFieldSubmitted: (value) {
-                            if (_newBoardKey.currentState!.validate()) {
-                              print('New Board Name: $_newBoardName');
-                              print('New Board Name: $_newBoardDescription');
-                              configState.addBoard(
-                                  _newBoardName, _newBoardDescription);
-                              Navigator.pop(context);
+                            if (_updateBoardKey.currentState!.validate()) {
+                              print('Update Board Name: $_updateBoardName');
+                              configState.updateBoard(
+                                  currentBoardName, _updateBoardName);
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Board created')),
+                                const SnackBar(content: Text('Board updated')),
                               );
                             }
                           },
@@ -135,18 +116,25 @@ class NewBoardFormState extends State<NewBoardForm> {
                             padding: const EdgeInsets.only(left: 20),
                             child: ElevatedButton(
                               onPressed: () {
-                                if (_newBoardKey.currentState!.validate()) {
-                                  print('New Board Name: $_newBoardName');
-                                  print(
-                                      'New Board Name: $_newBoardDescription');
-                                  configState.addBoard(
-                                      _newBoardName, _newBoardDescription);
+                                if (_updateBoardKey.currentState!.validate()) {
+                                  print('Update Board Name: $_updateBoardName');
+                                  configState.updateBoard(
+                                      currentBoardName, _updateBoardName);
                                   Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => BoardScreen(
+                                            boardName: _updateBoardName,
+                                            boardDescription:
+                                                _boardDescription)),
+                                  );
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text('Board created')),
+                                        content: Text('Board updated')),
                                   );
                                 }
                               },

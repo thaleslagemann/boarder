@@ -80,17 +80,20 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              for (var board in configState.favoriteBoardsList)
+              for (var board in configState.boards)
                 ListTile(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => BoardScreen(boardName: board)),
+                          builder: (context) => BoardScreen(
+                                boardName: board[0],
+                                boardDescription: board[1],
+                              )),
                     );
                   },
                   trailing: Icon(Icons.keyboard_arrow_right_sharp),
-                  title: Text(board.toString()),
+                  title: Text(board[0].toString()),
                   selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                 ),
             ],

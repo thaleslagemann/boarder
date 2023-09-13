@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/update_board_form.dart';
 import 'package:provider/provider.dart';
 
 class BoardScreen extends StatefulWidget {
-  const BoardScreen({super.key, required this.boardName});
+  const BoardScreen(
+      {super.key, required this.boardName, required this.boardDescription});
 
   final String boardName;
+  final String boardDescription;
 
   @override
   BoardScreenState createState() => BoardScreenState();
@@ -13,7 +16,6 @@ class BoardScreen extends StatefulWidget {
 
 class BoardScreenState extends State<BoardScreen> {
   var _bookmarkSwitch;
-  var boardName;
 
   Icon bookmarkIconSwitch() {
     switch (_bookmarkSwitch) {
@@ -28,7 +30,6 @@ class BoardScreenState extends State<BoardScreen> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
-    boardName = widget.boardName;
 
     showAlert(BuildContext context) {
       showDialog(
@@ -40,8 +41,9 @@ class BoardScreenState extends State<BoardScreen> {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  configState.deletedBoard(boardName);
-                  if (!configState.boardsList.contains(boardName)) {
+                  configState.deletedBoard(
+                      widget.boardName, widget.boardDescription);
+                  if (!configState.boards[0].contains(widget.boardName)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Board deleted')),
@@ -71,7 +73,7 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     checkBookmarkState() {
-      if (configState.favoriteBoardsList.contains(boardName)) {
+      if (configState.favoriteBoardsList.contains(widget.boardName)) {
         _bookmarkSwitch = true;
       } else {
         _bookmarkSwitch = false;
@@ -93,7 +95,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: IconButton(
                     icon: bookmarkIconSwitch(),
                     onPressed: () {
-                      configState.toggleFavBoard(boardName);
+                      configState.toggleFavBoard(widget.boardName);
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       if (!_bookmarkSwitch) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,6 +108,21 @@ class BoardScreenState extends State<BoardScreen> {
                       }
                     },
                   ),
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                      icon: Icon(Icons.edit_outlined),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UpdateBoardForm(
+                                    boardName: widget.boardName,
+                                    boardDescription: widget.boardDescription,
+                                  )),
+                        );
+                      }),
                 ),
                 Align(
                   alignment: Alignment.topLeft,
@@ -127,16 +144,23 @@ class BoardScreenState extends State<BoardScreen> {
                   ),
                 ],
               ),
-              // SizedBox(
-              //   height: 10,
-              // ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: Text('$boardName', style: TextStyle(fontSize: 30)),
+                    child:
+                        Text(widget.boardName, style: TextStyle(fontSize: 30)),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(widget.boardDescription),
                   ),
                 ],
               ),
