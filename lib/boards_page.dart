@@ -16,7 +16,7 @@ class BoardsPageState extends State<BoardsPage> {
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
 
-    if (configState.boards[0].isEmpty) {
+    if (configState.boards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
