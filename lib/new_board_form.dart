@@ -76,7 +76,7 @@ class NewBoardFormState extends State<NewBoardForm> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            if (configState.boardsList.contains(value)) {
+                            if (configState.isElementUnique(value)) {
                               return 'Board called $value already exists.';
                             }
                             return null;

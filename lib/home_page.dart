@@ -15,7 +15,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
 
-    if (configState.favoriteBoardsList.isEmpty) {
+    if (configState.favoriteBoards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
@@ -80,7 +80,7 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              for (var board in configState.boards)
+              for (var board in configState.favoriteBoards)
                 ListTile(
                   onTap: () {
                     Navigator.push(

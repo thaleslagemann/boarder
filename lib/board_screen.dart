@@ -42,7 +42,8 @@ class BoardScreenState extends State<BoardScreen> {
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
                   configState.deleteBoard(widget.boardName);
-                  if (!configState.containsElement(widget.boardName)) {
+                  if (!configState.containsElement(
+                      configState.boards, widget.boardName)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Board deleted')),
@@ -72,7 +73,8 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     checkBookmarkState() {
-      if (configState.favoriteBoardsList.contains(widget.boardName)) {
+      if (configState.containsElement(
+          configState.favoriteBoards, widget.boardName)) {
         _bookmarkSwitch = true;
       } else {
         _bookmarkSwitch = false;
@@ -159,7 +161,11 @@ class BoardScreenState extends State<BoardScreen> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: Text(widget.boardDescription),
+                    child: Text(
+                      maxLines: 8,
+                      softWrap: true,
+                      widget.boardDescription,
+                    ),
                   ),
                 ],
               ),

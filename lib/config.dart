@@ -13,22 +13,31 @@ class BoardDataStructure {
 }
 
 class ConfigState extends ChangeNotifier {
-  var boardsList = <String>[];
   List<BoardDataStructure> boards = [];
-  var favoriteBoardsList = <String>[];
+  List<BoardDataStructure> favoriteBoards = [];
 
-  int findIndexByElement(String elementToFind) {
-    for (int i = 0; i < boards.length; i++) {
-      if (boards[i].name == elementToFind ||
-          boards[i].description == elementToFind) {
+  int findIndexByElement(List<BoardDataStructure> list, String elementToFind) {
+    if (list.isEmpty) {
+      print("List empty");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].name == elementToFind ||
+          list[i].description == elementToFind) {
         return i;
       }
     }
     return -1; // Element not found
   }
 
-  bool containsElement(String elementToCheck) {
-    for (var board in boards) {
+  void printAllElements(List<BoardDataStructure> list) {
+    for (var pair in list) {
+      print([pair.name, pair.description]);
+    }
+  }
+
+  bool containsElement(List<BoardDataStructure> list, String elementToCheck) {
+    for (var board in list) {
       if (board.name == elementToCheck || board.description == elementToCheck) {
         return true;
       }
@@ -62,29 +71,40 @@ class ConfigState extends ChangeNotifier {
   }
 
   deleteBoard(value) {
-    var index = findIndexByElement(value);
-    boards.removeAt(index);
-    if (favoriteBoardsList.contains(value)) favoriteBoardsList.remove(value);
+    var boardIndex = findIndexByElement(boards, value);
+    var favsIndex = findIndexByElement(favoriteBoards, value);
+    boards.removeAt(boardIndex);
+    if (favoriteBoards.contains(value)) favoriteBoards.removeAt(favsIndex);
     notifyListeners();
   }
 
   updateBoard(boardName, newBoardName, newBoardDescription) {
-    var index = findIndexByElement(boardName);
-    if (index >= 0 && index < boards.length) {
-      boards[index].name = newBoardName;
-      boards[index].description = newBoardDescription;
+    var boardsIndex = findIndexByElement(boards, boardName);
+    var favsIndex = findIndexByElement(favoriteBoards, boardName);
+    if (boardsIndex >= 0 && boardsIndex < boards.length) {
+      boards[boardsIndex].name = newBoardName;
+      boards[boardsIndex].description = newBoardDescription;
     }
-    if (favoriteBoardsList.contains(boardName)) {
-      favoriteBoardsList[favoriteBoardsList.indexOf(boardName)] = newBoardName;
+    if (containsElement(favoriteBoards, boardName)) {
+      favoriteBoards[favsIndex] = boards[boardsIndex];
     }
     notifyListeners();
   }
 
-  toggleFavBoard(value) {
-    if (!favoriteBoardsList.contains(value)) {
-      favoriteBoardsList.add(value);
+  toggleFavBoard(boardName) {
+    var boardIndex = findIndexByElement(boards, boardName);
+    var favIndex = findIndexByElement(favoriteBoards, boardName);
+    print(boardIndex);
+    print(favIndex);
+    print(boardName);
+    print(containsElement(favoriteBoards, boardName));
+    printAllElements(favoriteBoards);
+    if (!containsElement(favoriteBoards, boardName)) {
+      favoriteBoards.add(boards[boardIndex]);
+      print(favoriteBoards);
     } else {
-      favoriteBoardsList.remove(value);
+      favoriteBoards.removeAt(favIndex);
+      print(favoriteBoards);
     }
     notifyListeners();
   }
