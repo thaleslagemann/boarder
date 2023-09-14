@@ -87,13 +87,13 @@ class HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => BoardScreen(
-                                boardName: board[0],
-                                boardDescription: board[1],
+                                boardName: board.name,
+                                boardDescription: board.description,
                               )),
                     );
                   },
                   trailing: Icon(Icons.keyboard_arrow_right_sharp),
-                  title: Text(board[0].toString()),
+                  title: Text(board.name.toString()),
                   selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                 ),
             ],

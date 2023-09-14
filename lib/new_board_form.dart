@@ -26,8 +26,8 @@ class NewBoardFormState extends State<NewBoardForm> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
-    var _newBoardName;
-    var _newBoardDescription;
+    String newBoardName = '';
+    String newBoardDescription = '';
 
     return Form(
       key: _newBoardKey,
@@ -82,7 +82,7 @@ class NewBoardFormState extends State<NewBoardForm> {
                             return null;
                           },
                           onChanged: (String value) {
-                            _newBoardName = value;
+                            newBoardName = value;
                           },
                         ),
                       ),
@@ -109,14 +109,14 @@ class NewBoardFormState extends State<NewBoardForm> {
                             return null;
                           },
                           onChanged: (String value) {
-                            _newBoardDescription = value;
+                            newBoardDescription = value;
                           },
                           onFieldSubmitted: (value) {
                             if (_newBoardKey.currentState!.validate()) {
-                              print('New Board Name: $_newBoardName');
-                              print('New Board Name: $_newBoardDescription');
+                              print('New Board Name: $newBoardName');
+                              print('New Board Name: $newBoardDescription');
                               configState.addBoard(
-                                  _newBoardName, _newBoardDescription);
+                                  newBoardName, newBoardDescription);
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
@@ -136,11 +136,10 @@ class NewBoardFormState extends State<NewBoardForm> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_newBoardKey.currentState!.validate()) {
-                                  print('New Board Name: $_newBoardName');
-                                  print(
-                                      'New Board Name: $_newBoardDescription');
+                                  print('New Board Name: $newBoardName');
+                                  print('New Board Name: $newBoardDescription');
                                   configState.addBoard(
-                                      _newBoardName, _newBoardDescription);
+                                      newBoardName, newBoardDescription);
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();
