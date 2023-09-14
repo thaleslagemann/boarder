@@ -18,12 +18,20 @@ class UpdateBoardForm extends StatefulWidget {
 
 class UpdateBoardFormState extends State<UpdateBoardForm> {
   final _updateBoardKey = GlobalKey<FormState>();
-  final updateBoardController = TextEditingController();
+  final updateBoardNameController = TextEditingController();
+  final updateBoardDescriptionController = TextEditingController();
 
   @override
   void dispose() {
-    updateBoardController.dispose();
+    updateBoardNameController.dispose();
+    updateBoardDescriptionController.dispose();
     super.dispose();
+  }
+
+  @override
+  void setExistingValues(boardName, boardDescription) {
+    updateBoardNameController.text = boardName;
+    updateBoardDescriptionController.text = boardDescription;
   }
 
   @override
@@ -32,6 +40,9 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
     var _updateBoardName;
     var currentBoardName = widget.boardName;
     String _boardDescription = widget.boardDescription;
+    var _newBoardDescription;
+
+    setExistingValues(currentBoardName, _boardDescription);
 
     return Form(
       key: _updateBoardKey,
@@ -69,21 +80,19 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Text('Board\'s new name:')),
+                            child: Text('Board\'s name:')),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: TextFormField(
                           autofocus: true,
-                          controller: updateBoardController,
+                          controller: updateBoardNameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            if (value == currentBoardName) {
-                              return 'Please choose a different name';
-                            }
-                            if (configState.boards[0].contains(value)) {
+                            if (configState.boards[0].contains(value) &&
+                                value != currentBoardName) {
                               return 'Board called $value already exists.';
                             }
                             return null;
@@ -91,14 +100,47 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                           onChanged: (String value) {
                             _updateBoardName = value;
                           },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Board\'s description:')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: TextFormField(
+                          autofocus: true,
+                          controller: updateBoardDescriptionController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          onChanged: (String value) {
+                            _newBoardDescription = value;
+                          },
                           onFieldSubmitted: (value) {
                             if (_updateBoardKey.currentState!.validate()) {
                               print('Update Board Name: $_updateBoardName');
-                              configState.updateBoard(
-                                  currentBoardName, _updateBoardName);
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-
+                              print('Update Board Name: $_newBoardDescription');
+                              configState.updateBoard(currentBoardName,
+                                  _updateBoardName, _newBoardDescription);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BoardScreen(
+                                        boardName: _updateBoardName,
+                                        boardDescription:
+                                            _newBoardDescription)),
+                              );
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -118,8 +160,10 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                               onPressed: () {
                                 if (_updateBoardKey.currentState!.validate()) {
                                   print('Update Board Name: $_updateBoardName');
-                                  configState.updateBoard(
-                                      currentBoardName, _updateBoardName);
+                                  print(
+                                      'Update Board Name: $_newBoardDescription');
+                                  configState.updateBoard(currentBoardName,
+                                      _updateBoardName, _newBoardDescription);
                                   Navigator.pop(context);
                                   Navigator.pop(context);
                                   Navigator.push(
@@ -128,7 +172,7 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                         builder: (context) => BoardScreen(
                                             boardName: _updateBoardName,
                                             boardDescription:
-                                                _boardDescription)),
+                                                _newBoardDescription)),
                                   );
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();

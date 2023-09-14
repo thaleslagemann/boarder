@@ -23,12 +23,13 @@ class ConfigState extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateBoard(value, newValue) {
-    if (boardsList.contains(value)) {
-      boardsList[boardsList.indexOf(value)] = newValue;
+  updateBoard(boardName, newboardName, newBoardDescription) {
+    if (boards.contains(boardName)) {
+      boards[boards.indexOf(boardName)] = [newboardName, newBoardDescription];
+      print(boards[boards.indexOf(boardName)]);
     }
-    if (favoriteBoardsList.contains(value)) {
-      favoriteBoardsList[favoriteBoardsList.indexOf(value)] = newValue;
+    if (favoriteBoardsList.contains(boardName)) {
+      favoriteBoardsList[favoriteBoardsList.indexOf(boardName)] = newboardName;
     }
     notifyListeners();
   }
