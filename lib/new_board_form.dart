@@ -70,13 +70,14 @@ class NewBoardFormState extends State<NewBoardForm> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: TextFormField(
+                          textInputAction: TextInputAction.next,
                           autofocus: true,
                           controller: newBoardNameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            if (configState.isElementUnique(value)) {
+                            if (configState.containsElement(configState.boards, value)) {
                               return 'Board called $value already exists.';
                             }
                             return null;
@@ -113,8 +114,8 @@ class NewBoardFormState extends State<NewBoardForm> {
                           },
                           onFieldSubmitted: (value) {
                             if (_newBoardKey.currentState!.validate()) {
-                              print('New Board Name: $newBoardName');
-                              print('New Board Name: $newBoardDescription');
+                              print('Line 117@lib/new_board_form.dart: New Board Name: $newBoardName');
+                              print('Line 118@lib/new_board_form.dart: New Board Name: $newBoardDescription');
                               configState.addBoard(
                                   newBoardName, newBoardDescription);
                               Navigator.pop(context);
@@ -136,8 +137,8 @@ class NewBoardFormState extends State<NewBoardForm> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_newBoardKey.currentState!.validate()) {
-                                  print('New Board Name: $newBoardName');
-                                  print('New Board Name: $newBoardDescription');
+                                  print('Line 140@lib/new_board_form.dart: New Board Name: $newBoardName');
+                                  print('Line 141@lib/new_board_form.dart: New Board Name: $newBoardDescription');
                                   configState.addBoard(
                                       newBoardName, newBoardDescription);
                                   Navigator.pop(context);

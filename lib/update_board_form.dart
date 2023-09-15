@@ -77,6 +77,7 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: TextFormField(
+                          textInputAction: TextInputAction.next,
                           autofocus: true,
                           controller: updateBoardNameController,
                           validator: (value) {
@@ -108,6 +109,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: TextFormField(
                           autofocus: true,
+                          minLines: 1,
+                          maxLines: 8,
                           controller: updateBoardDescriptionController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -121,8 +124,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                           },
                           onFieldSubmitted: (value) {
                             if (_updateBoardKey.currentState!.validate()) {
-                              print('Update Board Name: $newBoardName');
-                              print('Update Board Name: $newBoardDescription');
+                              print('Line 127@lib/update_board_form.dart: Update Board Name: $newBoardName');
+                              print('Line 128@lib/update_board_form.dart: Update Board Name: $newBoardDescription');
                               Navigator.pop(context);
                               Navigator.pop(context);
                               configState.updateBoard(
@@ -139,7 +142,7 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Board updated')),
+                                const SnackBar(content: Text('Line 145@lib/update_board_form.dart: Board updated')),
                               );
                             }
                           },
@@ -154,9 +157,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_updateBoardKey.currentState!.validate()) {
-                                  print('Update Board Name: $newBoardName');
-                                  print(
-                                      'Update Board Name: $newBoardDescription');
+                                  print('Line 160@lib/update_board_form.dart: Update Board Name: $newBoardName');
+                                  print('Line 161@lib/update_board_form.dart: Update Board Description: $newBoardDescription');
                                   Navigator.pop(context);
                                   Navigator.pop(context);
                                   configState.updateBoard(

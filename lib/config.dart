@@ -1,5 +1,4 @@
 library config.globals;
-
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/themes.dart';
 
@@ -18,7 +17,7 @@ class ConfigState extends ChangeNotifier {
 
   int findIndexByElement(List<BoardDataStructure> list, String elementToFind) {
     if (list.isEmpty) {
-      print("List empty");
+      print("Line 20@lib/config.dart: on FindIndexByElement(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
@@ -27,7 +26,8 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    return -1; // Element not found
+    print("Line 29@lib/config.dart: on FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
   }
 
   void printAllElements(List<BoardDataStructure> list) {
@@ -57,16 +57,17 @@ class ConfigState extends ChangeNotifier {
       }
       // If count is greater than 1, element is not unique
       if (count > 1) {
+        print("Line 60@lib/config.dart: At isElementUnique(): Element is not unique.");
         return false;
       }
     }
-
+    print("Line 64@lib/config.dart: At isElementUnique(): Element is unique.");
     return count == 1; // Element is unique if count is exactly 1
   }
 
   addBoard(value1, value2) {
     boards.add(BoardDataStructure(value1, value2));
-    print('boards: $boards');
+    print('Line 70@lib/config.dart: At addBoard(): boards list -> $boards');
     notifyListeners();
   }
 
@@ -110,7 +111,7 @@ class ConfigState extends ChangeNotifier {
   }
 
   doSomething() {
-    print('Doing something.');
+    print('Line 114@lib/config.dart: Doing something.');
   }
 
   // Widget build(BuildContext context) {
