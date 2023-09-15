@@ -14,6 +14,9 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
+    if (configState.boards.isEmpty) {
+      configState.loadDB();
+    }
 
     if (configState.favoriteBoards.isEmpty) {
       return Scaffold(
@@ -62,43 +65,46 @@ class HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Column(
-        children: [
-          ListView(
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.bookmark_sharp),
-                    Text(
-                      'Bookmarked Boards',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ],
+      body: SafeArea(
+        child: Stack(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Icon(Icons.bookmark_sharp),
+                Text(
+                  'Bookmarked Boards',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-              ),
-              for (var board in configState.favoriteBoards)
-                ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => BoardScreen(
-                                boardName: board.name,
-                                boardDescription: board.description,
-                              )),
-                    );
-                  },
-                  trailing: Icon(Icons.keyboard_arrow_right_sharp),
-                  title: Text(board.name.toString()),
-                  selectedColor: Theme.of(context).colorScheme.surfaceVariant,
-                ),
-            ],
-          )
-        ],
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 30.0),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (var board in configState.favoriteBoards)
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BoardScreen(
+                                  boardID: board.id,
+                                  boardName: board.name,
+                                  boardDescription: board.description,
+                                )),
+                      );
+                    },
+                    trailing: Icon(Icons.keyboard_arrow_right_sharp),
+                    title: Text(board.name.toString()),
+                    selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+                  ),
+              ],
+            ),
+          ),
+        ]),
       ),
     );
   }

@@ -1,23 +1,153 @@
 library config.globals;
+
+import 'dart:math';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/themes.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 MyTheme globalAppTheme = MyTheme();
 
 class BoardDataStructure {
-  String name;
-  String description;
+  final int id;
+  final String name;
+  final String description;
 
-  BoardDataStructure(this.name, this.description);
+  // Map<String, dynamic> toMap() {
+  //   return {
+  //     'id': id,
+  //     'name': name,
+  //     'description': description,
+  //   };
+  // }
+
+  // @override
+  // String toString() {
+  //   return 'Board{id: $id, name: $name, description: $description}';
+  // }
+
+  const BoardDataStructure(
+      {required this.id, required this.name, required this.description});
 }
 
 class ConfigState extends ChangeNotifier {
   List<BoardDataStructure> boards = [];
   List<BoardDataStructure> favoriteBoards = [];
+  late Database localDB;
+
+  loadDB() async {
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'local_boards_db.db');
+    localDB = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+      await db.execute(
+          'CREATE TABLE boards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+      await db.execute('DROP TABLE favoriteBoards');
+      await db.execute(
+          'CREATE TABLE favoriteBoards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+    });
+    if (!await tableIsEmpty('boards')) {
+      List<Map> boards = await localDB.rawQuery('SELECT * FROM boards');
+      convertRawQueryToBoard(boards);
+      print('Boards $boards');
+    }
+    if (!await tableIsEmpty('favoriteBoards')) {
+      List<Map> favoriteBoards =
+          await localDB.rawQuery('SELECT * FROM favoriteBoards');
+      print('FavoriteBoards: $favoriteBoards');
+      convertRawQueryToFavBoard(favoriteBoards);
+      print('FavoriteBoards: $favoriteBoards');
+    }
+    print('DB loaded');
+  }
+
+  convertRawQueryToBoard(List<Map> rawQuery) {
+    for (var i = 0; i < rawQuery.length; i++) {
+      int id = rawQuery[i].values.elementAt(0);
+      String name = rawQuery[i].values.elementAt(1).toString();
+      String description = rawQuery[i].values.elementAt(2).toString();
+
+      BoardDataStructure board =
+          BoardDataStructure(id: id, name: name, description: description);
+
+      if (!containsElement(boards, board)) {
+        boards.add(board);
+      }
+      print(
+          'On Convert Statement: [${board.id},${board.name},${board.description}]');
+    }
+  }
+
+  convertRawQueryToFavBoard(List<Map> rawQuery) {
+    for (var i = 0; i < rawQuery.length; i++) {
+      int id = rawQuery[i].values.elementAt(0);
+      String name = rawQuery[i].values.elementAt(1).toString();
+      String description = rawQuery[i].values.elementAt(2).toString();
+
+      BoardDataStructure board =
+          BoardDataStructure(id: id, name: name, description: description);
+
+      if (!containsElement(favoriteBoards, board)) {
+        favoriteBoards.add(board);
+      }
+      print(
+          'On Convert Statement: [${board.id},${board.name},${board.description}]');
+    }
+  }
+
+  Future<bool> tableIsEmpty(String table) async {
+    int? count = Sqflite.firstIntValue(
+        await localDB.rawQuery('SELECT COUNT(*) FROM $table'));
+
+    if (count != null) {
+      print('table is not empty');
+      return false;
+    }
+    print('table is empty');
+    return true;
+  }
+
+  insertOnBoardsDB(BoardDataStructure object) async {
+    await localDB.transaction((txn) async {
+      await txn.rawInsert(
+          'INSERT INTO boards(name, description) VALUES("${object.name}", "${object.description}")');
+      print('inserted: [{${object.id}, ${object.name}, ${object.description}]');
+    });
+  }
+
+  insertOnFavsDB(BoardDataStructure object) async {
+    await localDB.transaction((txn) async {
+      await txn.rawInsert(
+          'INSERT INTO favoriteBoards(name, description) VALUES("${object.name}", "${object.description}")');
+      print('inserted: [${object.id}, ${object.name}, ${object.description}]');
+    });
+  }
+
+  updateOnBoardsDB(BoardDataStructure object) async {
+    await localDB.rawUpdate(
+        'UPDATE boards SET name = ?, description = ? WHERE id = ?',
+        [object.name, object.description, object.id]);
+    print('updated: $object.name');
+  }
+
+  updateOnFavsDB(BoardDataStructure object) async {
+    await localDB.rawUpdate('UPDATE favoriteBoards SET name = ? WHERE id = ?',
+        [object.name, object.description, object.id]);
+    print('updated: $object.name');
+  }
+
+  deleteFromBoardsDB(id) async {
+    await localDB.rawDelete('DELETE FROM boards WHERE id = ?', ['$id']);
+  }
+
+  deleteFromFavsDB(id) async {
+    await localDB.rawDelete('DELETE FROM favs WHERE id = ?', ['$id']);
+  }
 
   int findIndexByElement(List<BoardDataStructure> list, String elementToFind) {
     if (list.isEmpty) {
-      print("Line 20@lib/config.dart: on FindIndexByElement(): List is empty; returning index (-1)");
+      print("At FindIndexByElement(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
@@ -26,29 +156,52 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    print("Line 29@lib/config.dart: on FindIndexByElement(): Element not found; returning index (-1)");
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findIndexByID(List<BoardDataStructure> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByElement(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].id == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
     return -1;
   }
 
   void printAllElements(List<BoardDataStructure> list) {
-    for (var pair in list) {
-      print([pair.name, pair.description]);
+    for (var board in list) {
+      print('At printAllElements(): ${[
+        board.id,
+        board.name,
+        board.description
+      ]}');
     }
   }
 
-  bool containsElement(List<BoardDataStructure> list, String elementToCheck) {
+  bool containsElement(List<BoardDataStructure> list, elementToCheck) {
     for (var board in list) {
-      if (board.name == elementToCheck || board.description == elementToCheck) {
+      if (board.id == elementToCheck ||
+          board.name == elementToCheck ||
+          board.description == elementToCheck) {
         return true;
       }
     }
     return false; // Element not found in any pair
   }
 
-  bool isElementUnique(String elementToCheck) {
+  bool isElementUnique(elementToCheck) {
     int count = 0;
 
     for (var board in boards) {
+      if (board.id == elementToCheck) {
+        count++;
+      }
       if (board.name == elementToCheck) {
         count++;
       }
@@ -57,17 +210,43 @@ class ConfigState extends ChangeNotifier {
       }
       // If count is greater than 1, element is not unique
       if (count > 1) {
-        print("Line 60@lib/config.dart: At isElementUnique(): Element is not unique.");
+        print("At isElementUnique(): Element is not unique.");
         return false;
       }
     }
-    print("Line 64@lib/config.dart: At isElementUnique(): Element is unique.");
+    print("At isElementUnique(): Element is unique.");
     return count == 1; // Element is unique if count is exactly 1
   }
 
-  addBoard(value1, value2) {
-    boards.add(BoardDataStructure(value1, value2));
-    print('Line 70@lib/config.dart: At addBoard(): boards list -> $boards');
+  int getSequentialID(List<BoardDataStructure> list, int id) {
+    if (containsElement(boards, id)) {
+      id = id + 1;
+      return getSequentialID(list, id);
+    }
+
+    print('At getSequentialID: New board ID is $id');
+    return id;
+  }
+
+  int getRandomID(List<BoardDataStructure> list) {
+    var id = Random().nextInt(99999);
+
+    if (containsElement(boards, id)) {
+      return getRandomID(list);
+    }
+
+    print('At getRandomID: New board ID is $id');
+    return id;
+  }
+
+  addBoard(String name, String description) {
+    boards.add(BoardDataStructure(
+        id: getSequentialID(boards, 1), name: name, description: description));
+    var boardIndex = findIndexByElement(boards, name);
+    print('Found new index: $boardIndex');
+    insertOnBoardsDB(boards[boardIndex]);
+    print('At addBoard(): boards list -> ');
+    printAllElements(boards);
     notifyListeners();
   }
 
@@ -75,47 +254,47 @@ class ConfigState extends ChangeNotifier {
     var boardIndex = findIndexByElement(boards, value);
     var favsIndex = findIndexByElement(favoriteBoards, value);
     boards.removeAt(boardIndex);
+    deleteFromBoardsDB(boards[boardIndex].id);
     if (favoriteBoards.contains(value)) favoriteBoards.removeAt(favsIndex);
     notifyListeners();
   }
 
-  updateBoard(boardName, newBoardName, newBoardDescription) {
-    var boardsIndex = findIndexByElement(boards, boardName);
-    var favsIndex = findIndexByElement(favoriteBoards, boardName);
-    if (boardsIndex >= 0 && boardsIndex < boards.length) {
-      boards[boardsIndex].name = newBoardName;
-      boards[boardsIndex].description = newBoardDescription;
+  updateBoard(boardID, newBoardName, newBoardDescription) {
+    var boardIndex = findIndexByID(boards, boardID);
+    var favsIndex = findIndexByID(favoriteBoards, boardID);
+    if (boardIndex >= 0 && boardIndex < boards.length) {
+      boards[boardIndex] = BoardDataStructure(
+          id: boardID, name: newBoardName, description: newBoardDescription);
+      updateOnBoardsDB(boards[boardIndex]);
     }
-    if (containsElement(favoriteBoards, boardName)) {
-      favoriteBoards[favsIndex] = boards[boardsIndex];
+    if (containsElement(favoriteBoards, boardID)) {
+      favoriteBoards[favsIndex] = boards[boardIndex];
+      updateOnFavsDB(boards[boardIndex]);
     }
     notifyListeners();
   }
 
-  toggleFavBoard(boardName) {
-    var boardIndex = findIndexByElement(boards, boardName);
-    var favIndex = findIndexByElement(favoriteBoards, boardName);
+  toggleFavBoard(boardID) {
+    var boardIndex = findIndexByID(boards, boardID);
+    var favIndex = findIndexByID(favoriteBoards, boardID);
     print(boardIndex);
     print(favIndex);
-    print(boardName);
-    print(containsElement(favoriteBoards, boardName));
+    print(boardID);
+    print(containsElement(favoriteBoards, boardID));
     printAllElements(favoriteBoards);
-    if (!containsElement(favoriteBoards, boardName)) {
+    if (!containsElement(favoriteBoards, boardID)) {
       favoriteBoards.add(boards[boardIndex]);
+      insertOnFavsDB(boards[boardIndex]);
       print(favoriteBoards);
     } else {
       favoriteBoards.removeAt(favIndex);
+      deleteFromFavsDB(boardID);
       print(favoriteBoards);
     }
     notifyListeners();
   }
 
   doSomething() {
-    print('Line 114@lib/config.dart: Doing something.');
+    print('At doSomthing(): Doing something.');
   }
-
-  // Widget build(BuildContext context) {
-  //   var themeState = context.watch<AppState>();
-
-  // }
 }

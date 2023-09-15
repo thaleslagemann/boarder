@@ -73,9 +73,8 @@ class BoardsPageState extends State<BoardsPage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: ListView(
-        shrinkWrap: true,
-        children: [
+      body: SafeArea(
+        child: Stack(children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -88,23 +87,32 @@ class BoardsPageState extends State<BoardsPage> {
               ],
             ),
           ),
-          for (var board in configState.boards)
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BoardScreen(
-                            boardName: board.name,
-                            boardDescription: board.description,
-                          )),
-                );
-              },
-              trailing: Icon(Icons.keyboard_arrow_right_sharp),
-              title: Text(board.name),
-              selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+          Padding(
+            padding: const EdgeInsets.only(top: 30.0),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (var board in configState.boards)
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BoardScreen(
+                                  boardID: board.id,
+                                  boardName: board.name,
+                                  boardDescription: board.description,
+                                )),
+                      );
+                    },
+                    trailing: Icon(Icons.keyboard_arrow_right_sharp),
+                    title: Text(board.name),
+                    selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+                  ),
+              ],
             ),
-        ],
+          ),
+        ]),
       ),
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(

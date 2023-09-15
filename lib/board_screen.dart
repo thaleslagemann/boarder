@@ -5,8 +5,12 @@ import 'package:provider/provider.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen(
-      {super.key, required this.boardName, required this.boardDescription});
+      {super.key,
+      required this.boardID,
+      required this.boardName,
+      required this.boardDescription});
 
+  final int boardID;
   final String boardName;
   final String boardDescription;
 
@@ -96,7 +100,8 @@ class BoardScreenState extends State<BoardScreen> {
                   child: IconButton(
                     icon: bookmarkIconSwitch(),
                     onPressed: () {
-                      configState.toggleFavBoard(widget.boardName);
+                      print('Toggle bookmark was activated');
+                      configState.toggleFavBoard(widget.boardID);
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       if (!_bookmarkSwitch) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -119,6 +124,7 @@ class BoardScreenState extends State<BoardScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => UpdateBoardForm(
+                                    boardID: widget.boardID,
                                     boardName: widget.boardName,
                                     boardDescription: widget.boardDescription,
                                   )),
@@ -141,7 +147,7 @@ class BoardScreenState extends State<BoardScreen> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: Text('This is a board called:'),
+                    child: Text('#${widget.boardID}'),
                   ),
                 ],
               ),
@@ -159,12 +165,17 @@ class BoardScreenState extends State<BoardScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      maxLines: 8,
-                      softWrap: true,
-                      widget.boardDescription,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          maxLines: 8,
+                          softWrap: true,
+                          widget.boardDescription,
+                        ),
+                      ),
                     ),
                   ),
                 ],

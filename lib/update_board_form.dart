@@ -5,8 +5,12 @@ import 'package:provider/provider.dart';
 
 class UpdateBoardForm extends StatefulWidget {
   const UpdateBoardForm(
-      {super.key, required this.boardName, required this.boardDescription});
+      {super.key,
+      required this.boardID,
+      required this.boardName,
+      required this.boardDescription});
 
+  final int boardID;
   final String boardName;
   final String boardDescription;
 
@@ -31,6 +35,7 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
+    int boardID = widget.boardID;
     String newBoardName = widget.boardName;
     String newBoardDescription = widget.boardDescription;
     updateBoardNameController.text = newBoardName;
@@ -124,25 +129,26 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                           },
                           onFieldSubmitted: (value) {
                             if (_updateBoardKey.currentState!.validate()) {
-                              print('Line 127@lib/update_board_form.dart: Update Board Name: $newBoardName');
-                              print('Line 128@lib/update_board_form.dart: Update Board Name: $newBoardDescription');
+                              print('Update Board Name: $newBoardName');
+                              print('Update Board Name: $newBoardDescription');
                               Navigator.pop(context);
                               Navigator.pop(context);
                               configState.updateBoard(
-                                  widget.boardName,
+                                  widget.boardID,
                                   updateBoardNameController.text,
                                   updateBoardDescriptionController.text);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => BoardScreen(
+                                        boardID: boardID,
                                         boardName: newBoardName,
                                         boardDescription: newBoardDescription)),
                               );
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Line 145@lib/update_board_form.dart: Board updated')),
+                                const SnackBar(content: Text('Board updated')),
                               );
                             }
                           },
@@ -157,18 +163,20 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_updateBoardKey.currentState!.validate()) {
-                                  print('Line 160@lib/update_board_form.dart: Update Board Name: $newBoardName');
-                                  print('Line 161@lib/update_board_form.dart: Update Board Description: $newBoardDescription');
+                                  print('Update Board Name: $newBoardName');
+                                  print(
+                                      'Update Board Description: $newBoardDescription');
                                   Navigator.pop(context);
                                   Navigator.pop(context);
                                   configState.updateBoard(
-                                      widget.boardName,
+                                      widget.boardID,
                                       updateBoardNameController.text,
                                       updateBoardDescriptionController.text);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => BoardScreen(
+                                            boardID: boardID,
                                             boardName: newBoardName,
                                             boardDescription:
                                                 newBoardDescription)),
