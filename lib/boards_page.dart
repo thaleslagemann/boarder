@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/new_board_form.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/config.dart';
 
@@ -15,6 +16,18 @@ class BoardsPageState extends State<BoardsPage> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
+
+    if (configState.loadingDB) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Center(
+          child: LoadingAnimationWidget.threeArchedCircle(
+        color: Theme.of(context).colorScheme.onInverseSurface,
+        size: 50,
+      ),
+        ),
+      );
+    }
 
     if (configState.boards.isEmpty) {
       return Scaffold(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/boards_page.dart';
+import 'package:kanban_flt/config.dart';
 import 'package:kanban_flt/settings_page.dart';
 import 'package:kanban_flt/home_page.dart';
+import 'package:provider/provider.dart';
 
 class AppBody extends StatefulWidget {
   @override
@@ -29,6 +31,8 @@ class AppBodyState extends State<AppBody> {
     }
 
     return LayoutBuilder(builder: (context, constraints) {
+      var configState = context.watch<ConfigState>();
+      configState.loadDB();
       return Scaffold(
         drawer: Drawer(
           child: ListView(

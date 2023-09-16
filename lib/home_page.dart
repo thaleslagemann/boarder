@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:provider/provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -14,10 +15,19 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
-    if (configState.boards.isEmpty) {
-      configState.loadDB();
-    }
 
+    if (configState.loadingDB) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Center(
+          child: LoadingAnimationWidget.threeArchedCircle(
+        color: Theme.of(context).colorScheme.inverseSurface,
+        size: 50,
+      ),
+        ),
+      );
+    }
+    
     if (configState.favoriteBoards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,

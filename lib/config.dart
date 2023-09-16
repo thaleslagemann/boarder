@@ -14,19 +14,6 @@ class BoardDataStructure {
   final String name;
   final String description;
 
-  // Map<String, dynamic> toMap() {
-  //   return {
-  //     'id': id,
-  //     'name': name,
-  //     'description': description,
-  //   };
-  // }
-
-  // @override
-  // String toString() {
-  //   return 'Board{id: $id, name: $name, description: $description}';
-  // }
-
   const BoardDataStructure(
       {required this.id, required this.name, required this.description});
 }
@@ -35,31 +22,35 @@ class ConfigState extends ChangeNotifier {
   List<BoardDataStructure> boards = [];
   List<BoardDataStructure> favoriteBoards = [];
   late Database localDB;
+  bool loadingDB = true;
 
   loadDB() async {
-    var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'local_boards_db.db');
-    localDB = await openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-      await db.execute(
-          'CREATE TABLE boards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
-      await db.execute('DROP TABLE favoriteBoards');
-      await db.execute(
-          'CREATE TABLE favoriteBoards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
-    });
-    if (!await tableIsEmpty('boards')) {
+    if(loadingDB) {
+      print('Loading DB: $loadingDB');
+      var databasesPath = await getDatabasesPath();
+      print('databasesPath: $databasesPath');
+      String path = join(databasesPath, 'local_boards_db.db');
+      print('LocalDB path: $path');
+      localDB = await openDatabase(path, version: 1,
+          onCreate: (Database db, int version) async {
+        await db.execute(
+            'CREATE TABLE boards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+        await db.execute(
+            'CREATE TABLE favoriteBoards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+      });
       List<Map> boards = await localDB.rawQuery('SELECT * FROM boards');
       convertRawQueryToBoard(boards);
       print('Boards $boards');
-    }
-    if (!await tableIsEmpty('favoriteBoards')) {
+      //await localDB.execute('DELETE FROM favoriteBoards WHERE id = 1');
       List<Map> favoriteBoards =
           await localDB.rawQuery('SELECT * FROM favoriteBoards');
-      print('FavoriteBoards: $favoriteBoards');
       convertRawQueryToFavBoard(favoriteBoards);
       print('FavoriteBoards: $favoriteBoards');
+      print('DB loaded');
+      loadingDB = false;
+      print('Loading DB: $loadingDB');
+      notifyListeners();
     }
-    print('DB loaded');
   }
 
   convertRawQueryToBoard(List<Map> rawQuery) {
@@ -128,21 +119,22 @@ class ConfigState extends ChangeNotifier {
     await localDB.rawUpdate(
         'UPDATE boards SET name = ?, description = ? WHERE id = ?',
         [object.name, object.description, object.id]);
-    print('updated: $object.name');
+    print('updated: ${object.name}');
   }
 
   updateOnFavsDB(BoardDataStructure object) async {
-    await localDB.rawUpdate('UPDATE favoriteBoards SET name = ? WHERE id = ?',
+    await localDB.rawUpdate(
+        'UPDATE favoriteBoards SET name = ?, description = ? WHERE id = ?',
         [object.name, object.description, object.id]);
-    print('updated: $object.name');
+    print('updated: ${object.name}');
   }
 
   deleteFromBoardsDB(id) async {
-    await localDB.rawDelete('DELETE FROM boards WHERE id = ?', ['$id']);
+    await localDB.rawDelete('DELETE FROM boards WHERE id = ?', [id]);
   }
 
   deleteFromFavsDB(id) async {
-    await localDB.rawDelete('DELETE FROM favs WHERE id = ?', ['$id']);
+    await localDB.rawDelete('DELETE FROM favoriteBoards WHERE id = ?', [id]);
   }
 
   int findIndexByElement(List<BoardDataStructure> list, String elementToFind) {
@@ -162,7 +154,7 @@ class ConfigState extends ChangeNotifier {
 
   int findIndexByID(List<BoardDataStructure> list, int id) {
     if (list.isEmpty) {
-      print("At FindIndexByElement(): List is empty; returning index (-1)");
+      print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
@@ -176,11 +168,7 @@ class ConfigState extends ChangeNotifier {
 
   void printAllElements(List<BoardDataStructure> list) {
     for (var board in list) {
-      print('At printAllElements(): ${[
-        board.id,
-        board.name,
-        board.description
-      ]}');
+      print('At printAllElements(): [${board.id}, ${board.name}, ${board.description}]');
     }
   }
 
@@ -250,12 +238,19 @@ class ConfigState extends ChangeNotifier {
     notifyListeners();
   }
 
-  deleteBoard(value) {
-    var boardIndex = findIndexByElement(boards, value);
-    var favsIndex = findIndexByElement(favoriteBoards, value);
-    boards.removeAt(boardIndex);
+  deleteBoard(int id) {
+    var boardIndex = findIndexByID(boards, id);
+    var favsIndex = findIndexByID(favoriteBoards, id);
+    print('board index is $boardIndex');
+    print('favoriteBoard index is $favsIndex');
+    printAllElements(boards);
+    print('Element to be deleted: [${boards[boardIndex].id}, ${boards[boardIndex].name}, ${boards[boardIndex].description}]');
     deleteFromBoardsDB(boards[boardIndex].id);
-    if (favoriteBoards.contains(value)) favoriteBoards.removeAt(favsIndex);
+    boards.removeAt(boardIndex);
+    if (favsIndex >= 0) {
+      deleteFromFavsDB(favoriteBoards[favsIndex].id);
+      favoriteBoards.removeAt(favsIndex);
+    }
     notifyListeners();
   }
 

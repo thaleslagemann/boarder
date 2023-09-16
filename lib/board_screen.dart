@@ -45,9 +45,9 @@ class BoardScreenState extends State<BoardScreen> {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  configState.deleteBoard(widget.boardName);
+                  configState.deleteBoard(widget.boardID);
                   if (!configState.containsElement(
-                      configState.boards, widget.boardName)) {
+                      configState.boards, widget.boardID)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Board deleted')),
