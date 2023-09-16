@@ -288,8 +288,4 @@ class ConfigState extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  doSomething() {
-    print('At doSomthing(): Doing something.');
-  }
 }
