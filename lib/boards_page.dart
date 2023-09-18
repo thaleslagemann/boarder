@@ -22,9 +22,9 @@ class BoardsPageState extends State<BoardsPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: LoadingAnimationWidget.threeArchedCircle(
-        color: Theme.of(context).colorScheme.onInverseSurface,
-        size: 50,
-      ),
+            color: Theme.of(context).colorScheme.onInverseSurface,
+            size: 50,
+          ),
         ),
       );
     }
@@ -38,12 +38,16 @@ class BoardsPageState extends State<BoardsPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.space_dashboard_sharp),
+                    Icon(
+                      Icons.space_dashboard_sharp,
+                      size: 24,
+                    ),
                     Text(
                       'Boards',
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                   ],
                 ),
@@ -91,11 +95,16 @@ class BoardsPageState extends State<BoardsPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.space_dashboard_sharp),
+                Icon(
+                  Icons.space_dashboard_sharp,
+                  size: 24,
+                ),
                 Text(
-                  'Boards',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ' Boards',
+                  style: TextStyle(fontSize: 24),
                 ),
               ],
             ),

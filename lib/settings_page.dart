@@ -36,82 +36,116 @@ class SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: SettingsList(
-          sections: [
-            SettingsSection(
-              title: Text('System'),
-              tiles: [
-                SettingsTile(
-                  title: Text('Theme'),
-                  leading: Icon(Icons.brightness_high_sharp),
-                  trailing: DropdownButtonHideUnderline(
-                    child: DropdownButton2<String>(
-                      isExpanded: true,
-                      hint: Text(
-                        selectedTheme!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).hintColor,
-                        ),
-                      ),
-                      items: _themeOptions
-                          .map((String item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(context).hintColor,
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                      value: selectedTheme,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedTheme = value;
-                          print('Attempting to switch theme to $selectedTheme');
-                          globalAppTheme.switchTheme(
-                              _themeOptions.indexOf(selectedTheme!));
-                          print(globalAppTheme.currentTheme());
-                        });
-                      },
-                      buttonStyleData: const ButtonStyleData(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        height: 40,
-                        width: 120,
-                      ),
-                      menuItemStyleData: const MenuItemStyleData(
-                        height: 40,
-                      ),
+        child: Stack(children: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.settings_sharp,
+                      size: 24,
                     ),
-                  ),
-                  onPressed: (value) {},
+                    Text(
+                      ' Settings',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SettingsSection(
-              title: Text('Security'),
-              tiles: [
-                SettingsTile.switchTile(
-                  initialValue: _encryptionSwitch,
-                  title: Text('Encrypt data'),
-                  leading: encryptionIconSwitch(),
-                  onPressed: (value) {
-                    setState((() {
-                      _encryptionSwitch = !_encryptionSwitch;
-                    }));
-                  },
-                  onToggle: (value) {
-                    setState((() {
-                      _encryptionSwitch = !_encryptionSwitch;
-                    }));
-                  },
+              ),
+              Expanded(
+                child: SettingsList(
+                  contentPadding: EdgeInsets.only(top: 20.0),
+                  sections: [
+                    SettingsSection(
+                      title: Text('System'),
+                      tiles: [
+                        SettingsTile(
+                          title: Text('Theme'),
+                          leading: Icon(Icons.brightness_high_sharp),
+                          trailing: DropdownButtonHideUnderline(
+                            child: DropdownButton2<String>(
+                              isExpanded: true,
+                              hint: Text(
+                                selectedTheme!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).hintColor,
+                                ),
+                              ),
+                              items: _themeOptions
+                                  .map((String item) =>
+                                      DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context).hintColor,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
+                              value: selectedTheme,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedTheme = value;
+                                  print(
+                                      'Attempting to switch theme to $selectedTheme');
+                                  globalAppTheme.switchTheme(
+                                      _themeOptions.indexOf(selectedTheme!));
+                                  print(globalAppTheme.currentTheme());
+                                });
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Theme changed')),
+                                );
+                              },
+                              buttonStyleData: const ButtonStyleData(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                height: 40,
+                                width: 120,
+                              ),
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
+                              ),
+                            ),
+                          ),
+                          onPressed: (value) {},
+                        ),
+                      ],
+                    ),
+                    SettingsSection(
+                      title: Text('Security'),
+                      tiles: [
+                        SettingsTile.switchTile(
+                          initialValue: _encryptionSwitch,
+                          title: Text('Encrypt data'),
+                          leading: encryptionIconSwitch(),
+                          onPressed: (value) {
+                            setState((() {
+                              _encryptionSwitch = !_encryptionSwitch;
+                            }));
+                          },
+                          onToggle: (value) {
+                            setState((() {
+                              _encryptionSwitch = !_encryptionSwitch;
+                            }));
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ]),
       ),
     );
   }

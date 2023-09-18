@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -21,54 +20,9 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: LoadingAnimationWidget.threeArchedCircle(
-        color: Theme.of(context).colorScheme.inverseSurface,
-        size: 50,
-      ),
-        ),
-      );
-    }
-    
-    if (configState.favoriteBoards.isEmpty) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Stack(
-          children: [
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.bookmark_sharp),
-                    Text(
-                      'Bookmarked Boards',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('You have no bookmarks yet.'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Try adding a bookmark by pressing ['),
-                      Icon(Icons.bookmark_outline_sharp, size: 14),
-                      Text(' bookmark button ]'),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text('on a board\'s screen.')],
-                  )
-                ],
-              ),
-            ),
-          ],
+            color: Theme.of(context).colorScheme.inverseSurface,
+            size: 50,
+          ),
         ),
       );
     }
@@ -76,46 +30,73 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Stack(children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Icon(Icons.bookmark_sharp),
-                Text(
-                  'Bookmarked Boards',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                for (var board in configState.favoriteBoards)
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BoardScreen(
-                                  boardID: board.id,
-                                  boardName: board.name,
-                                  boardDescription: board.description,
-                                )),
-                      );
-                    },
-                    trailing: Icon(Icons.keyboard_arrow_right_sharp),
-                    title: Text(board.name.toString()),
-                    selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+          child: Stack(children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.home_sharp,
+                    size: 24,
                   ),
+                  Text(
+                    ' Home Page',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.ramen_dining),
+                SizedBox(height: 15),
               ],
             ),
-          ),
-        ]),
-      ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Welcome to Kanban_flt.'),
+                SizedBox(height: 15),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('We are very happy to have you here!'),
+                SizedBox(height: 15),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: Text(
+                      'The app is currently under development, so we appreciate the patience.',
+                      maxLines: 8,
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      ])),
     );
   }
 }

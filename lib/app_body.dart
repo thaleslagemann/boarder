@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/boards_page.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/favorites_page.dart';
 import 'package:kanban_flt/settings_page.dart';
 import 'package:kanban_flt/home_page.dart';
+import 'package:kanban_flt/test_page.dart';
 import 'package:provider/provider.dart';
 
 class AppBody extends StatefulWidget {
@@ -11,7 +13,7 @@ class AppBody extends StatefulWidget {
 }
 
 class AppBodyState extends State<AppBody> {
-  var selectedIndex = 1;
+  var selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +23,15 @@ class AppBodyState extends State<AppBody> {
         page = BoardsPage();
         break;
       case 1:
-        page = HomePage();
+        page = FavoritesPage();
         break;
       case 2:
+        page = HomePage();
+        break;
+      case 3:
+        page = FavoritesPage();
+        break;
+      case 4:
         page = SettingsPage();
         break;
       default:
@@ -58,10 +66,6 @@ class AppBodyState extends State<AppBody> {
                 leading: Icon(Icons.person),
                 title: Text('Profile'),
               ),
-              ListTile(
-                leading: Icon(Icons.circle_notifications),
-                title: Text('Test'),
-              ),
             ],
           ),
         ),
@@ -79,8 +83,16 @@ class AppBodyState extends State<AppBody> {
               label: 'Boards',
             ),
             NavigationDestination(
+              icon: Icon(Icons.terminal_sharp),
+              label: 'Test',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.home_sharp),
               label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bookmark_sharp),
+              label: 'Bookmarks',
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_sharp),
