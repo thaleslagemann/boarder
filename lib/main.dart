@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanban_flt/test_page.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/app_body.dart';
 import 'package:kanban_flt/config.dart';
@@ -33,7 +34,7 @@ class AppState extends State<MyApp> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         themeMode: globalAppTheme.currentTheme(),
-        home: AppBody(),
+        home: TestScreen(),
       ),
     );
   }
