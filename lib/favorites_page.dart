@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/config.dart';
-import 'package:kanban_flt/test_page.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -108,7 +108,12 @@ class FavoritesPageState extends State<FavoritesPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => TestScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => BoardScreen(
+                                  boardID: board.id,
+                                  boardName: board.name,
+                                  boardDescription: board.description,
+                                )),
                       );
                     },
                     trailing: Icon(Icons.keyboard_arrow_right_sharp),

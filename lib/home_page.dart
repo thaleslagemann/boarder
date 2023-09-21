@@ -34,21 +34,25 @@ class HomePageState extends State<HomePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.home_sharp,
-                    size: 24,
-                  ),
-                  Text(
-                    ' Home Page',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.home_sharp,
+                      size: 24,
+                    ),
+                    Text(
+                      ' Home Page',
+                      style: TextStyle(fontSize: 24),
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -67,14 +71,30 @@ class HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Welcome to Kanban_flt.'),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: Text(
+                      'Welcome to Kanban_flt.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
                 SizedBox(height: 15),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('We are very happy to have you here!'),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: Text(
+                      'We are very happy to have you here!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
                 SizedBox(height: 15),
               ],
             ),

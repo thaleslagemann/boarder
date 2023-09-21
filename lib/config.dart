@@ -169,7 +169,7 @@ class ConfigState extends ChangeNotifier {
   void printAllElements(List<BoardDataStructure> list) {
     for (var board in list) {
       print(
-          'At printAllElements(): [${board.id}, ${board.name}, ${board.description}]');
+          'All Elements on $list: [${board.id}, ${board.name}, ${board.description}]');
     }
   }
 
