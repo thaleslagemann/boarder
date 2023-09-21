@@ -25,7 +25,7 @@ class ConfigState extends ChangeNotifier {
   bool loadingDB = true;
 
   loadDB() async {
-    if(loadingDB) {
+    if (loadingDB) {
       print('Loading DB: $loadingDB');
       var databasesPath = await getDatabasesPath();
       print('databasesPath: $databasesPath');
@@ -168,7 +168,8 @@ class ConfigState extends ChangeNotifier {
 
   void printAllElements(List<BoardDataStructure> list) {
     for (var board in list) {
-      print('At printAllElements(): [${board.id}, ${board.name}, ${board.description}]');
+      print(
+          'At printAllElements(): [${board.id}, ${board.name}, ${board.description}]');
     }
   }
 
@@ -244,7 +245,8 @@ class ConfigState extends ChangeNotifier {
     print('board index is $boardIndex');
     print('favoriteBoard index is $favsIndex');
     printAllElements(boards);
-    print('Element to be deleted: [${boards[boardIndex].id}, ${boards[boardIndex].name}, ${boards[boardIndex].description}]');
+    print(
+        'Element to be deleted: [${boards[boardIndex].id}, ${boards[boardIndex].name}, ${boards[boardIndex].description}]');
     deleteFromBoardsDB(boards[boardIndex].id);
     boards.removeAt(boardIndex);
     if (favsIndex >= 0) {

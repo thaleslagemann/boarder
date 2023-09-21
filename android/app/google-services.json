@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "279286220681",
+    "firebase_url": "https://kaban-flt-default-rtdb.firebaseio.com",
+    "project_id": "kaban-flt",
+    "storage_bucket": "kaban-flt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279286220681:android:6eb0014421b0534a330358",
+        "android_client_info": {
+          "package_name": "com.example.kanban_flt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "279286220681-cfsf341ikp9t1gkgucl8qk3dbc7l8tdm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDifrJSZJXjXVnr5tkKGneEBSkAyI6X4J4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "279286220681-cfsf341ikp9t1gkgucl8qk3dbc7l8tdm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "279286220681-a26a8uupdqhjslj7tuup26sgo155875t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kanbanFlt"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
