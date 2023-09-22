@@ -16,7 +16,7 @@ dependencies:
   
   get:
   dropdown_button2: ^2.3.8
-
+  drag_and_drop_lists:
   loading_animation_widget:
   kanban_board:
   appflowy_board:
