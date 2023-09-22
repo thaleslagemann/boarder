@@ -1,9 +1,11 @@
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/boards_page.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:kanban_flt/favorites_page.dart';
 import 'package:kanban_flt/settings_page.dart';
 import 'package:kanban_flt/home_page.dart';
+import 'package:kanban_flt/test_screen.dart';
 import 'package:provider/provider.dart';
 
 class AppBody extends StatefulWidget {
@@ -19,7 +21,7 @@ class AppBodyState extends State<AppBody> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = FavoritesPage();
+        page = TestScreen();
         break;
       case 1:
         page = BoardsPage();
@@ -48,7 +50,7 @@ class AppBodyState extends State<AppBody> {
               const UserAccountsDrawerHeader(
                 decoration: BoxDecoration(color: Color(0xFF4FC3F7)),
                 accountName: Text(
-                  "Admin",
+                  "name",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -64,6 +66,33 @@ class AppBodyState extends State<AppBody> {
               ListTile(
                 leading: Icon(Icons.person),
                 title: Text('Profile'),
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<ProfileScreen>(
+                      builder: (context) => ProfileScreen(
+                        appBar: AppBar(
+                          title: const Text('User Profile'),
+                        ),
+                        actions: [
+                          SignedOutAction((context) {
+                            Navigator.of(context).pop();
+                          })
+                        ],
+                        children: [
+                          const Divider(),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(2),
+                          //   child: AspectRatio(
+                          //     aspectRatio: 1,
+                          //     child: Text('This is a text'),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                  )
+                },
               ),
             ],
           ),

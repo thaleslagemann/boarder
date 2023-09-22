@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +76,7 @@ class HomePageState extends State<HomePage> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                     child: Text(
-                      'Welcome to Kanban_flt.',
+                      'Welcome to Kanban_flt, ${FirebaseAuth.instance.currentUser?.displayName}!',
                       textAlign: TextAlign.center,
                     ),
                   ),

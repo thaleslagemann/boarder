@@ -1,18 +1,15 @@
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:kanban_flt/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/test_page.dart';
+import 'package:kanban_flt/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/config.dart';
 
 Future main() async {
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  sqfliteFfiInit();
-
-  databaseFactory = databaseFactoryFfi;
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -42,7 +39,7 @@ class AppState extends State<MyApp> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         themeMode: globalAppTheme.currentTheme(),
-        home: TestScreen(),
+        home: const AuthGate(),
       ),
     );
   }

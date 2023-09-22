@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite_common_ffi: any
+  sqlite3_flutter_libs:
   
   get:
   dropdown_button2: ^2.3.8
@@ -25,6 +26,8 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   firebase_core: ^2.16.0
+  firebase_auth: ^4.10.0
+  firebase_ui_auth: ^1.4.0
 
 dev_dependencies:
   flutter_test:
