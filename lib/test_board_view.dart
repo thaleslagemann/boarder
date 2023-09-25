@@ -19,9 +19,9 @@ class BasicExample extends StatefulWidget {
 
 class _BasicExample extends State<BasicExample> {
   List<HeaderStructure> headers = [];
-  static Size screenSize = WidgetsBinding.instance.window.physicalSize;
-  double width = screenSize.width;
-  double height = screenSize.height;
+  // static Size screenSize = WidgetsBinding.instance.window.physicalSize;
+  // double width = screenSize.width;
+  // double height = screenSize.height;
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskFieldController = TextEditingController();
   String newHeaderName = '';
@@ -89,6 +89,7 @@ class _BasicExample extends State<BasicExample> {
                   newHeaderName = value;
                 });
               },
+              autofocus: true,
               controller: _headerFieldController,
               decoration: const InputDecoration(hintText: "Header name"),
             ),
@@ -133,6 +134,7 @@ class _BasicExample extends State<BasicExample> {
                   newTaskName = value;
                 });
               },
+              autofocus: true,
               controller: _taskFieldController,
               decoration: const InputDecoration(hintText: "Task name"),
             ),
@@ -176,49 +178,54 @@ class _BasicExample extends State<BasicExample> {
 
   pushItemIntoHeader(int headerIndex, String itemName) {
     headers[headerIndex].content.children.add(
-          DragAndDropItem(
-            child: Container(
-              margin: const EdgeInsets.all(5.0),
-              padding: const EdgeInsets.all(3.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  border:
-                      Border.all(color: Theme.of(context).colorScheme.surface)),
-              child: Stack(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(itemName, softWrap: true),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          IconButton(
-                            onPressed: () => {},
-                            icon: Icon(Icons.keyboard_arrow_down_sharp),
-                          ),
-                        ],
+      DragAndDropItem(
+        child: Container(
+          margin: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(5.0),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              border:
+                  Border.all(width: 0.5, color: Theme.of(context).colorScheme.inverseSurface)),
+          child: Stack(children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(itemName, softWrap: true),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      IconButton(
+                        onPressed: () => {},
+                        icon: Icon(Icons.keyboard_arrow_down_sharp),
                       ),
-                    ),
-                  ],
-                )
-              ]),
-            ),
-          ),
-        );
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ]),
+        ),
+      ),
+    );
   }
 
   generateHeader(String headerName) {
     return DragAndDropList(
       header: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          IconButton(
+            onPressed: () => {},
+            icon: Icon(Icons.more_vert_sharp),
+          ),
           const Expanded(
             flex: 1,
             child: Divider(),
@@ -235,7 +242,7 @@ class _BasicExample extends State<BasicExample> {
               onPressed: () {
                 _displayTaskInputDialog(context, headerName);
               },
-              icon: Icon(Icons.add))
+              icon: Icon(Icons.add)),
         ],
       ),
       children: <DragAndDropItem>[],
@@ -253,11 +260,12 @@ class _BasicExample extends State<BasicExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
-        foregroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.inverseSurface,
         backgroundColor: Color(0xFF4FC3F7),
         onPressed: () {
           _displayHeaderInputDialog(context);
@@ -266,11 +274,12 @@ class _BasicExample extends State<BasicExample> {
         child: Icon(Icons.add),
       ),
       body: SafeArea(
-          child: DragAndDropLists(
-        children: listHeaders(),
-        onItemReorder: _onItemReorder,
-        onListReorder: _onListReorder,
-      )),
+        child: DragAndDropLists(
+          children: listHeaders(),
+          onItemReorder: _onItemReorder,
+          onListReorder: _onListReorder,
+        )
+      ),
     );
   }
 
