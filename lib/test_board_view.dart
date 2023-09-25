@@ -18,13 +18,14 @@ class BasicExample extends StatefulWidget {
 }
 
 class _BasicExample extends State<BasicExample> {
-  List<DragAndDropList> _contents = [];
   List<HeaderStructure> headers = [];
   static Size screenSize = WidgetsBinding.instance.window.physicalSize;
   double width = screenSize.width;
   double height = screenSize.height;
-  final TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _headerFieldController = TextEditingController();
+  final TextEditingController _taskFieldController = TextEditingController();
   String newHeaderName = '';
+  String newTaskName = '';
 
   @override
   void initState() {
@@ -40,6 +41,34 @@ class _BasicExample extends State<BasicExample> {
     return false; // Element not found in any pair
   }
 
+  int findIndexByElement(List list, String elementToFind) {
+    if (list.isEmpty) {
+      print("At FindIndexByElement(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].name == elementToFind) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int getContentIndex(List<HeaderStructure> list, String elementToFind) {
+    if (list.isEmpty) {
+      print("At FindIndexByElement(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].name == elementToFind) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
   int getSequentialID(List<HeaderStructure> list, int id) {
     if (containsElement(list, id)) {
       id = id + 1;
@@ -48,7 +77,7 @@ class _BasicExample extends State<BasicExample> {
     return id;
   }
 
-  Future<void> _displayTextInputDialog(BuildContext context) async {
+  Future<void> _displayHeaderInputDialog(BuildContext context) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -60,7 +89,7 @@ class _BasicExample extends State<BasicExample> {
                   newHeaderName = value;
                 });
               },
-              controller: _textFieldController,
+              controller: _headerFieldController,
               decoration: const InputDecoration(hintText: "Header name"),
             ),
             actions: <Widget>[
@@ -77,11 +106,56 @@ class _BasicExample extends State<BasicExample> {
                 child: const Text('ok'),
                 onPressed: () {
                   setState(() {
-                    newHeaderName = _textFieldController.text;
+                    newHeaderName = _headerFieldController.text;
                     print(newHeaderName);
                     pushHeaderIntoList(newHeaderName);
                     newHeaderName = '';
-                    _textFieldController.clear();
+                    _headerFieldController.clear();
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<void> _displayTaskInputDialog(
+      BuildContext context, String headerName) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('New task name'),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  newTaskName = value;
+                });
+              },
+              controller: _taskFieldController,
+              decoration: const InputDecoration(hintText: "Task name"),
+            ),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('cancel'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              TextButton(
+                child: const Text('ok'),
+                onPressed: () {
+                  setState(() {
+                    newTaskName = _taskFieldController.text;
+                    print(newTaskName);
+                    pushItemIntoHeader(
+                        findIndexByElement(headers, headerName), newTaskName);
+                    newTaskName = '';
+                    _taskFieldController.clear();
                     Navigator.pop(context);
                   });
                 },
@@ -100,40 +174,42 @@ class _BasicExample extends State<BasicExample> {
     }
   }
 
-  pushItemIntoHeader(int headerIndex) {
+  pushItemIntoHeader(int headerIndex, String itemName) {
     headers[headerIndex].content.children.add(
           DragAndDropItem(
-            child: Row(
-              children: [
-                Column(
+            child: Container(
+              margin: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.all(3.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.surface)),
+              child: Stack(children: [
+                Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0, top: 10.0),
-                      child: Text('item'),
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(itemName, softWrap: true),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          IconButton(
+                            onPressed: () => {},
+                            icon: Icon(Icons.keyboard_arrow_down_sharp),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: WidgetsBinding.instance.window.physicalSize.width *
-                          0.27,
-                    )
-                  ],
-                ),
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      IconButton(
-                          onPressed: () => setState(() {}),
-                          icon: Icon(Icons.keyboard_arrow_down_sharp)),
-                    ])
-              ],
+                )
+              ]),
             ),
           ),
         );
@@ -155,6 +231,11 @@ class _BasicExample extends State<BasicExample> {
             flex: 1,
             child: Divider(),
           ),
+          IconButton(
+              onPressed: () {
+                _displayTaskInputDialog(context, headerName);
+              },
+              icon: Icon(Icons.add))
         ],
       ),
       children: <DragAndDropItem>[],
@@ -179,7 +260,7 @@ class _BasicExample extends State<BasicExample> {
         foregroundColor: Theme.of(context).colorScheme.surface,
         backgroundColor: Color(0xFF4FC3F7),
         onPressed: () {
-          _displayTextInputDialog(context);
+          _displayHeaderInputDialog(context);
           print(newHeaderName);
         },
         child: Icon(Icons.add),
