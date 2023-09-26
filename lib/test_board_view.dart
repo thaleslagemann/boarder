@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class HeaderStructure {
   final int id;
-  final String name;
+  String name;
   late DragAndDropList content;
 
   HeaderStructure(
@@ -19,13 +19,13 @@ class BasicExample extends StatefulWidget {
 
 class _BasicExample extends State<BasicExample> {
   List<HeaderStructure> headers = [];
-  // static Size screenSize = WidgetsBinding.instance.window.physicalSize;
-  // double width = screenSize.width;
-  // double height = screenSize.height;
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskFieldController = TextEditingController();
+  final TextEditingController _headerRenameFieldController =
+      TextEditingController();
   String newHeaderName = '';
   String newTaskName = '';
+  String renameHeaderNewName = '';
 
   @override
   void initState() {
@@ -38,7 +38,21 @@ class _BasicExample extends State<BasicExample> {
         return true;
       }
     }
-    return false; // Element not found in any pair
+    return false;
+  }
+
+  int findIndexByID(List<HeaderStructure> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].id == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
   }
 
   int findIndexByElement(List list, String elementToFind) {
@@ -82,7 +96,7 @@ class _BasicExample extends State<BasicExample> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('New header name'),
+            title: const Text('Create a new header'),
             content: TextField(
               onChanged: (value) {
                 setState(() {
@@ -127,7 +141,7 @@ class _BasicExample extends State<BasicExample> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('New task name'),
+            title: const Text('Create a new task'),
             content: TextField(
               onChanged: (value) {
                 setState(() {
@@ -167,10 +181,87 @@ class _BasicExample extends State<BasicExample> {
         });
   }
 
+  Future<void> _displayHeaderRenameDialog(
+      BuildContext context, int headerID) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Rename header'),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  renameHeaderNewName = value;
+                });
+              },
+              autofocus: true,
+              controller: _headerRenameFieldController,
+              decoration: const InputDecoration(hintText: "New header name"),
+            ),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('cancel'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              TextButton(
+                child: const Text('ok'),
+                onPressed: () {
+                  setState(() {
+                    renameHeaderNewName = _headerRenameFieldController.text;
+                    print(renameHeaderNewName);
+                    renameHeaderAt(headerID, renameHeaderNewName);
+                    Navigator.pop(context);
+                    renameHeaderNewName = '';
+                    _headerRenameFieldController.clear();
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<void> _displayHeaderDeletionConfirmationDialog(
+      BuildContext context, int headerID) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Delete header?'),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('cancel'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              TextButton(
+                child: const Text('ok'),
+                onPressed: () {
+                  setState(() {
+                    removeHeader(headerID);
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   pushHeaderIntoList(String headerName) {
-    DragAndDropList content = generateHeader(headerName);
-    headers.add(HeaderStructure(
-        id: getSequentialID(headers, 0), name: headerName, content: content));
+    var headerID = getSequentialID(headers, 0);
+    DragAndDropList content = generateHeader(headerName, headerID);
+    headers
+        .add(HeaderStructure(id: headerID, name: headerName, content: content));
     for (var i = 0; i < headers.length; i++) {
       print('[${headers[i].id}, ${headers[i].name}]');
     }
@@ -178,53 +269,99 @@ class _BasicExample extends State<BasicExample> {
 
   pushItemIntoHeader(int headerIndex, String itemName) {
     headers[headerIndex].content.children.add(
-      DragAndDropItem(
-        child: Container(
-          margin: const EdgeInsets.all(20.0),
-          padding: const EdgeInsets.all(5.0),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              border:
-                  Border.all(width: 0.5, color: Theme.of(context).colorScheme.inverseSurface)),
-          child: Stack(children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(itemName, softWrap: true),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      IconButton(
-                        onPressed: () => {},
-                        icon: Icon(Icons.keyboard_arrow_down_sharp),
+          DragAndDropItem(
+            child: Container(
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+              padding: const EdgeInsets.all(5.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(7.5)),
+                  border: Border.all(
+                      width: 0.5,
+                      color: Theme.of(context).colorScheme.inverseSurface)),
+              child: Stack(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(itemName, softWrap: true),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          IconButton(
+                            onPressed: () => {},
+                            icon: Icon(Icons.keyboard_arrow_down_sharp),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          ]),
-        ),
-      ),
-    );
+                    ),
+                  ],
+                )
+              ]),
+            ),
+          ),
+        );
   }
 
-  generateHeader(String headerName) {
+  void renameHeaderAt(int headerID, String newName) {
+    int index = findIndexByID(headers, headerID);
+    headers[index].name = newName;
+    print('Updated Header: [${headers[index].id}, ${headers[index].name}]');
+    print('Headers list:');
+    for (var i = 0; i < headers.length; i++) {
+      print("[${headers[i].id}, ${headers[i].name}]");
+    }
+  }
+
+  void removeHeader(int headerID) {
+    int index = findIndexByID(headers, headerID);
+    var removedHeader = headers.removeAt(index);
+    print('Removed Header: [${removedHeader.id}, ${removedHeader.name}]');
+    print('Headers list:');
+    for (var i = 0; i < headers.length; i++) {
+      print("[${headers[i].id}, ${headers[i].name}]");
+    }
+  }
+
+  void choiceAction(String choice, int headerID) {
+    if (choice == Constants.Delete) {
+      print(
+          'Removing header ${headers[findIndexByID(headers, headerID)].name}');
+      _displayHeaderDeletionConfirmationDialog(context, headerID);
+    } else if (choice == Constants.Rename) {
+      _displayHeaderRenameDialog(context, headerID);
+    } else if (choice == Constants.ThirdItem) {
+      print('I Third Item');
+    }
+  }
+
+  generateHeader(String headerName, int headerID) {
     return DragAndDropList(
       header: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          IconButton(
-            onPressed: () => {},
+          PopupMenuButton<String>(
             icon: Icon(Icons.more_vert_sharp),
+            itemBuilder: (BuildContext context) {
+              return Constants.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                    onTap: () => {
+                          setState(() {
+                            choiceAction(choice, headerID);
+                          })
+                        });
+              }).toList();
+            },
           ),
           const Expanded(
             flex: 1,
@@ -259,6 +396,7 @@ class _BasicExample extends State<BasicExample> {
 
   @override
   Widget build(BuildContext context) {
+    List<DragAndDropList> headersList = listHeaders();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
@@ -274,12 +412,11 @@ class _BasicExample extends State<BasicExample> {
         child: Icon(Icons.add),
       ),
       body: SafeArea(
-        child: DragAndDropLists(
-          children: listHeaders(),
-          onItemReorder: _onItemReorder,
-          onListReorder: _onListReorder,
-        )
-      ),
+          child: DragAndDropLists(
+        children: headersList,
+        onItemReorder: _onItemReorder,
+        onListReorder: _onListReorder,
+      )),
     );
   }
 
@@ -298,4 +435,16 @@ class _BasicExample extends State<BasicExample> {
       headers.insert(newListIndex, movedList);
     });
   }
+}
+
+class Constants {
+  static const String Delete = 'Delete';
+  static const String Rename = 'Rename';
+  static const String ThirdItem = 'Third Item';
+
+  static const List<String> choices = <String>[
+    Delete,
+    Rename,
+    ThirdItem,
+  ];
 }
