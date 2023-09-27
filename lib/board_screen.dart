@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/test_board_view.dart';
 import 'package:kanban_flt/update_board_form.dart';
 import 'package:provider/provider.dart';
 
@@ -92,10 +93,24 @@ class BoardScreenState extends State<BoardScreen> {
       body: SafeArea(
         child: Stack(
           children: [
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                children: [
+                  SizedBox(
+                      height: MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top -
+                          50,
+                      width: MediaQuery.of(context).size.width,
+                      child: BasicExample()),
+                ],
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(alignment: Alignment.topRight, child: CloseButton()),
+                Align(alignment: Alignment.topLeft, child: CloseButton()),
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
@@ -140,48 +155,34 @@ class BoardScreenState extends State<BoardScreen> {
                         showAlert(context);
                       }),
                 ),
-              ],
-            ),
-            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text('#${widget.boardID}'),
-                  ),
-                ],
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child:
-                        Text(widget.boardName, style: TextStyle(fontSize: 30)),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                      child: Align(
-                        alignment: Alignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 13.0, left: 65),
                         child: Text(
-                          maxLines: 8,
-                          softWrap: true,
-                          widget.boardDescription,
+                          '#${widget.boardID}. ',
+                          style: TextStyle(fontSize: 22),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ]),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 13.0),
+                        child: Text(
+                          widget.boardName,
+                          style: TextStyle(fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ],
         ),
       ),

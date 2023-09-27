@@ -34,9 +34,13 @@ class ConfigState extends ChangeNotifier {
       localDB = await openDatabase(path, version: 1,
           onCreate: (Database db, int version) async {
         await db.execute(
-            'CREATE TABLE boards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+            'CREATE TABLE [IF NOT EXISTS] boards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
         await db.execute(
-            'CREATE TABLE favoriteBoards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+            'CREATE TABLE [IF NOT EXISTS] favoriteBoards (id INTEGER PRIMARY KEY, name TEXT, description TEXT)');
+        await db.execute(
+            'CREATE TABLE [IF NOT EXISTS] boardHeader (headerId INTEGER PRIMARY KEY, boardId INTEGER FOREIGN KEY, headerName TEXT)');
+        await db.execute(
+            'CREATE TABLE [IF NOT EXISTS] headerTask (headerId INTEGER FOREIGN KEY, taskDescription TEXT)');
       });
       List<Map> boards = await localDB.rawQuery('SELECT * FROM boards');
       convertRawQueryToBoard(boards);
@@ -181,7 +185,7 @@ class ConfigState extends ChangeNotifier {
         return true;
       }
     }
-    return false; // Element not found in any pair
+    return false;
   }
 
   bool isElementUnique(elementToCheck) {
@@ -197,14 +201,13 @@ class ConfigState extends ChangeNotifier {
       if (board.description == elementToCheck) {
         count++;
       }
-      // If count is greater than 1, element is not unique
       if (count > 1) {
         print("At isElementUnique(): Element is not unique.");
         return false;
       }
     }
     print("At isElementUnique(): Element is unique.");
-    return count == 1; // Element is unique if count is exactly 1
+    return count == 1;
   }
 
   int getSequentialID(List<BoardDataStructure> list, int id) {
@@ -274,19 +277,12 @@ class ConfigState extends ChangeNotifier {
   toggleFavBoard(boardID) {
     var boardIndex = findIndexByID(boards, boardID);
     var favIndex = findIndexByID(favoriteBoards, boardID);
-    print(boardIndex);
-    print(favIndex);
-    print(boardID);
-    print(containsElement(favoriteBoards, boardID));
-    printAllElements(favoriteBoards);
     if (!containsElement(favoriteBoards, boardID)) {
       favoriteBoards.add(boards[boardIndex]);
       insertOnFavsDB(boards[boardIndex]);
-      print(favoriteBoards);
     } else {
       favoriteBoards.removeAt(favIndex);
       deleteFromFavsDB(boardID);
-      print(favoriteBoards);
     }
     notifyListeners();
   }

@@ -4,10 +4,17 @@ import 'package:flutter/material.dart';
 class HeaderStructure {
   final int id;
   String name;
-  late DragAndDropList content;
+  List<int> taskIdList;
 
   HeaderStructure(
-      {required this.id, required this.name, required this.content});
+      {required this.id, required this.name, required this.taskIdList});
+}
+
+class TaskStructure {
+  final int id;
+  String name;
+
+  TaskStructure({required this.id, required this.name});
 }
 
 class BasicExample extends StatefulWidget {
@@ -19,6 +26,7 @@ class BasicExample extends StatefulWidget {
 
 class _BasicExample extends State<BasicExample> {
   List<HeaderStructure> headers = [];
+  List<TaskStructure> tasks = [];
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskFieldController = TextEditingController();
   final TextEditingController _headerRenameFieldController =
@@ -32,7 +40,7 @@ class _BasicExample extends State<BasicExample> {
     super.initState();
   }
 
-  bool containsElement(List<HeaderStructure> list, elementToCheck) {
+  bool containsElement(List<dynamic> list, elementToCheck) {
     for (var element in list) {
       if (element.id == elementToCheck) {
         return true;
@@ -41,7 +49,7 @@ class _BasicExample extends State<BasicExample> {
     return false;
   }
 
-  int findIndexByID(List<HeaderStructure> list, int id) {
+  int findIndexByID(List<dynamic> list, int id) {
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
@@ -83,7 +91,7 @@ class _BasicExample extends State<BasicExample> {
     return -1;
   }
 
-  int getSequentialID(List<HeaderStructure> list, int id) {
+  int getSequentialID(List<dynamic> list, int id) {
     if (containsElement(list, id)) {
       id = id + 1;
       return getSequentialID(list, id);
@@ -136,7 +144,7 @@ class _BasicExample extends State<BasicExample> {
   }
 
   Future<void> _displayTaskInputDialog(
-      BuildContext context, String headerName) async {
+      BuildContext context, int headerID) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -168,8 +176,9 @@ class _BasicExample extends State<BasicExample> {
                   setState(() {
                     newTaskName = _taskFieldController.text;
                     print(newTaskName);
-                    pushItemIntoHeader(
-                        findIndexByElement(headers, headerName), newTaskName);
+                    var taskID = getSequentialID(tasks, 0);
+                    pushItemIntoList(
+                        findIndexByID(headers, headerID), taskID, newTaskName);
                     newTaskName = '';
                     _taskFieldController.clear();
                     Navigator.pop(context);
@@ -259,56 +268,17 @@ class _BasicExample extends State<BasicExample> {
 
   pushHeaderIntoList(String headerName) {
     var headerID = getSequentialID(headers, 0);
-    DragAndDropList content = generateHeader(headerName, headerID);
-    headers
-        .add(HeaderStructure(id: headerID, name: headerName, content: content));
+    List<int> taskIdList = [];
+    headers.add(HeaderStructure(
+        id: headerID, name: headerName, taskIdList: taskIdList));
     for (var i = 0; i < headers.length; i++) {
       print('[${headers[i].id}, ${headers[i].name}]');
     }
   }
 
-  pushItemIntoHeader(int headerIndex, String itemName) {
-    headers[headerIndex].content.children.add(
-          DragAndDropItem(
-            child: Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-              padding: const EdgeInsets.all(5.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(7.5)),
-                  border: Border.all(
-                      width: 0.5,
-                      color: Theme.of(context).colorScheme.inverseSurface)),
-              child: Stack(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(itemName, softWrap: true),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          IconButton(
-                            onPressed: () => {},
-                            icon: Icon(Icons.keyboard_arrow_down_sharp),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              ]),
-            ),
-          ),
-        );
+  pushItemIntoList(int headerIndex, int taskID, String taskName) {
+    tasks.add(TaskStructure(id: taskID, name: taskName));
+    headers[headerIndex].taskIdList.add(taskID);
   }
 
   void renameHeaderAt(int headerID, String newName) {
@@ -343,60 +313,8 @@ class _BasicExample extends State<BasicExample> {
     }
   }
 
-  generateHeader(String headerName, int headerID) {
-    return DragAndDropList(
-      header: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert_sharp),
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                    onTap: () => {
-                          setState(() {
-                            choiceAction(choice, headerID);
-                          })
-                        });
-              }).toList();
-            },
-          ),
-          const Expanded(
-            flex: 1,
-            child: Divider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Text(headerName),
-          ),
-          const Expanded(
-            flex: 1,
-            child: Divider(),
-          ),
-          IconButton(
-              onPressed: () {
-                _displayTaskInputDialog(context, headerName);
-              },
-              icon: Icon(Icons.add)),
-        ],
-      ),
-      children: <DragAndDropItem>[],
-    );
-  }
-
-  List<DragAndDropList> listHeaders() {
-    List<DragAndDropList> list = [];
-    for (var element in headers) {
-      list.add(element.content);
-    }
-    return list;
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<DragAndDropList> headersList = listHeaders();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
@@ -413,7 +331,101 @@ class _BasicExample extends State<BasicExample> {
       ),
       body: SafeArea(
           child: DragAndDropLists(
-        children: headersList,
+        children: [
+          for (var header in headers)
+            DragAndDropList(
+              header: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert_sharp),
+                    itemBuilder: (BuildContext context) {
+                      return Constants.choices.map((String choice) {
+                        return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice),
+                            onTap: () => {
+                                  setState(() {
+                                    choiceAction(choice, header.id);
+                                  })
+                                });
+                      }).toList();
+                    },
+                  ),
+                  const Expanded(
+                    flex: 1,
+                    child: Divider(),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Text(header.name),
+                  ),
+                  const Expanded(
+                    flex: 1,
+                    child: Divider(),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        _displayTaskInputDialog(context, header.id);
+                      },
+                      icon: Icon(Icons.add)),
+                ],
+              ),
+              children: <DragAndDropItem>[
+                for (var task in header.taskIdList)
+                  if (tasks[findIndexByID(tasks, task)].id == task)
+                    DragAndDropItem(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 5.0),
+                        padding: const EdgeInsets.all(5.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(7.5)),
+                            border: Border.all(
+                                width: 0.5,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inverseSurface)),
+                        child: Stack(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Text(
+                                    tasks[findIndexByID(tasks, task)].name,
+                                    softWrap: true),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () => {
+                                        print(tasks[findIndexByID(tasks, task)]
+                                            .name)
+                                      },
+                                      icon:
+                                          Icon(Icons.keyboard_arrow_down_sharp),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        ]),
+                      ),
+                    ),
+              ],
+            ),
+        ],
         onItemReorder: _onItemReorder,
         onListReorder: _onListReorder,
       )),
@@ -423,9 +435,9 @@ class _BasicExample extends State<BasicExample> {
   _onItemReorder(
       int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
     setState(() {
-      var movedItem =
-          headers[oldListIndex].content.children.removeAt(oldItemIndex);
-      headers[newListIndex].content.children.insert(newItemIndex, movedItem);
+      var movedItem = headers[oldListIndex].taskIdList.removeAt(oldItemIndex);
+      headers[newListIndex].taskIdList.insert(newItemIndex, movedItem);
+      print('[$oldItemIndex, $oldListIndex] -> [$newItemIndex, $newListIndex]');
     });
   }
 
