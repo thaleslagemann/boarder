@@ -9,6 +9,18 @@ import 'package:sqflite/sqflite.dart';
 
 MyTheme globalAppTheme = MyTheme();
 
+class Constants {
+  static const String Delete = 'Delete';
+  static const String Rename = 'Rename';
+  static const String ThirdItem = 'Third Item';
+
+  static const List<String> choices = <String>[
+    Delete,
+    Rename,
+    ThirdItem,
+  ];
+}
+
 class BoardDataStructure {
   final int id;
   final String name;
@@ -18,7 +30,26 @@ class BoardDataStructure {
       {required this.id, required this.name, required this.description});
 }
 
+class HeaderStructure {
+  final int id;
+  String name;
+  List<int> taskIdList;
+
+  HeaderStructure(
+      {required this.id, required this.name, required this.taskIdList});
+}
+
+class TaskStructure {
+  final int id;
+  String name;
+
+  TaskStructure({required this.id, required this.name});
+}
+
 class ConfigState extends ChangeNotifier {
+  List<HeaderStructure> headers = [];
+  List<TaskStructure> tasks = [];
+
   List<BoardDataStructure> boards = [];
   List<BoardDataStructure> favoriteBoards = [];
   late Database localDB;
@@ -141,7 +172,7 @@ class ConfigState extends ChangeNotifier {
     await localDB.rawDelete('DELETE FROM favoriteBoards WHERE id = ?', [id]);
   }
 
-  int findIndexByElement(List<BoardDataStructure> list, String elementToFind) {
+  int findIndexByElement(List<dynamic> list, String elementToFind) {
     if (list.isEmpty) {
       print("At FindIndexByElement(): List is empty; returning index (-1)");
       return -1;
@@ -156,7 +187,7 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findIndexByID(List<BoardDataStructure> list, int id) {
+  int findIndexByID(List<dynamic> list, int id) {
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
@@ -170,18 +201,36 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  void printAllElements(List<BoardDataStructure> list) {
+  void printAllElements(List<dynamic> list) {
     for (var board in list) {
       print(
           'All Elements on $list: [${board.id}, ${board.name}, ${board.description}]');
     }
   }
 
-  bool containsElement(List<BoardDataStructure> list, elementToCheck) {
+  bool containsElement(List<dynamic> list, elementToCheck) {
     for (var board in list) {
       if (board.id == elementToCheck ||
           board.name == elementToCheck ||
           board.description == elementToCheck) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool containsHeader(List<dynamic> list, elementToCheck) {
+    for (var header in list) {
+      if (header.id == elementToCheck || header.name == elementToCheck) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool containsTask(List<dynamic> list, elementToCheck) {
+    for (var header in list) {
+      if (header.id == elementToCheck || header.name == elementToCheck) {
         return true;
       }
     }
@@ -210,8 +259,8 @@ class ConfigState extends ChangeNotifier {
     return count == 1;
   }
 
-  int getSequentialID(List<BoardDataStructure> list, int id) {
-    if (containsElement(boards, id)) {
+  int getSequentialID(List<dynamic> list, int id) {
+    if (containsElement(list, id)) {
       id = id + 1;
       return getSequentialID(list, id);
     }
@@ -220,7 +269,27 @@ class ConfigState extends ChangeNotifier {
     return id;
   }
 
-  int getRandomID(List<BoardDataStructure> list) {
+  int getSequentialHeaderID(List<dynamic> list, int id) {
+    if (containsHeader(list, id)) {
+      id = id + 1;
+      return getSequentialHeaderID(list, id);
+    }
+
+    print('At getSequentialHeaderID: New header ID is $id');
+    return id;
+  }
+
+  int getSequentialTaskID(List<dynamic> list, int id) {
+    if (containsTask(list, id)) {
+      id = id + 1;
+      return getSequentialTaskID(list, id);
+    }
+
+    print('At getSequentialTaskID: New task ID is $id');
+    return id;
+  }
+
+  int getRandomID(List<dynamic> list) {
     var id = Random().nextInt(99999);
 
     if (containsElement(boards, id)) {
@@ -285,5 +354,40 @@ class ConfigState extends ChangeNotifier {
       deleteFromFavsDB(boardID);
     }
     notifyListeners();
+  }
+
+  pushHeaderIntoList(String headerName) {
+    var headerID = getSequentialHeaderID(headers, 0);
+    List<int> taskIdList = [];
+    headers.add(HeaderStructure(
+        id: headerID, name: headerName, taskIdList: taskIdList));
+    for (var i = 0; i < headers.length; i++) {
+      print('[${headers[i].id}, ${headers[i].name}]');
+    }
+  }
+
+  void removeHeader(int headerID) {
+    int index = findIndexByID(headers, headerID);
+    var removedHeader = headers.removeAt(index);
+    print('Removed Header: [${removedHeader.id}, ${removedHeader.name}]');
+    print('Headers list:');
+    for (var i = 0; i < headers.length; i++) {
+      print("[${headers[i].id}, ${headers[i].name}]");
+    }
+  }
+
+  void renameHeaderAt(int headerID, String newName) {
+    int index = findIndexByID(headers, headerID);
+    headers[index].name = newName;
+    print('Updated Header: [${headers[index].id}, ${headers[index].name}]');
+    print('Headers list:');
+    for (var i = 0; i < headers.length; i++) {
+      print("[${headers[i].id}, ${headers[i].name}]");
+    }
+  }
+
+  pushItemIntoList(int headerIndex, int taskID, String taskName) {
+    tasks.add(TaskStructure(id: taskID, name: taskName));
+    headers[headerIndex].taskIdList.add(taskID);
   }
 }

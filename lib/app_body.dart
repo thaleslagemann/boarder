@@ -5,7 +5,6 @@ import 'package:kanban_flt/config.dart';
 import 'package:kanban_flt/favorites_page.dart';
 import 'package:kanban_flt/settings_page.dart';
 import 'package:kanban_flt/home_page.dart';
-import 'package:kanban_flt/test_screen.dart';
 import 'package:provider/provider.dart';
 
 class AppBody extends StatefulWidget {
@@ -21,7 +20,7 @@ class AppBodyState extends State<AppBody> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = TestScreen();
+        page = HomePage(); //TestScreen();
         break;
       case 1:
         page = BoardsPage();
