@@ -27,9 +27,7 @@ class BoardsPageState extends State<BoardsPage> {
           ),
         ),
       );
-    }
-
-    if (configState.boards.isEmpty) {
+    } else if (configState.boards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(

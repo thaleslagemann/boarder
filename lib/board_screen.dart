@@ -3,9 +3,11 @@ library config.globals;
 // ignore_for_file: unused_field
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:kanban_flt/update_board_form.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen(
@@ -26,28 +28,32 @@ class BoardScreenState extends State<BoardScreen> {
   late bool _bookmarkSwitch;
 
   final TextEditingController _headerFieldController = TextEditingController();
-  final TextEditingController _taskFieldController = TextEditingController();
+  final TextEditingController _taskNameFieldController =
+      TextEditingController();
+  final TextEditingController _taskDescFieldController =
+      TextEditingController();
   final TextEditingController _headerRenameFieldController =
       TextEditingController();
   String newHeaderName = '';
   String newTaskName = '';
+  String newTaskDesc = '';
   String renameHeaderNewName = '';
 
-  Icon bookmarkIconSwitch() {
+  IconData bookmarkIconSwitch() {
     switch (_bookmarkSwitch) {
       case true:
-        return Icon(Icons.bookmark_sharp);
+        return Icons.bookmark_remove_rounded;
       case false:
-        return Icon(Icons.bookmark_border_sharp);
+        return Icons.bookmark_add_outlined;
     }
-    return Icon(Icons.bookmark_sharp);
+    return Icons.bookmark_sharp;
   }
 
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
 
-    showAlert(BuildContext context) {
+    showBoardDeletionAlert(BuildContext context, boardID) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -57,9 +63,9 @@ class BoardScreenState extends State<BoardScreen> {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  configState.deleteBoard(widget.boardID);
+                  configState.deleteBoard(boardID);
                   if (!configState.containsElement(
-                      configState.boards, widget.boardID)) {
+                      configState.boards, boardID)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Board deleted')),
@@ -199,7 +205,8 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       newHeaderName = _headerFieldController.text;
                       print(newHeaderName);
-                      configState.pushHeaderIntoList(newHeaderName);
+                      configState.pushHeaderIntoList(
+                          newHeaderName, widget.boardID);
                       newHeaderName = '';
                       _headerFieldController.clear();
                       Navigator.pop(context);
@@ -218,16 +225,28 @@ class BoardScreenState extends State<BoardScreen> {
           builder: (context) {
             return AlertDialog(
               title: const Text('Create a new task'),
-              content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    newTaskName = value;
-                  });
-                },
-                autofocus: true,
-                controller: _taskFieldController,
-                decoration: const InputDecoration(hintText: "Task name"),
-              ),
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      newTaskName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _taskNameFieldController,
+                  decoration: const InputDecoration(hintText: "Name"),
+                ),
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      newTaskName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _taskDescFieldController,
+                  decoration: const InputDecoration(hintText: "Description"),
+                ),
+              ]),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -242,7 +261,8 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
-                      newTaskName = _taskFieldController.text;
+                      newTaskName = _taskNameFieldController.text;
+                      newTaskDesc = _taskDescFieldController.text;
                       print(newTaskName);
                       var taskID =
                           configState.getSequentialTaskID(configState.tasks, 0);
@@ -250,9 +270,88 @@ class BoardScreenState extends State<BoardScreen> {
                           configState.findIndexByID(
                               configState.headers, headerID),
                           taskID,
-                          newTaskName);
+                          newTaskName,
+                          newTaskDesc);
                       newTaskName = '';
-                      _taskFieldController.clear();
+                      newTaskDesc = '';
+                      _taskNameFieldController.clear();
+                      _taskDescFieldController.clear();
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+              ],
+            );
+          });
+    }
+
+    Future<void> _displayBoardDetailsDialog(
+        BuildContext context, int boardID) async {
+      var index = configState.findIndexByID(configState.boards, boardID);
+      return showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Board details'),
+              content: Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Row(
+                      children: [
+                        Text(
+                          'ID: ${configState.boards[index].id}',
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Name: ${configState.boards[index].name}',
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Description: ${configState.boards[index].description}',
+                            textAlign: TextAlign.left,
+                            softWrap: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Creation date: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.boards[index].creationDate)}',
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
+                          softWrap: true,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Last update: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.boards[index].lastUpdate)}',
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
+                          softWrap: true,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('ok'),
+                  onPressed: () {
+                    setState(() {
                       Navigator.pop(context);
                     });
                   },
@@ -292,15 +391,59 @@ class BoardScreenState extends State<BoardScreen> {
 
     checkBookmarkState();
 
-    void choiceAction(String choice, int headerID) {
+    void headerChoiceAction(String choice, int headerID) {
       if (choice == Constants.Delete) {
         print(
             'Removing header ${configState.headers[configState.findIndexByID(configState.headers, headerID)].name}');
         _displayHeaderDeletionConfirmationDialog(context, headerID);
       } else if (choice == Constants.Rename) {
         _displayHeaderRenameDialog(context, headerID);
-      } else if (choice == Constants.ThirdItem) {
-        print('I Third Item');
+      }
+    }
+
+    IconData choiceIcon(String choice) {
+      if (choice == 'Delete') {
+        return Icons.delete_outline_sharp;
+      } else if (choice == 'Edit') {
+        return Icons.edit_outlined;
+      } else if (choice == 'Bookmark') {
+        return bookmarkIconSwitch();
+      } else if (choice == 'Details') {
+        return Icons.info_sharp;
+      }
+      return Icons.not_interested_outlined;
+    }
+
+    void boardChoiceAction(String choice, int boardID) {
+      var index = configState.findIndexByID(configState.boards, boardID);
+      if (choice == Constants.Delete) {
+        print('Removing board ${configState.boards[index].name}');
+        showBoardDeletionAlert(context, boardID);
+      } else if (choice == Constants.Edit) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => UpdateBoardForm(
+                    boardID: boardID,
+                    boardName: configState.boards[index].name,
+                    boardDescription: configState.boards[index].description,
+                  )),
+        );
+      } else if (choice == Constants.Bookmark) {
+        print('Toggle bookmark was activated');
+        configState.toggleFavBoard(widget.boardID);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        if (!_bookmarkSwitch) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Added bookmark')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Removed bookmark')),
+          );
+        }
+      } else if (choice == Constants.Details) {
+        _displayBoardDetailsDialog(context, boardID);
       }
     }
 
@@ -310,7 +453,7 @@ class BoardScreenState extends State<BoardScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
-        foregroundColor: Theme.of(context).colorScheme.inverseSurface,
+        foregroundColor: Theme.of(context).colorScheme.surface,
         backgroundColor: Color(0xFF4FC3F7),
         onPressed: () {
           _displayHeaderInputDialog(context);
@@ -339,14 +482,14 @@ class BoardScreenState extends State<BoardScreen> {
                                   PopupMenuButton<String>(
                                     icon: Icon(Icons.more_vert_sharp),
                                     itemBuilder: (BuildContext context) {
-                                      return Constants.choices
+                                      return Constants.headerChoices
                                           .map((String choice) {
                                         return PopupMenuItem<String>(
                                             value: choice,
                                             child: Text(choice),
                                             onTap: () => {
                                                   setState(() {
-                                                    choiceAction(
+                                                    headerChoiceAction(
                                                         choice, header.id);
                                                   })
                                                 });
@@ -456,77 +599,47 @@ class BoardScreenState extends State<BoardScreen> {
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Align(alignment: Alignment.topLeft, child: CloseButton()),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: bookmarkIconSwitch(),
-                    onPressed: () {
-                      print('Toggle bookmark was activated');
-                      configState.toggleFavBoard(widget.boardID);
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      if (!_bookmarkSwitch) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Added bookmark')),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Removed bookmark')),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                      icon: Icon(Icons.edit_outlined),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => UpdateBoardForm(
-                                    boardID: widget.boardID,
-                                    boardName: widget.boardName,
-                                    boardDescription: widget.boardDescription,
-                                  )),
-                        );
-                      }),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                      icon: Icon(Icons.delete_outline_sharp),
-                      onPressed: () {
-                        showAlert(context);
-                      }),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Align(
-                      alignment: Alignment.topRight,
+                      alignment: Alignment.topCenter,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 13.0, left: 65),
+                        padding: const EdgeInsets.only(top: 13.0),
                         child: Text(
-                          '#${widget.boardID}. ',
+                          widget.boardName.capitalizeFirst!,
                           style: TextStyle(fontSize: 22),
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 13.0),
-                        child: Text(
-                          widget.boardName,
-                          style: TextStyle(fontSize: 22),
-                        ),
-                      ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert_sharp),
+                      itemBuilder: (BuildContext context) {
+                        return Constants.boardChoices.map((String choice) {
+                          return PopupMenuItem<String>(
+                              value: choice,
+                              child: Row(
+                                children: [
+                                  Icon(choiceIcon(choice)),
+                                  Text(' $choice'),
+                                ],
+                              ),
+                              onTap: () => {
+                                    setState(() {
+                                      boardChoiceAction(choice, widget.boardID);
+                                    })
+                                  });
+                        }).toList();
+                      },
                     ),
                   ],
                 )

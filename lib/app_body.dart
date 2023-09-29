@@ -80,13 +80,6 @@ class AppBodyState extends State<AppBody> {
                         ],
                         children: [
                           const Divider(),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(2),
-                          //   child: AspectRatio(
-                          //     aspectRatio: 1,
-                          //     child: Text('This is a text'),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -118,7 +111,7 @@ class AppBodyState extends State<AppBody> {
               label: 'Home',
             ),
             NavigationDestination(
-              icon: Icon(Icons.bookmark_sharp),
+              icon: Icon(Icons.bookmarks_sharp),
               label: 'Bookmarks',
             ),
             NavigationDestination(
