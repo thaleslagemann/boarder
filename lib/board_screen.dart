@@ -398,6 +398,8 @@ class BoardScreenState extends State<BoardScreen> {
         _displayHeaderDeletionConfirmationDialog(context, headerID);
       } else if (choice == Constants.Rename) {
         _displayHeaderRenameDialog(context, headerID);
+      } else if (choice == Constants.Add) {
+        _displayTaskInputDialog(context, headerID);
       }
     }
 
@@ -473,49 +475,50 @@ class BoardScreenState extends State<BoardScreen> {
                           50,
                       width: MediaQuery.of(context).size.width,
                       child: DragAndDropLists(
+                        listDragHandle: DragHandle(
+                            verticalAlignment: DragHandleVerticalAlignment.top,
+                            child: Icon(Icons.drag_handle)),
                         children: [
                           for (var header in configState.headers)
                             DragAndDropList(
-                              header: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  PopupMenuButton<String>(
-                                    icon: Icon(Icons.more_vert_sharp),
-                                    itemBuilder: (BuildContext context) {
-                                      return Constants.headerChoices
-                                          .map((String choice) {
-                                        return PopupMenuItem<String>(
-                                            value: choice,
-                                            child: Text(choice),
-                                            onTap: () => {
-                                                  setState(() {
-                                                    headerChoiceAction(
-                                                        choice, header.id);
-                                                  })
-                                                });
-                                      }).toList();
-                                    },
-                                  ),
-                                  const Expanded(
-                                    flex: 1,
-                                    child: Divider(),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    child: Text(header.name),
-                                  ),
-                                  const Expanded(
-                                    flex: 1,
-                                    child: Divider(),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {
-                                        _displayTaskInputDialog(
-                                            context, header.id);
+                              contentsWhenEmpty: Text('Empty header'),
+                              header: Padding(
+                                padding: const EdgeInsets.only(right: 45.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    PopupMenuButton<String>(
+                                      icon: Icon(Icons.more_vert_sharp),
+                                      itemBuilder: (BuildContext context) {
+                                        return Constants.headerChoices
+                                            .map((String choice) {
+                                          return PopupMenuItem<String>(
+                                              value: choice,
+                                              child: Text(choice),
+                                              onTap: () => {
+                                                    setState(() {
+                                                      headerChoiceAction(
+                                                          choice, header.id);
+                                                    })
+                                                  });
+                                        }).toList();
                                       },
-                                      icon: Icon(Icons.add)),
-                                ],
+                                    ),
+                                    const Expanded(
+                                      flex: 1,
+                                      child: Divider(),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      child: Text(header.name),
+                                    ),
+                                    const Expanded(
+                                      flex: 1,
+                                      child: Divider(),
+                                    ),
+                                  ],
+                                ),
                               ),
                               children: <DragAndDropItem>[
                                 for (var task in header.taskIdList)

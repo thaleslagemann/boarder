@@ -10,6 +10,7 @@ import 'package:sqflite/sqflite.dart';
 MyTheme globalAppTheme = MyTheme();
 
 class Constants {
+  static const String Add = 'Add';
   static const String Delete = 'Delete';
   static const String Rename = 'Rename';
   static const String Edit = 'Edit';
@@ -17,6 +18,7 @@ class Constants {
   static const String Details = 'Details';
 
   static const List<String> headerChoices = <String>[
+    Add,
     Delete,
     Rename,
   ];
@@ -110,13 +112,18 @@ class ConfigState extends ChangeNotifier {
       List<Map> favoriteBoards =
           await localDB.rawQuery('SELECT * FROM favoriteBoards');
       convertRawQueryToFavBoard(favoriteBoards);
-      List<Map> headers = await localDB.rawQuery('SELECT * FROM headers');
-      convertRawQueryToHeader(headers);
+      List<Map> headersQuery = await localDB.rawQuery('SELECT * FROM headers');
+      convertRawQueryToHeader(headersQuery);
       List<Map> tasks = await localDB.rawQuery('SELECT * FROM tasks');
       convertRawQueryToTask(tasks);
+      for (var header in headers) {
+        print('Getting ${header.name}\'s tasks');
+        headers[findIndexByID(headers, header.id)].taskIdList =
+            await getHeadersTaskList(header.id);
+      }
       print('Boards $boards');
       print('FavoriteBoards: $favoriteBoards');
-      print('Headers: $headers');
+      print('Headers: $headersQuery');
       print('Tasks: $tasks');
       print('DB loaded');
       loadingDB = false;
@@ -195,9 +202,9 @@ class ConfigState extends ChangeNotifier {
     for (var i = 0; i < rawQuery.length; i++) {
       print(rawQuery[i].values);
       int id = rawQuery[i].values.elementAt(0);
-      int parentHeaderID = rawQuery[i].values.elementAt(1);
-      String name = rawQuery[i].values.elementAt(2).toString();
-      String taskDescription = rawQuery[i].values.elementAt(3).toString();
+      String name = rawQuery[i].values.elementAt(1).toString();
+      String taskDescription = rawQuery[i].values.elementAt(2).toString();
+      int parentHeaderID = rawQuery[i].values.elementAt(3);
 
       TaskStructure task = TaskStructure(
         id: id,
@@ -206,10 +213,10 @@ class ConfigState extends ChangeNotifier {
         taskDescription: taskDescription,
       );
 
-      if (!containsElement(tasks, task)) {
+      if (!containsTask(tasks, task)) {
         tasks.add(task);
+        print('On Convert Task Statement: Add [${task.id},${task.name}]');
       }
-      print('On Convert Header Statement: [${task.id},${task.name}]');
     }
   }
 
@@ -265,18 +272,25 @@ class ConfigState extends ChangeNotifier {
   void insertOnHeadersDB(HeaderStructure object) async {
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO headers(headerId, headerName, parentBoardID, taskIdList) VALUES("${object.id}", "${object.name}", "${object.parentBoardID}", "${object.taskIdList}")');
+          'INSERT INTO headers(headerId, headerName, parentBoardID) VALUES(?, ?, ?)',
+          [object.id, object.name, object.parentBoardID]);
       print(
-          'inserted: [{"${object.id}", "${object.name}", "${object.parentBoardID}", "${object.taskIdList}"]');
+          'inserted: ["${object.id}", "${object.name}", "${object.parentBoardID}"]');
     });
   }
 
   void insertOnTasksDB(TaskStructure object) async {
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO tasks(taskId, parentHeaderID, taskName, description) VALUES("${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}")');
+          'INSERT INTO tasks(taskId, headerID, taskName, taskDescription) VALUES(?, ?, ?, ?)',
+          [
+            object.id,
+            object.parentHeaderID,
+            object.name,
+            object.taskDescription
+          ]);
       print(
-          'inserted: [{"${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}"]');
+          'inserted: ["${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}"]');
     });
   }
 
@@ -306,15 +320,20 @@ class ConfigState extends ChangeNotifier {
 
   void updateOnHeadersDB(HeaderStructure object) async {
     await localDB.rawUpdate(
-        'UPDATE headers SET headerName = ?, taskIdList = ? WHERE headerId = ?',
-        [object.name, object.taskIdList, object.id]);
+        'UPDATE headers SET headerName = ? WHERE headerId = ?',
+        [object.name, object.id]);
     print('updated: ${object.name}');
   }
 
   void updateOnTasksDB(TaskStructure object) async {
     await localDB.rawUpdate(
-        'UPDATE tasks SET taskName = ?, taskDescription = ? WHERE taskId = ?',
-        [object.name, object.taskDescription, object.id]);
+        'UPDATE tasks SET taskName = ?, taskDescription = ?, headerId = ? WHERE taskId = ?',
+        [
+          object.name,
+          object.taskDescription,
+          object.parentHeaderID,
+          object.id
+        ]);
     print('updated: ${object.name}');
   }
 
@@ -332,6 +351,22 @@ class ConfigState extends ChangeNotifier {
 
   void deleteFromTasksDB(id) async {
     await localDB.rawDelete('DELETE FROM tasks WHERE taskId = ?', [id]);
+  }
+
+  Future<List<int>> getHeadersTaskList(int headerId) async {
+    List<int> taskList = [];
+
+    var query = await localDB
+        .rawQuery('SELECT taskId FROM tasks WHERE headerId = ?', [headerId]);
+
+    for (var task in query) {
+      taskList.add(task.values.elementAt(0) as int);
+    }
+
+    for (var item in taskList) {
+      print(item);
+    }
+    return taskList;
   }
 
   int findIndexByElement(List<dynamic> list, String elementToFind) {
@@ -582,7 +617,6 @@ class ConfigState extends ChangeNotifier {
         taskDescription: taskDescription));
     tasks.add(newTask);
     headers[headerIndex].taskIdList.add(taskID);
-    updateOnHeadersDB(headers[headerIndex]);
     insertOnTasksDB(newTask);
   }
 
