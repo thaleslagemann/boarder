@@ -85,6 +85,7 @@ class ConfigState extends ChangeNotifier {
       print('DBs Path: $databasesPath');
       String path = join(databasesPath, 'local_boards_db.db');
       print('LocalDB path: $path');
+      //databaseFactory.deleteDatabase(path);
       localDB = await openDatabase(path, version: 1,
           onCreate: (Database db, int version) async {
         // await db.execute('DROP TABLE boards');
@@ -130,15 +131,15 @@ class ConfigState extends ChangeNotifier {
       int id = rawQuery[i].values.elementAt(0);
       String name = rawQuery[i].values.elementAt(1).toString();
       String description = rawQuery[i].values.elementAt(2).toString();
-      DateTime creationDate = rawQuery[i].values.elementAt(3).cast<DateTime>();
-      DateTime lastUpdate = rawQuery[i].values.elementAt(4).cast<DateTime>();
+      String creationDate = rawQuery[i].values.elementAt(3).toString();
+      String lastUpdate = rawQuery[i].values.elementAt(4).toString();
 
       BoardDataStructure board = BoardDataStructure(
           id: id,
           name: name,
           description: description,
-          creationDate: creationDate,
-          lastUpdate: lastUpdate);
+          creationDate: DateTime.parse(creationDate),
+          lastUpdate: DateTime.parse(lastUpdate));
 
       if (!containsElement(boards, board)) {
         boards.add(board);
@@ -152,21 +153,20 @@ class ConfigState extends ChangeNotifier {
       int id = rawQuery[i].values.elementAt(0);
       String name = rawQuery[i].values.elementAt(1).toString();
       String description = rawQuery[i].values.elementAt(2).toString();
-      DateTime creationDate = rawQuery[i].values.elementAt(3).cast<DateTime>();
-      DateTime lastUpdate = rawQuery[i].values.elementAt(4).cast<DateTime>();
+      String creationDate = rawQuery[i].values.elementAt(3).toString();
+      String lastUpdate = rawQuery[i].values.elementAt(4).toString();
 
       BoardDataStructure board = BoardDataStructure(
           id: id,
           name: name,
           description: description,
-          creationDate: creationDate,
-          lastUpdate: lastUpdate);
+          creationDate: DateTime.parse(creationDate),
+          lastUpdate: DateTime.parse(lastUpdate));
 
       if (!containsElement(favoriteBoards, board)) {
         favoriteBoards.add(board);
       }
-      print(
-          'On Convert Fav Statement: [${board.id},${board.name},${board.description}]');
+      print('On Convert Fav Statement: [${board.id},${board.name}]');
     }
   }
 
@@ -225,28 +225,47 @@ class ConfigState extends ChangeNotifier {
     return true;
   }
 
+  void queryDB(BoardDataStructure object) async {
+    print(localDB.rawQuery("SELECT * FROM boards"));
+  }
+
   void insertOnBoardsDB(BoardDataStructure object) async {
+    print('Executing SQL Insertion...');
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO boards(name, description, creationDate, lastUpdate) VALUES("${object.name}", "${object.description}", "${object.creationDate}", "${object.lastUpdate}")');
-      print(
-          'inserted: [{${object.id}, ${object.name}, ${object.description}, ${object.creationDate}, ${object.lastUpdate}]');
+          'INSERT INTO boards(id, name, description, creationDate, lastUpdate) VALUES(?, ?, ?, ?, ?)',
+          [
+            object.id,
+            object.name,
+            object.description,
+            object.creationDate.toString(),
+            object.lastUpdate.toString()
+          ]);
+      print('Finished insertion, new values: [${object.id}, ${object.name}]');
+      queryDB(object);
     });
   }
 
   void insertOnFavsDB(BoardDataStructure object) async {
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO favoriteBoards(name, description, creationDate, lastUpdate) VALUES("${object.name}", "${object.description}", "${object.creationDate}", "${object.lastUpdate}")');
+          'INSERT INTO favoriteBoards(id, name, description, creationDate, lastUpdate) VALUES(?, ?, ?, ?, ?)',
+          [
+            object.id,
+            object.name,
+            object.description,
+            object.creationDate.toString(),
+            object.lastUpdate.toString()
+          ]);
       print(
-          'inserted: [${object.id}, ${object.name}, ${object.description}, ${object.creationDate}, ${object.lastUpdate}]');
+          'inserted: [${object.id}, ${object.name}, ${object.description}, ${object.creationDate.toString()}, ${object.lastUpdate.toString()}]');
     });
   }
 
   void insertOnHeadersDB(HeaderStructure object) async {
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO headers(id, name, parentBoardID, taskIdList) VALUES("${object.id}", "${object.name}", "${object.parentBoardID}", "${object.taskIdList}")');
+          'INSERT INTO headers(headerId, headerName, parentBoardID, taskIdList) VALUES("${object.id}", "${object.name}", "${object.parentBoardID}", "${object.taskIdList}")');
       print(
           'inserted: [{"${object.id}", "${object.name}", "${object.parentBoardID}", "${object.taskIdList}"]');
     });
@@ -255,7 +274,7 @@ class ConfigState extends ChangeNotifier {
   void insertOnTasksDB(TaskStructure object) async {
     await localDB.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO tasks(id, parentHeaderID, name, description) VALUES("${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}")');
+          'INSERT INTO tasks(taskId, parentHeaderID, taskName, description) VALUES("${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}")');
       print(
           'inserted: [{"${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}"]');
     });
@@ -264,27 +283,37 @@ class ConfigState extends ChangeNotifier {
   void updateOnBoardsDB(BoardDataStructure object) async {
     await localDB.rawUpdate(
         'UPDATE boards SET name = ?, description = ?, lastUpdate = ? WHERE id = ?',
-        [object.name, object.description, object.lastUpdate, object.id]);
+        [
+          object.name,
+          object.description,
+          object.lastUpdate.toString(),
+          object.id
+        ]);
     print('updated: ${object.name}');
   }
 
   void updateOnFavsDB(BoardDataStructure object) async {
     await localDB.rawUpdate(
         'UPDATE favoriteBoards SET name = ?, description = ?, lastUpdate = ? WHERE id = ?',
-        [object.name, object.description, object.lastUpdate, object.id]);
+        [
+          object.name,
+          object.description,
+          object.lastUpdate.toString(),
+          object.id
+        ]);
     print('updated: ${object.name}');
   }
 
   void updateOnHeadersDB(HeaderStructure object) async {
     await localDB.rawUpdate(
-        'UPDATE headers SET name = ?, taskIdList = ? WHERE id = ?',
+        'UPDATE headers SET headerName = ?, taskIdList = ? WHERE headerId = ?',
         [object.name, object.taskIdList, object.id]);
     print('updated: ${object.name}');
   }
 
   void updateOnTasksDB(TaskStructure object) async {
     await localDB.rawUpdate(
-        'UPDATE tasks SET name = ?, taskDescription = ? WHERE id = ?',
+        'UPDATE tasks SET taskName = ?, taskDescription = ? WHERE taskId = ?',
         [object.name, object.taskDescription, object.id]);
     print('updated: ${object.name}');
   }
@@ -298,11 +327,11 @@ class ConfigState extends ChangeNotifier {
   }
 
   void deleteFromHeadersDB(id) async {
-    await localDB.rawDelete('DELETE FROM headers WHERE id = ?', [id]);
+    await localDB.rawDelete('DELETE FROM headers WHERE headerId = ?', [id]);
   }
 
   void deleteFromTasksDB(id) async {
-    await localDB.rawDelete('DELETE FROM tasks WHERE id = ?', [id]);
+    await localDB.rawDelete('DELETE FROM tasks WHERE taskId = ?', [id]);
   }
 
   int findIndexByElement(List<dynamic> list, String elementToFind) {
@@ -336,8 +365,7 @@ class ConfigState extends ChangeNotifier {
 
   void printAllElements(List<dynamic> list) {
     for (var board in list) {
-      print(
-          'All Elements on $list: [${board.id}, ${board.name}, ${board.description}]');
+      print('All Elements on $list: [${board.id}, ${board.name}]');
     }
   }
 
