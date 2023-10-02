@@ -364,6 +364,11 @@ class BoardScreenState extends State<BoardScreen> {
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
       setState(() {
+        int taskId = configState.tasks[newItemIndex].id;
+        int newParentId = configState.headers[newListIndex].id;
+        print('Old: ${configState.tasks[oldItemIndex].name}');
+        print('New: ${configState.tasks[newItemIndex].name}');
+        configState.reorderTask(taskId, newParentId, newItemIndex);
         var movedItem =
             configState.headers[oldListIndex].taskIdList.removeAt(oldItemIndex);
         configState.headers[newListIndex].taskIdList
@@ -398,7 +403,7 @@ class BoardScreenState extends State<BoardScreen> {
         _displayHeaderDeletionConfirmationDialog(context, headerID);
       } else if (choice == Constants.Rename) {
         _displayHeaderRenameDialog(context, headerID);
-      } else if (choice == Constants.Add) {
+      } else if (choice == Constants.AddTask) {
         _displayTaskInputDialog(context, headerID);
       }
     }

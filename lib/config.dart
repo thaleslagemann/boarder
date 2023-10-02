@@ -10,7 +10,7 @@ import 'package:sqflite/sqflite.dart';
 MyTheme globalAppTheme = MyTheme();
 
 class Constants {
-  static const String Add = 'Add';
+  static const String AddTask = 'Add Task';
   static const String Delete = 'Delete';
   static const String Rename = 'Rename';
   static const String Edit = 'Edit';
@@ -18,7 +18,7 @@ class Constants {
   static const String Details = 'Details';
 
   static const List<String> headerChoices = <String>[
-    Add,
+    AddTask,
     Delete,
     Rename,
   ];
@@ -117,7 +117,7 @@ class ConfigState extends ChangeNotifier {
       List<Map> tasks = await localDB.rawQuery('SELECT * FROM tasks');
       convertRawQueryToTask(tasks);
       for (var header in headers) {
-        print('Getting ${header.name}\'s tasks');
+        print('Getting header [${header.name}]\'s tasks');
         headers[findIndexByID(headers, header.id)].taskIdList =
             await getHeadersTaskList(header.id);
       }
@@ -191,7 +191,7 @@ class ConfigState extends ChangeNotifier {
         taskIdList: [],
       );
 
-      if (!containsElement(headers, header)) {
+      if (!containsHeader(headers, header)) {
         headers.add(header);
       }
       print('On Convert Header Statement: [${header.id},${header.name}]');
@@ -248,7 +248,7 @@ class ConfigState extends ChangeNotifier {
             object.creationDate.toString(),
             object.lastUpdate.toString()
           ]);
-      print('Finished insertion, new values: [${object.id}, ${object.name}]');
+      print('Inserted: [${object.id}, ${object.name}] -> Boards');
       queryDB(object);
     });
   }
@@ -264,8 +264,7 @@ class ConfigState extends ChangeNotifier {
             object.creationDate.toString(),
             object.lastUpdate.toString()
           ]);
-      print(
-          'inserted: [${object.id}, ${object.name}, ${object.description}, ${object.creationDate.toString()}, ${object.lastUpdate.toString()}]');
+      print('inserted: [${object.id}, ${object.name}] -> Favorite Boards');
     });
   }
 
@@ -275,7 +274,7 @@ class ConfigState extends ChangeNotifier {
           'INSERT INTO headers(headerId, headerName, parentBoardID) VALUES(?, ?, ?)',
           [object.id, object.name, object.parentBoardID]);
       print(
-          'inserted: ["${object.id}", "${object.name}", "${object.parentBoardID}"]');
+          'inserted: ["${object.id}", "${object.name}" -> [${object.parentBoardID}, ${boards[findIndexByID(boards, object.parentBoardID)].name}]');
     });
   }
 
@@ -290,7 +289,7 @@ class ConfigState extends ChangeNotifier {
             object.taskDescription
           ]);
       print(
-          'inserted: ["${object.id}", "${object.parentHeaderID}", "${object.name}", "${object.taskDescription}"]');
+          'inserted: [${object.id}, ${object.name}] -> [${object.parentHeaderID}, ${headers[findIndexByID(headers, object.parentHeaderID)].name}]');
     });
   }
 
@@ -363,9 +362,6 @@ class ConfigState extends ChangeNotifier {
       taskList.add(task.values.elementAt(0) as int);
     }
 
-    for (var item in taskList) {
-      print(item);
-    }
     return taskList;
   }
 
@@ -618,6 +614,16 @@ class ConfigState extends ChangeNotifier {
     tasks.add(newTask);
     headers[headerIndex].taskIdList.add(taskID);
     insertOnTasksDB(newTask);
+  }
+
+  void reorderTask(int taskId, int newParentId, int newIndex) {
+    TaskStructure updatedTask = (TaskStructure(
+        id: taskId,
+        parentHeaderID: newParentId,
+        name: tasks[newIndex].name,
+        taskDescription: tasks[newIndex].taskDescription));
+
+    updateOnTasksDB(updatedTask);
   }
 
   void removeTask(int taskId) {
