@@ -130,7 +130,7 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       renameHeaderNewName = _headerRenameFieldController.text;
                       print(renameHeaderNewName);
-                      configState.renameHeaderAt(headerID, renameHeaderNewName);
+                      configState.updateHeaderAt(headerID, renameHeaderNewName);
                       Navigator.pop(context);
                       renameHeaderNewName = '';
                       _headerRenameFieldController.clear();

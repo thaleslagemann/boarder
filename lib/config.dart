@@ -1,5 +1,6 @@
 library config.globals;
 
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
@@ -36,13 +37,15 @@ class BoardDataStructure {
   final String description;
   final DateTime creationDate;
   final DateTime lastUpdate;
+  List<int> headerIdList;
 
-  const BoardDataStructure(
+  BoardDataStructure(
       {required this.id,
       required this.name,
       required this.description,
       required this.creationDate,
-      required this.lastUpdate});
+      required this.lastUpdate,
+      required this.headerIdList});
 }
 
 class HeaderStructure {
@@ -95,11 +98,11 @@ class ConfigState extends ChangeNotifier {
         // await db.execute('DROP TABLE headers');
         // await db.execute('DROP TABLE tasks');
         await db.execute(
-            'CREATE TABLE IF NOT EXISTS boards(id INTEGER PRIMARY KEY, name TEXT, description TEXT, creationDate TEXT, lastUpdate TEXT)');
+            'CREATE TABLE IF NOT EXISTS boards(id INTEGER PRIMARY KEY, name TEXT, description TEXT, creationDate TEXT, lastUpdate TEXT, headerIDs TEXT)');
         await db.execute(
             'CREATE TABLE IF NOT EXISTS favoriteBoards(id INTEGER PRIMARY KEY, name TEXT, description TEXT, creationDate TEXT, lastUpdate TEXT)');
         await db.execute(
-            'CREATE TABLE IF NOT EXISTS headers(headerId INTEGER PRIMARY KEY, headerName TEXT, parentBoardId INTEGER)');
+            'CREATE TABLE IF NOT EXISTS headers(headerId INTEGER PRIMARY KEY, headerName TEXT, parentBoardId INTEGER, taskIDs TEXT)');
         await db.execute(
             'CREATE TABLE IF NOT EXISTS tasks(taskId INTEGER PRIMARY KEY, taskName TEXT, taskDescription TEXT, headerId INTEGER)');
       });
@@ -107,8 +110,8 @@ class ConfigState extends ChangeNotifier {
       // await localDB.execute('DELETE FROM boards');
       // await localDB.execute('DELETE FROM headers');
       // await localDB.execute('DELETE FROM tasks');
-      List<Map> boards = await localDB.rawQuery('SELECT * FROM boards');
-      convertRawQueryToBoard(boards);
+      List<Map> boardsQuery = await localDB.rawQuery('SELECT * FROM boards');
+      convertRawQueryToBoard(boardsQuery);
       List<Map> favoriteBoards =
           await localDB.rawQuery('SELECT * FROM favoriteBoards');
       convertRawQueryToFavBoard(favoriteBoards);
@@ -119,7 +122,12 @@ class ConfigState extends ChangeNotifier {
       for (var header in headers) {
         print('Getting header [${header.name}]\'s tasks');
         headers[findIndexByID(headers, header.id)].taskIdList =
-            await getHeadersTaskList(header.id);
+            await getTaskListDataFromHeader(header.id);
+      }
+      for (var board in boards) {
+        print('Getting board [${board.name}]\'s headers');
+        boards[findIndexByID(boards, board.id)].headerIdList =
+            await getBoardsHeaderList(board.id);
       }
       print('Boards $boards');
       print('FavoriteBoards: $favoriteBoards');
@@ -129,6 +137,7 @@ class ConfigState extends ChangeNotifier {
       loadingDB = false;
       print('Loading DB: $loadingDB');
       notifyListeners();
+      localDB.close();
     }
   }
 
@@ -146,7 +155,8 @@ class ConfigState extends ChangeNotifier {
           name: name,
           description: description,
           creationDate: DateTime.parse(creationDate),
-          lastUpdate: DateTime.parse(lastUpdate));
+          lastUpdate: DateTime.parse(lastUpdate),
+          headerIdList: []);
 
       if (!containsElement(boards, board)) {
         boards.add(board);
@@ -168,7 +178,8 @@ class ConfigState extends ChangeNotifier {
           name: name,
           description: description,
           creationDate: DateTime.parse(creationDate),
-          lastUpdate: DateTime.parse(lastUpdate));
+          lastUpdate: DateTime.parse(lastUpdate),
+          headerIdList: []);
 
       if (!containsElement(favoriteBoards, board)) {
         favoriteBoards.add(board);
@@ -232,6 +243,75 @@ class ConfigState extends ChangeNotifier {
     return true;
   }
 
+  Future<void> insertHeaderListDataOnBoard(
+      int boardID, List<int> headerIdList) async {
+    final jsonList = jsonEncode(headerIdList);
+
+    await localDB.update(
+      'boards',
+      {'headerIDs': jsonList},
+      where: 'id = ?',
+      whereArgs: [boardID],
+    );
+  }
+
+  Future<void> insertTaskListDataOnHeader(
+      int headerID, List<int> taskIdList) async {
+    final Database localDB = await openDatabase(
+        join(await getDatabasesPath(), 'local_boards_db.db'));
+    final jsonList = jsonEncode(taskIdList);
+
+    await localDB.update(
+      'headers',
+      {'taskIDs': jsonList},
+      where: 'headerId = ?',
+      whereArgs: [headerID],
+    );
+    print('Updated header tasklist at id: $headerID');
+    print('Task order by id:');
+    for (var task in taskIdList) {
+      print(task);
+    }
+    localDB.close();
+  }
+
+  Future<List<int>> getHeaderListDataFromBoard() async {
+    final List<Map<String, dynamic>> result = await localDB.query('boards');
+    if (result.isNotEmpty) {
+      final jsonList = result[0]['headerIDs'] as String;
+      final decodedList = jsonDecode(jsonList) as List<dynamic>;
+      final headerIdList = decodedList.cast<int>();
+
+      return headerIdList;
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<int>> getTaskListDataFromHeader(int headerID) async {
+    final List<Map<String, dynamic>> result = await localDB.query(
+      'headers',
+      columns: ['taskIDs'],
+      where: 'headerId = ?',
+      whereArgs: [headerID],
+    );
+    if (result.isNotEmpty && result[0]['taskIDs'] != null) {
+      print(result[0]);
+      final jsonList = result[0]['taskIDs'] as String;
+      final decodedList = jsonDecode(jsonList) as List<dynamic>;
+      final taskIdList = decodedList.cast<int>();
+
+      print('Task id order:');
+      for (var task in taskIdList) {
+        print(task);
+      }
+
+      return taskIdList;
+    } else {
+      return [];
+    }
+  }
+
   void queryDB(BoardDataStructure object) async {
     print(localDB.rawQuery("SELECT * FROM boards"));
   }
@@ -274,8 +354,11 @@ class ConfigState extends ChangeNotifier {
           'INSERT INTO headers(headerId, headerName, parentBoardID) VALUES(?, ?, ?)',
           [object.id, object.name, object.parentBoardID]);
       print(
-          'inserted: ["${object.id}", "${object.name}" -> [${object.parentBoardID}, ${boards[findIndexByID(boards, object.parentBoardID)].name}]');
+          'inserted: ["${object.id}", "${object.name}"] -> [${object.parentBoardID}, ${boards[findIndexByID(boards, object.parentBoardID)].name}]');
     });
+    int parentIndex = findIndexByID(boards, object.parentBoardID);
+    await insertHeaderListDataOnBoard(
+        object.parentBoardID, boards[parentIndex].headerIdList);
   }
 
   void insertOnTasksDB(TaskStructure object) async {
@@ -293,6 +376,18 @@ class ConfigState extends ChangeNotifier {
     });
   }
 
+  Future<void> updateBoardsHeaderListData(
+      int boardID, List<int> updatedHeaderIdList) async {
+    final updatedListJson = jsonEncode(updatedHeaderIdList);
+
+    await localDB.update(
+      'boards',
+      {'headerIDs': updatedListJson},
+      where: 'id = ?',
+      whereArgs: [boardID],
+    );
+  }
+
   void updateOnBoardsDB(BoardDataStructure object) async {
     await localDB.rawUpdate(
         'UPDATE boards SET name = ?, description = ?, lastUpdate = ? WHERE id = ?',
@@ -302,6 +397,7 @@ class ConfigState extends ChangeNotifier {
           object.lastUpdate.toString(),
           object.id
         ]);
+    await updateBoardsHeaderListData(object.id, object.headerIdList);
     print('updated: ${object.name}');
   }
 
@@ -321,6 +417,8 @@ class ConfigState extends ChangeNotifier {
     await localDB.rawUpdate(
         'UPDATE headers SET headerName = ? WHERE headerId = ?',
         [object.name, object.id]);
+
+    await insertTaskListDataOnHeader(object.id, object.taskIdList);
     print('updated: ${object.name}');
   }
 
@@ -350,6 +448,19 @@ class ConfigState extends ChangeNotifier {
 
   void deleteFromTasksDB(id) async {
     await localDB.rawDelete('DELETE FROM tasks WHERE taskId = ?', [id]);
+  }
+
+  Future<List<int>> getBoardsHeaderList(int boardId) async {
+    List<int> headerList = [];
+
+    var query = await localDB.rawQuery(
+        'SELECT headerId FROM headers WHERE parentBoardId = ?', [boardId]);
+
+    for (var header in query) {
+      headerList.add(header.values.elementAt(0) as int);
+    }
+
+    return headerList;
   }
 
   Future<List<int>> getHeadersTaskList(int headerId) async {
@@ -387,6 +498,20 @@ class ConfigState extends ChangeNotifier {
     }
     for (int i = 0; i < list.length; i++) {
       if (list[i].id == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findIndexByIDIntList(List<int> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i] == id) {
         return i;
       }
     }
@@ -498,7 +623,8 @@ class ConfigState extends ChangeNotifier {
         name: name,
         description: description,
         creationDate: DateTime.now(),
-        lastUpdate: DateTime.now()));
+        lastUpdate: DateTime.now(),
+        headerIdList: []));
     var boardIndex = findIndexByElement(boards, name);
     print('Found new index: $boardIndex');
     insertOnBoardsDB(boards[boardIndex]);
@@ -514,7 +640,7 @@ class ConfigState extends ChangeNotifier {
     print('favoriteBoard index is $favsIndex');
     printAllElements(boards);
     print(
-        'Element to be deleted: [${boards[boardIndex].id}, ${boards[boardIndex].name}, ${boards[boardIndex].description}]');
+        'Element to be deleted: [${boards[boardIndex].id}, ${boards[boardIndex].name}]');
     deleteFromBoardsDB(boards[boardIndex].id);
     boards.removeAt(boardIndex);
     if (favsIndex >= 0) {
@@ -536,7 +662,8 @@ class ConfigState extends ChangeNotifier {
           name: newBoardName,
           description: newBoardDescription,
           creationDate: boards[boardIndex].creationDate,
-          lastUpdate: lastUpdate);
+          lastUpdate: lastUpdate,
+          headerIdList: boards[boardIndex].headerIdList);
       updateOnBoardsDB(boards[boardIndex]);
     }
     if (favsIndex != -1 && containsElement(favoriteBoards, boardID)) {
@@ -568,6 +695,8 @@ class ConfigState extends ChangeNotifier {
         parentBoardID: parentBoardID,
         taskIdList: taskIdList));
     headers.add(newHeader);
+    int parentIndex = findIndexByID(boards, parentBoardID);
+    boards[parentIndex].headerIdList.add(headerID);
     if (findIndexByID(headers, headerID) != -1) {
       insertOnHeadersDB(newHeader);
       print('Inserted new header into headers table');
@@ -577,18 +706,7 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
-  void removeHeader(int headerID) {
-    int index = findIndexByID(headers, headerID);
-    var removedHeader = headers.removeAt(index);
-    deleteFromHeadersDB(headerID);
-    print('Removed Header: [${removedHeader.id}, ${removedHeader.name}]');
-    print('Headers list:');
-    for (var i = 0; i < headers.length; i++) {
-      print("[${headers[i].id}, ${headers[i].name}]");
-    }
-  }
-
-  void renameHeaderAt(int headerID, String newName) {
+  void updateHeaderAt(int headerID, String newName) {
     int index = findIndexByID(headers, headerID);
     var newHeader = HeaderStructure(
         id: headers[index].id,
@@ -604,6 +722,22 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
+  void updateTaskAt(int taskID, String newName, String newDescription) {
+    int index = findIndexByID(tasks, taskID);
+    var newTask = TaskStructure(
+        id: tasks[index].id,
+        parentHeaderID: headers[index].parentBoardID,
+        name: newName,
+        taskDescription: newDescription);
+    tasks[index] = newTask;
+    updateOnTasksDB(newTask);
+    print('Updated Task: [${tasks[index].id}, ${tasks[index].name}]');
+    print('Tasks list:');
+    for (var i = 0; i < tasks.length; i++) {
+      print("[${tasks[i].id}, ${tasks[i].name}]");
+    }
+  }
+
   void pushItemIntoList(
       int headerIndex, int taskID, String taskName, String taskDescription) {
     var newTask = (TaskStructure(
@@ -616,14 +750,32 @@ class ConfigState extends ChangeNotifier {
     insertOnTasksDB(newTask);
   }
 
-  void reorderTask(int taskId, int newParentId, int newIndex) {
-    TaskStructure updatedTask = (TaskStructure(
-        id: taskId,
-        parentHeaderID: newParentId,
-        name: tasks[newIndex].name,
-        taskDescription: tasks[newIndex].taskDescription));
+  void reorderHeader(int headerId, int parentId, int newIndex) {
+    var parentIndex = findIndexByID(boards, parentId);
 
-    updateOnTasksDB(updatedTask);
+    boards[parentIndex].headerIdList.insert(newIndex, headerId);
+    boards[parentIndex].headerIdList.removeAt(
+        findIndexByIDIntList(headers[parentIndex].taskIdList, headerId));
+  }
+
+  void removeHeader(int headerID) {
+    int index = findIndexByID(headers, headerID);
+    var removedHeader = headers.removeAt(index);
+    deleteFromHeadersDB(headerID);
+    print('Removed Header: [${removedHeader.id}, ${removedHeader.name}]');
+    print('Headers list:');
+    for (var i = 0; i < headers.length; i++) {
+      print("[${headers[i].id}, ${headers[i].name}]");
+    }
+  }
+
+  void reorderTask(int taskId, int newParentId, int newIndex) {
+    var headerIndex = findIndexByID(headers, newParentId);
+
+    headers[headerIndex].taskIdList.insert(newIndex, taskId);
+    headers[headerIndex].taskIdList.removeAt(
+        findIndexByIDIntList(headers[headerIndex].taskIdList, taskId));
+    insertTaskListDataOnHeader(newParentId, headers[headerIndex].taskIdList);
   }
 
   void removeTask(int taskId) {
