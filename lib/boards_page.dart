@@ -112,8 +112,16 @@ class BoardsPageState extends State<BoardsPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
+                SizedBox(height: 40),
                 for (var board in configState.boards)
                   ListTile(
+                    tileColor: Theme.of(context).colorScheme.surface,
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                            width: 1,
+                            color:
+                                Theme.of(context).colorScheme.inverseSurface),
+                        borderRadius: BorderRadius.circular(10)),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -125,7 +133,7 @@ class BoardsPageState extends State<BoardsPage> {
                                 )),
                       );
                     },
-                    trailing: Icon(Icons.keyboard_arrow_right_sharp),
+                    trailing: Icon(Icons.more_vert_sharp),
                     title: Text(board.name),
                     selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                   ),
