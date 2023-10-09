@@ -365,10 +365,12 @@ class BoardScreenState extends State<BoardScreen> {
         int newListIndex) {
       setState(() {
         int taskId = configState.tasks[newItemIndex].id;
+        int oldParentId = configState.headers[oldListIndex].id;
         int newParentId = configState.headers[newListIndex].id;
         print('Old: ${configState.tasks[oldItemIndex].name}');
         print('New: ${configState.tasks[newItemIndex].name}');
-        configState.reorderTask(taskId, newParentId, newItemIndex);
+        configState.reorderTask(
+            taskId, oldParentId, newParentId, oldItemIndex, newItemIndex);
         var movedItem =
             configState.headers[oldListIndex].taskIdList.removeAt(oldItemIndex);
         configState.headers[newListIndex].taskIdList
@@ -485,120 +487,126 @@ class BoardScreenState extends State<BoardScreen> {
                             child: Icon(Icons.drag_handle)),
                         children: [
                           for (var header in configState.headers)
-                            DragAndDropList(
-                              contentsWhenEmpty: Text('Empty header'),
-                              header: Padding(
-                                padding: const EdgeInsets.only(right: 45.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    PopupMenuButton<String>(
-                                      icon: Icon(Icons.more_vert_sharp),
-                                      itemBuilder: (BuildContext context) {
-                                        return Constants.headerChoices
-                                            .map((String choice) {
-                                          return PopupMenuItem<String>(
-                                              value: choice,
-                                              child: Text(choice),
-                                              onTap: () => {
-                                                    setState(() {
-                                                      headerChoiceAction(
-                                                          choice, header.id);
-                                                    })
-                                                  });
-                                        }).toList();
-                                      },
-                                    ),
-                                    const Expanded(
-                                      flex: 1,
-                                      child: Divider(),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 5),
-                                      child: Text(header.name),
-                                    ),
-                                    const Expanded(
-                                      flex: 1,
-                                      child: Divider(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              children: <DragAndDropItem>[
-                                for (var task in header.taskIdList)
-                                  if (configState
-                                          .tasks[configState.findIndexByID(
-                                              configState.tasks, task)]
-                                          .id ==
-                                      task)
-                                    DragAndDropItem(
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 20.0, vertical: 5.0),
-                                        padding: const EdgeInsets.all(5.0),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(7.5)),
-                                            border: Border.all(
-                                                width: 0.5,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .inverseSurface)),
-                                        child: Stack(children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Text(
-                                                    configState
-                                                        .tasks[configState
-                                                            .findIndexByID(
-                                                                configState
-                                                                    .tasks,
-                                                                task)]
-                                                        .name,
-                                                    softWrap: true),
-                                              ),
-                                              Expanded(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    IconButton(
-                                                      onPressed: () => {
-                                                        print(configState
-                                                            .tasks[configState
-                                                                .findIndexByID(
-                                                                    configState
-                                                                        .tasks,
-                                                                    task)]
-                                                            .name)
-                                                      },
-                                                      icon: Icon(Icons
-                                                          .keyboard_arrow_down_sharp),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ]),
+                            if (configState
+                                .boards[configState.findIndexByID(
+                                    configState.boards, widget.boardID)]
+                                .headerIdList
+                                .contains(header.id))
+                              DragAndDropList(
+                                contentsWhenEmpty: Text('Empty header'),
+                                header: Padding(
+                                  padding: const EdgeInsets.only(right: 45.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      PopupMenuButton<String>(
+                                        icon: Icon(Icons.more_vert_sharp),
+                                        itemBuilder: (BuildContext context) {
+                                          return Constants.headerChoices
+                                              .map((String choice) {
+                                            return PopupMenuItem<String>(
+                                                value: choice,
+                                                child: Text(choice),
+                                                onTap: () => {
+                                                      setState(() {
+                                                        headerChoiceAction(
+                                                            choice, header.id);
+                                                      })
+                                                    });
+                                          }).toList();
+                                        },
                                       ),
-                                    ),
-                              ],
-                            ),
+                                      const Expanded(
+                                        flex: 1,
+                                        child: Divider(),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        child: Text(header.name),
+                                      ),
+                                      const Expanded(
+                                        flex: 1,
+                                        child: Divider(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                children: <DragAndDropItem>[
+                                  for (var task in header.taskIdList)
+                                    if (configState
+                                        .headers[configState.findIndexByID(
+                                            configState.headers, header.id)]
+                                        .taskIdList
+                                        .contains(task))
+                                      DragAndDropItem(
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 5.0),
+                                          padding: const EdgeInsets.all(5.0),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(7.5)),
+                                              border: Border.all(
+                                                  width: 0.5,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .inverseSurface)),
+                                          child: Stack(children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
+                                                  child: Text(
+                                                      configState
+                                                          .tasks[configState
+                                                              .findIndexByID(
+                                                                  configState
+                                                                      .tasks,
+                                                                  task)]
+                                                          .name,
+                                                      softWrap: true),
+                                                ),
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      IconButton(
+                                                        onPressed: () => {
+                                                          print(configState
+                                                              .tasks[configState
+                                                                  .findIndexByID(
+                                                                      configState
+                                                                          .tasks,
+                                                                      task)]
+                                                              .name)
+                                                        },
+                                                        icon: Icon(Icons
+                                                            .keyboard_arrow_down_sharp),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ]),
+                                        ),
+                                      ),
+                                ],
+                              ),
                         ],
                         onItemReorder: _onItemReorder,
                         onListReorder: _onListReorder,
