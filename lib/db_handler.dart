@@ -271,10 +271,16 @@ class DatabaseHelper {
 
   Future<void> deleteBoard(int boardId) async {
     final Database db = await DatabaseHelper.instance.database;
-    await db.delete(
-      'Boards',
-      where: 'board_id = ?',
-      whereArgs: [boardId],
-    );
+
+    final headers =
+        await db.query('Headers', where: 'board_id = ?', whereArgs: [boardId]);
+    for (final header in headers) {
+      final headerId = header['header_id'] as int;
+
+      await db.delete('Tasks', where: 'header_id = ?', whereArgs: [headerId]);
+      await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
+    }
+
+    await db.delete('Boards', where: 'board_id = ?', whereArgs: [boardId]);
   }
 }
