@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/db_handler.dart';
 import 'package:provider/provider.dart';
 
 class UpdateBoardForm extends StatefulWidget {
@@ -133,17 +134,29 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                               print('Update Board Name: $newBoardDescription');
                               Navigator.pop(context);
                               Navigator.pop(context);
-                              configState.updateBoard(
-                                  widget.boardID,
-                                  updateBoardNameController.text,
-                                  updateBoardDescriptionController.text);
+                              configState.databaseHelper.updateBoard(Board(
+                                  boardId: widget.boardID,
+                                  name: updateBoardNameController.text,
+                                  description:
+                                      updateBoardDescriptionController.text,
+                                  creationDate: configState
+                                      .databaseHelper
+                                      .boards[configState.findIndexByID(
+                                          configState.databaseHelper.boards,
+                                          widget.boardID)]
+                                      .creationDate,
+                                  lastUpdate: DateTime.now()));
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => BoardScreen(
-                                        boardID: boardID,
-                                        boardName: newBoardName,
-                                        boardDescription: newBoardDescription)),
+                                          board:
+                                              configState.databaseHelper.boards[
+                                                  configState.findIndexByID(
+                                                      configState.databaseHelper
+                                                          .boards,
+                                                      boardID)],
+                                        )),
                               );
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
@@ -168,18 +181,29 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                       'Update Board Description: $newBoardDescription');
                                   Navigator.pop(context);
                                   Navigator.pop(context);
-                                  configState.updateBoard(
-                                      widget.boardID,
-                                      updateBoardNameController.text,
-                                      updateBoardDescriptionController.text);
+                                  configState.databaseHelper.updateBoard(Board(
+                                      boardId: widget.boardID,
+                                      name: updateBoardNameController.text,
+                                      description:
+                                          updateBoardDescriptionController.text,
+                                      creationDate: configState
+                                          .databaseHelper
+                                          .boards[configState.findIndexByID(
+                                              configState.databaseHelper.boards,
+                                              widget.boardID)]
+                                          .creationDate,
+                                      lastUpdate: DateTime.now()));
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => BoardScreen(
-                                            boardID: boardID,
-                                            boardName: newBoardName,
-                                            boardDescription:
-                                                newBoardDescription)),
+                                              board: configState
+                                                      .databaseHelper.boards[
+                                                  configState.findIndexByID(
+                                                      configState.databaseHelper
+                                                          .boards,
+                                                      boardID)],
+                                            )),
                                   );
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();

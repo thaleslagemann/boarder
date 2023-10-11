@@ -28,7 +28,7 @@ class FavoritesPageState extends State<FavoritesPage> {
       );
     }
 
-    if (configState.favoriteBoards.isEmpty) {
+    if (configState.bookmarkedBoards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
@@ -103,21 +103,27 @@ class FavoritesPageState extends State<FavoritesPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
-                for (var board in configState.favoriteBoards)
+                for (var bookmark in configState.bookmarkedBoards)
                   ListTile(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => BoardScreen(
-                                  boardID: board.id,
-                                  boardName: board.name,
-                                  boardDescription: board.description,
+                                  board: configState.databaseHelper.boards[
+                                      configState.findIndexByID(
+                                          configState.databaseHelper.boards,
+                                          bookmark)],
                                 )),
                       );
                     },
                     trailing: Icon(Icons.keyboard_arrow_right_sharp),
-                    title: Text(board.name.toString()),
+                    title: Text(configState
+                        .databaseHelper
+                        .boards[configState.findIndexByID(
+                            configState.databaseHelper.boards, bookmark)]
+                        .name
+                        .toString()),
                     selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                   ),
               ],

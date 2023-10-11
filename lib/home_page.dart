@@ -20,9 +20,14 @@ class HomePageState extends State<HomePage> {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
-          child: LoadingAnimationWidget.threeArchedCircle(
-            color: Theme.of(context).colorScheme.inverseSurface,
-            size: 50,
+          child: Column(
+            children: [
+              LoadingAnimationWidget.threeArchedCircle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+                size: 50,
+              ),
+              Text('Loading...')
+            ],
           ),
         ),
       );

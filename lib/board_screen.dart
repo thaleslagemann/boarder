@@ -5,20 +5,18 @@ import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/db_handler.dart';
 import 'package:kanban_flt/update_board_form.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class BoardScreen extends StatefulWidget {
-  const BoardScreen(
-      {super.key,
-      required this.boardID,
-      required this.boardName,
-      required this.boardDescription});
+  const BoardScreen({
+    super.key,
+    required this.board,
+  });
 
-  final int boardID;
-  final String boardName;
-  final String boardDescription;
+  final Board board;
 
   @override
   BoardScreenState createState() => BoardScreenState();
@@ -63,9 +61,9 @@ class BoardScreenState extends State<BoardScreen> {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  configState.deleteBoard(boardID);
-                  if (!configState.containsElement(
-                      configState.boards, boardID)) {
+                  configState.databaseHelper.deleteBoard(boardID);
+                  if (!configState.containsBoard(
+                      configState.databaseHelper.boards, boardID)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Board deleted')),
@@ -97,7 +95,9 @@ class BoardScreenState extends State<BoardScreen> {
     Future<void> _displayHeaderRenameDialog(
         BuildContext context, int headerID) async {
       _headerRenameFieldController.text = configState
-          .headers[configState.findIndexByID(configState.headers, headerID)]
+          .databaseHelper
+          .headers[configState.findIndexByID(
+              configState.databaseHelper.headers, headerID)]
           .name;
       return showDialog(
           context: context,
@@ -130,7 +130,8 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       renameHeaderNewName = _headerRenameFieldController.text;
                       print(renameHeaderNewName);
-                      configState.updateHeaderAt(headerID, renameHeaderNewName);
+                      configState.databaseHelper
+                          .updateHeaderName(headerID, renameHeaderNewName);
                       Navigator.pop(context);
                       renameHeaderNewName = '';
                       _headerRenameFieldController.clear();
@@ -163,7 +164,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
-                      configState.removeHeader(headerID);
+                      configState.databaseHelper.deleteHeader(headerID);
                       Navigator.pop(context);
                     });
                   },
@@ -205,8 +206,17 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       newHeaderName = _headerFieldController.text;
                       print(newHeaderName);
-                      configState.pushHeaderIntoList(
-                          newHeaderName, widget.boardID);
+                      configState.databaseHelper.createHeader(Header(
+                          headerId: configState.databaseHelper.headers.length,
+                          boardId: widget.board.boardId,
+                          name: newHeaderName,
+                          orderIndex: configState
+                              .databaseHelper
+                              .boards[configState.findIndexByID(
+                                  configState.databaseHelper.boards,
+                                  widget.board.boardId)]
+                              .headers
+                              .length));
                       newHeaderName = '';
                       _headerFieldController.clear();
                       Navigator.pop(context);
@@ -264,14 +274,17 @@ class BoardScreenState extends State<BoardScreen> {
                       newTaskName = _taskNameFieldController.text;
                       newTaskDesc = _taskDescFieldController.text;
                       print(newTaskName);
-                      var taskID =
-                          configState.getSequentialTaskID(configState.tasks, 0);
-                      configState.pushItemIntoList(
-                          configState.findIndexByID(
-                              configState.headers, headerID),
-                          taskID,
-                          newTaskName,
-                          newTaskDesc);
+                      var taskID = configState.getSequentialTaskID(
+                          configState.databaseHelper.tasks, 0);
+                      configState.databaseHelper.createTask(Task(
+                        taskId: taskID,
+                        headerId: headerID,
+                        name: newTaskName,
+                        description: newTaskDesc,
+                        assignedUserId: 0,
+                        orderIndex: configState.findIndexByID(
+                            configState.databaseHelper.headers, headerID),
+                      ));
                       newTaskName = '';
                       newTaskDesc = '';
                       _taskNameFieldController.clear();
@@ -287,7 +300,8 @@ class BoardScreenState extends State<BoardScreen> {
 
     Future<void> _displayBoardDetailsDialog(
         BuildContext context, int boardID) async {
-      var index = configState.findIndexByID(configState.boards, boardID);
+      var index =
+          configState.findIndexByID(configState.databaseHelper.boards, boardID);
       return showDialog(
           context: context,
           builder: (context) {
@@ -300,7 +314,7 @@ class BoardScreenState extends State<BoardScreen> {
                     Row(
                       children: [
                         Text(
-                          'ID: ${configState.boards[index].id}',
+                          'ID: ${configState.databaseHelper.boards[index].boardId}',
                           textAlign: TextAlign.left,
                         ),
                       ],
@@ -308,7 +322,7 @@ class BoardScreenState extends State<BoardScreen> {
                     Row(
                       children: [
                         Text(
-                          'Name: ${configState.boards[index].name}',
+                          'Name: ${configState.databaseHelper.boards[index].name}',
                           textAlign: TextAlign.left,
                         ),
                       ],
@@ -317,7 +331,7 @@ class BoardScreenState extends State<BoardScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            'Description: ${configState.boards[index].description}',
+                            'Description: ${configState.databaseHelper.boards[index].description}',
                             textAlign: TextAlign.left,
                             softWrap: true,
                           ),
@@ -327,7 +341,7 @@ class BoardScreenState extends State<BoardScreen> {
                     Row(
                       children: [
                         Text(
-                          'Creation date: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.boards[index].creationDate)}',
+                          'Creation date: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate)}',
                           maxLines: 2,
                           textAlign: TextAlign.left,
                           softWrap: true,
@@ -337,7 +351,7 @@ class BoardScreenState extends State<BoardScreen> {
                     Row(
                       children: [
                         Text(
-                          'Last update: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.boards[index].lastUpdate)}',
+                          'Last update: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate)}',
                           maxLines: 2,
                           textAlign: TextAlign.left,
                           softWrap: true,
@@ -364,16 +378,11 @@ class BoardScreenState extends State<BoardScreen> {
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
       setState(() {
-        int taskId = configState.tasks[newItemIndex].id;
-        int oldParentId = configState.headers[oldListIndex].id;
-        int newParentId = configState.headers[newListIndex].id;
-        print('Old: ${configState.tasks[oldItemIndex].name}');
-        print('New: ${configState.tasks[newItemIndex].name}');
-        configState.reorderTask(
-            taskId, oldParentId, newParentId, oldItemIndex, newItemIndex);
-        var movedItem =
-            configState.headers[oldListIndex].taskIdList.removeAt(oldItemIndex);
-        configState.headers[newListIndex].taskIdList
+        configState.databaseHelper.updateTaskOrderInDatabase(
+            configState.databaseHelper.headers[oldListIndex]);
+        var movedItem = configState.databaseHelper.headers[oldListIndex].tasks
+            .removeAt(oldItemIndex);
+        configState.databaseHelper.headers[newListIndex].tasks
             .insert(newItemIndex, movedItem);
         print(
             '[$oldItemIndex, $oldListIndex] -> [$newItemIndex, $newListIndex]');
@@ -382,26 +391,26 @@ class BoardScreenState extends State<BoardScreen> {
 
     _onListReorder(int oldListIndex, int newListIndex) {
       setState(() {
-        var movedList = configState.headers.removeAt(oldListIndex);
-        configState.headers.insert(newListIndex, movedList);
+        var movedList = widget.board.headers.removeAt(oldListIndex);
+        widget.board.headers.insert(newListIndex, movedList);
       });
     }
 
-    checkBookmarkState() {
-      if (configState.containsElement(
-          configState.favoriteBoards, widget.boardName)) {
+    checkBookmarkState(int bookmarkId) {
+      if (configState.containsBookmark(
+          configState.bookmarkedBoards, bookmarkId)) {
         _bookmarkSwitch = true;
       } else {
         _bookmarkSwitch = false;
       }
     }
 
-    checkBookmarkState();
+    checkBookmarkState(widget.board.boardId);
 
     void headerChoiceAction(String choice, int headerID) {
       if (choice == Constants.Delete) {
         print(
-            'Removing header ${configState.headers[configState.findIndexByID(configState.headers, headerID)].name}');
+            'Removing header ${configState.databaseHelper.headers[configState.findIndexByID(configState.databaseHelper.headers, headerID)].name}');
         _displayHeaderDeletionConfirmationDialog(context, headerID);
       } else if (choice == Constants.Rename) {
         _displayHeaderRenameDialog(context, headerID);
@@ -424,9 +433,11 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     void boardChoiceAction(String choice, int boardID) {
-      var index = configState.findIndexByID(configState.boards, boardID);
+      var index =
+          configState.findIndexByID(configState.databaseHelper.boards, boardID);
       if (choice == Constants.Delete) {
-        print('Removing board ${configState.boards[index].name}');
+        print(
+            'Removing board ${configState.databaseHelper.boards[index].name}');
         showBoardDeletionAlert(context, boardID);
       } else if (choice == Constants.Edit) {
         Navigator.push(
@@ -434,13 +445,14 @@ class BoardScreenState extends State<BoardScreen> {
           MaterialPageRoute(
               builder: (context) => UpdateBoardForm(
                     boardID: boardID,
-                    boardName: configState.boards[index].name,
-                    boardDescription: configState.boards[index].description,
+                    boardName: configState.databaseHelper.boards[index].name,
+                    boardDescription:
+                        configState.databaseHelper.boards[index].description,
                   )),
         );
       } else if (choice == Constants.Bookmark) {
         print('Toggle bookmark was activated');
-        configState.toggleFavBoard(widget.boardID);
+        configState.toggleBookmark(widget.board.boardId);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (!_bookmarkSwitch) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -486,12 +498,14 @@ class BoardScreenState extends State<BoardScreen> {
                             verticalAlignment: DragHandleVerticalAlignment.top,
                             child: Icon(Icons.drag_handle)),
                         children: [
-                          for (var header in configState.headers)
+                          for (var header in configState.databaseHelper.headers)
                             if (configState
+                                .databaseHelper
                                 .boards[configState.findIndexByID(
-                                    configState.boards, widget.boardID)]
-                                .headerIdList
-                                .contains(header.id))
+                                    configState.databaseHelper.boards,
+                                    widget.board.boardId)]
+                                .headers
+                                .contains(header))
                               DragAndDropList(
                                 contentsWhenEmpty: Text('Empty header'),
                                 header: Padding(
@@ -510,7 +524,8 @@ class BoardScreenState extends State<BoardScreen> {
                                                 onTap: () => {
                                                       setState(() {
                                                         headerChoiceAction(
-                                                            choice, header.id);
+                                                            choice,
+                                                            header.headerId);
                                                       })
                                                     });
                                           }).toList();
@@ -533,11 +548,13 @@ class BoardScreenState extends State<BoardScreen> {
                                   ),
                                 ),
                                 children: <DragAndDropItem>[
-                                  for (var task in header.taskIdList)
+                                  for (var task in header.tasks)
                                     if (configState
+                                        .databaseHelper
                                         .headers[configState.findIndexByID(
-                                            configState.headers, header.id)]
-                                        .taskIdList
+                                            configState.databaseHelper.headers,
+                                            header.headerId)]
+                                        .tasks
                                         .contains(task))
                                       DragAndDropItem(
                                         child: Container(
@@ -566,11 +583,12 @@ class BoardScreenState extends State<BoardScreen> {
                                                       10.0),
                                                   child: Text(
                                                       configState
-                                                          .tasks[configState
-                                                              .findIndexByID(
-                                                                  configState
-                                                                      .tasks,
-                                                                  task)]
+                                                          .databaseHelper
+                                                          .tasks[configState.findIndexByID(
+                                                              configState
+                                                                  .databaseHelper
+                                                                  .tasks,
+                                                              task.taskId)]
                                                           .name,
                                                       softWrap: true),
                                                 ),
@@ -587,11 +605,12 @@ class BoardScreenState extends State<BoardScreen> {
                                                       IconButton(
                                                         onPressed: () => {
                                                           print(configState
-                                                              .tasks[configState
-                                                                  .findIndexByID(
-                                                                      configState
-                                                                          .tasks,
-                                                                      task)]
+                                                              .databaseHelper
+                                                              .tasks[configState.findIndexByID(
+                                                                  configState
+                                                                      .databaseHelper
+                                                                      .tasks,
+                                                                  task.taskId)]
                                                               .name)
                                                         },
                                                         icon: Icon(Icons
@@ -628,7 +647,13 @@ class BoardScreenState extends State<BoardScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 13.0),
                         child: Text(
-                          widget.boardName.capitalizeFirst!,
+                          configState
+                              .databaseHelper
+                              .boards[configState.findIndexByID(
+                                  configState.databaseHelper.boards,
+                                  widget.board.boardId)]
+                              .name
+                              .capitalizeFirst!,
                           style: TextStyle(fontSize: 22),
                         ),
                       ),
@@ -651,7 +676,8 @@ class BoardScreenState extends State<BoardScreen> {
                               ),
                               onTap: () => {
                                     setState(() {
-                                      boardChoiceAction(choice, widget.boardID);
+                                      boardChoiceAction(
+                                          choice, widget.board.boardId);
                                     })
                                   });
                         }).toList();

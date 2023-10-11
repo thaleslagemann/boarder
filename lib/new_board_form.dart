@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/config.dart';
+import 'package:kanban_flt/db_handler.dart';
 import 'package:provider/provider.dart';
 
 class NewBoardForm extends StatefulWidget {
@@ -77,8 +78,8 @@ class NewBoardFormState extends State<NewBoardForm> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            if (configState.containsElement(
-                                configState.boards, value)) {
+                            if (configState.containsBoard(
+                                configState.databaseHelper.boards, value)) {
                               return 'Board called $value already exists.';
                             }
                             return null;
@@ -117,8 +118,13 @@ class NewBoardFormState extends State<NewBoardForm> {
                             if (_newBoardKey.currentState!.validate()) {
                               print('New Board Name: $newBoardName');
                               print('New Board Name: $newBoardDescription');
-                              configState.addBoard(
-                                  newBoardName, newBoardDescription);
+                              configState.databaseHelper.insertBoard(Board(
+                                  boardId:
+                                      configState.databaseHelper.boards.length,
+                                  name: newBoardName,
+                                  description: newBoardDescription,
+                                  creationDate: DateTime.now(),
+                                  lastUpdate: DateTime.now()));
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
@@ -140,8 +146,13 @@ class NewBoardFormState extends State<NewBoardForm> {
                                 if (_newBoardKey.currentState!.validate()) {
                                   print('New Board Name: $newBoardName');
                                   print('New Board Name: $newBoardDescription');
-                                  configState.addBoard(
-                                      newBoardName, newBoardDescription);
+                                  configState.databaseHelper.insertBoard(Board(
+                                      boardId: configState
+                                          .databaseHelper.boards.length,
+                                      name: newBoardName,
+                                      description: newBoardDescription,
+                                      creationDate: DateTime.now(),
+                                      lastUpdate: DateTime.now()));
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();

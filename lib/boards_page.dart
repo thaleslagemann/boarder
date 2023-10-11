@@ -21,13 +21,18 @@ class BoardsPageState extends State<BoardsPage> {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
-          child: LoadingAnimationWidget.threeArchedCircle(
-            color: Theme.of(context).colorScheme.onInverseSurface,
-            size: 50,
+          child: Column(
+            children: [
+              LoadingAnimationWidget.threeArchedCircle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+                size: 50,
+              ),
+              Text('Loading...')
+            ],
           ),
         ),
       );
-    } else if (configState.boards.isEmpty) {
+    } else if (configState.databaseHelper.boards.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
@@ -113,7 +118,7 @@ class BoardsPageState extends State<BoardsPage> {
               shrinkWrap: true,
               children: [
                 SizedBox(height: 40),
-                for (var board in configState.boards)
+                for (var board in configState.databaseHelper.boards)
                   ListTile(
                     tileColor: Theme.of(context).colorScheme.surface,
                     shape: RoundedRectangleBorder(
@@ -127,9 +132,7 @@ class BoardsPageState extends State<BoardsPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => BoardScreen(
-                                  boardID: board.id,
-                                  boardName: board.name,
-                                  boardDescription: board.description,
+                                  board: board,
                                 )),
                       );
                     },
