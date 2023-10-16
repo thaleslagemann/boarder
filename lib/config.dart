@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/db_handler.dart';
 import 'package:kanban_flt/themes.dart';
-import 'package:sqflite/sqflite.dart';
 
 MyTheme globalAppTheme = MyTheme();
 

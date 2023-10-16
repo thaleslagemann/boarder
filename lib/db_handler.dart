@@ -1,6 +1,5 @@
 import 'dart:html';
 
-import 'package:kanban_flt/config.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
