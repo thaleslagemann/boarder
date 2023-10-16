@@ -96,7 +96,7 @@ class BoardScreenState extends State<BoardScreen> {
         BuildContext context, int headerID) async {
       _headerRenameFieldController.text = configState
           .databaseHelper
-          .headers[configState.findIndexByID(
+          .headers[configState.findHeaderIndexByID(
               configState.databaseHelper.headers, headerID)]
           .name;
       return showDialog(
@@ -206,17 +206,19 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       newHeaderName = _headerFieldController.text;
                       print(newHeaderName);
-                      configState.databaseHelper.createHeader(Header(
+                      final newHeader = Header(
                           headerId: configState.databaseHelper.headers.length,
                           boardId: widget.board.boardId,
                           name: newHeaderName,
                           orderIndex: configState
                               .databaseHelper
-                              .boards[configState.findIndexByID(
+                              .boards[configState.findBoardIndexByID(
                                   configState.databaseHelper.boards,
                                   widget.board.boardId)]
                               .headers
-                              .length));
+                              .length);
+                      configState.databaseHelper.createHeader(newHeader);
+                      configState.databaseHelper.addHeader(newHeader);
                       newHeaderName = '';
                       _headerFieldController.clear();
                       Navigator.pop(context);
@@ -276,15 +278,19 @@ class BoardScreenState extends State<BoardScreen> {
                       print(newTaskName);
                       var taskID = configState.getSequentialTaskID(
                           configState.databaseHelper.tasks, 0);
-                      configState.databaseHelper.createTask(Task(
+                      var newTask = Task(
                         taskId: taskID,
                         headerId: headerID,
                         name: newTaskName,
                         description: newTaskDesc,
                         assignedUserId: 0,
-                        orderIndex: configState.findIndexByID(
-                            configState.databaseHelper.headers, headerID),
-                      ));
+                        orderIndex: configState.findTaskIndexByID(
+                            configState.databaseHelper.tasks, taskID),
+                      );
+                      configState.databaseHelper.createTask(newTask);
+                      configState.databaseHelper.addTask(newTask);
+                      configState.databaseHelper
+                          .addTaskToHeader(newTask, headerID);
                       newTaskName = '';
                       newTaskDesc = '';
                       _taskNameFieldController.clear();
@@ -300,8 +306,8 @@ class BoardScreenState extends State<BoardScreen> {
 
     Future<void> _displayBoardDetailsDialog(
         BuildContext context, int boardID) async {
-      var index =
-          configState.findIndexByID(configState.databaseHelper.boards, boardID);
+      var index = configState.findBoardIndexByID(
+          configState.databaseHelper.boards, boardID);
       return showDialog(
           context: context,
           builder: (context) {
@@ -377,9 +383,20 @@ class BoardScreenState extends State<BoardScreen> {
 
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
+      int taskIndex = configState.findTaskIndexByID(
+          configState.databaseHelper.tasks,
+          configState
+              .databaseHelper.headers[oldListIndex].tasks[oldItemIndex].taskId);
+      //int oldHeaderId = configState.databaseHelper.boards[].headerId;
+      //int newHeaderId = configState.databaseHelper.tasks[taskIndex].headerId;
+
       setState(() {
         configState.databaseHelper.updateTaskOrderInDatabase(
-            configState.databaseHelper.headers[oldListIndex]);
+            configState.databaseHelper.tasks[taskIndex],
+            configState.databaseHelper.headers[oldListIndex],
+            configState.databaseHelper.headers[newListIndex],
+            oldItemIndex,
+            newItemIndex);
         var movedItem = configState.databaseHelper.headers[oldListIndex].tasks
             .removeAt(oldItemIndex);
         configState.databaseHelper.headers[newListIndex].tasks
@@ -410,7 +427,7 @@ class BoardScreenState extends State<BoardScreen> {
     void headerChoiceAction(String choice, int headerID) {
       if (choice == Constants.Delete) {
         print(
-            'Removing header ${configState.databaseHelper.headers[configState.findIndexByID(configState.databaseHelper.headers, headerID)].name}');
+            'Removing header ${configState.databaseHelper.headers[configState.findHeaderIndexByID(configState.databaseHelper.headers, headerID)].name}');
         _displayHeaderDeletionConfirmationDialog(context, headerID);
       } else if (choice == Constants.Rename) {
         _displayHeaderRenameDialog(context, headerID);
@@ -433,8 +450,8 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     void boardChoiceAction(String choice, int boardID) {
-      var index =
-          configState.findIndexByID(configState.databaseHelper.boards, boardID);
+      var index = configState.findBoardIndexByID(
+          configState.databaseHelper.boards, boardID);
       if (choice == Constants.Delete) {
         print(
             'Removing board ${configState.databaseHelper.boards[index].name}');
@@ -501,7 +518,7 @@ class BoardScreenState extends State<BoardScreen> {
                           for (var header in configState.databaseHelper.headers)
                             if (configState
                                 .databaseHelper
-                                .boards[configState.findIndexByID(
+                                .boards[configState.findBoardIndexByID(
                                     configState.databaseHelper.boards,
                                     widget.board.boardId)]
                                 .headers
@@ -551,9 +568,11 @@ class BoardScreenState extends State<BoardScreen> {
                                   for (var task in header.tasks)
                                     if (configState
                                         .databaseHelper
-                                        .headers[configState.findIndexByID(
-                                            configState.databaseHelper.headers,
-                                            header.headerId)]
+                                        .headers[
+                                            configState.findHeaderIndexByID(
+                                                configState
+                                                    .databaseHelper.headers,
+                                                header.headerId)]
                                         .tasks
                                         .contains(task))
                                       DragAndDropItem(
@@ -584,11 +603,12 @@ class BoardScreenState extends State<BoardScreen> {
                                                   child: Text(
                                                       configState
                                                           .databaseHelper
-                                                          .tasks[configState.findIndexByID(
-                                                              configState
-                                                                  .databaseHelper
-                                                                  .tasks,
-                                                              task.taskId)]
+                                                          .tasks[configState
+                                                              .findTaskIndexByID(
+                                                                  configState
+                                                                      .databaseHelper
+                                                                      .tasks,
+                                                                  task.taskId)]
                                                           .name,
                                                       softWrap: true),
                                                 ),
@@ -606,7 +626,7 @@ class BoardScreenState extends State<BoardScreen> {
                                                         onPressed: () => {
                                                           print(configState
                                                               .databaseHelper
-                                                              .tasks[configState.findIndexByID(
+                                                              .tasks[configState.findTaskIndexByID(
                                                                   configState
                                                                       .databaseHelper
                                                                       .tasks,
@@ -649,7 +669,7 @@ class BoardScreenState extends State<BoardScreen> {
                         child: Text(
                           configState
                               .databaseHelper
-                              .boards[configState.findIndexByID(
+                              .boards[configState.findBoardIndexByID(
                                   configState.databaseHelper.boards,
                                   widget.board.boardId)]
                               .name

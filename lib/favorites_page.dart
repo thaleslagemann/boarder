@@ -111,7 +111,7 @@ class FavoritesPageState extends State<FavoritesPage> {
                         MaterialPageRoute(
                             builder: (context) => BoardScreen(
                                   board: configState.databaseHelper.boards[
-                                      configState.findIndexByID(
+                                      configState.findBoardIndexByID(
                                           configState.databaseHelper.boards,
                                           bookmark)],
                                 )),
@@ -120,7 +120,7 @@ class FavoritesPageState extends State<FavoritesPage> {
                     trailing: Icon(Icons.keyboard_arrow_right_sharp),
                     title: Text(configState
                         .databaseHelper
-                        .boards[configState.findIndexByID(
+                        .boards[configState.findBoardIndexByID(
                             configState.databaseHelper.boards, bookmark)]
                         .name
                         .toString()),

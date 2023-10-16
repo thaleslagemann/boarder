@@ -40,6 +40,42 @@ class ConfigState extends ChangeNotifier {
       print('Loading DB: $loadingDB');
       await databaseHelper.initializeDatabase();
       databaseHelper.boards = await databaseHelper.getAllBoards();
+      for (var board in databaseHelper.boards) {
+        print("Getting headers for board ${board.name}");
+        databaseHelper
+            .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
+            .headers = await databaseHelper.getHeadersForBoard(board.boardId);
+        for (var head in board.headers) {
+          print("Header found: [${head.headerId}, ${head.name}]");
+          databaseHelper.addHeader(head);
+        }
+        for (var header in board.headers) {
+          print("Getting tasks for header ${header.name}");
+          databaseHelper
+              .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
+              .headers[
+                  findHeaderIndexByID(databaseHelper.headers, header.headerId)]
+              .tasks = await databaseHelper.getTasksForHeader(header.headerId);
+          for (var task in header.tasks) {
+            print(
+                "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+            databaseHelper.addTask(task);
+          }
+        }
+      }
+      print("Boards:");
+      for (var board in databaseHelper.boards) {
+        print("[${board.boardId}, ${board.name}]");
+      }
+      print("Headers:");
+      for (var header in databaseHelper.headers) {
+        print("[${header.headerId}, ${header.name}]");
+      }
+      print("Tasks:");
+      for (var task in databaseHelper.tasks) {
+        print(
+            "[ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+      }
       print('DB loaded');
       loadingDB = false;
       print('Loading DB: $loadingDB');
@@ -62,13 +98,55 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findIndexByID(List<dynamic> list, int id) {
+  int findBoardIndexByID(List<dynamic> list, int id) {
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
-      if (list[i].id == id) {
+      if (list[i].boardId == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findBookmarkIndexByID(List<dynamic> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].boardId == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findHeaderIndexByID(List<dynamic> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].headerId == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findTaskIndexByID(List<dynamic> list, int id) {
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].taskId == id) {
         return i;
       }
     }
@@ -94,7 +172,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsBoard(List<dynamic> list, elementToCheck) {
     for (var board in list) {
-      if (board.id == elementToCheck ||
+      if (board.board_id == elementToCheck ||
           board.name == elementToCheck ||
           board.description == elementToCheck) {
         return true;
@@ -105,7 +183,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsHeader(List<dynamic> list, elementToCheck) {
     for (var header in list) {
-      if (header.id == elementToCheck || header.name == elementToCheck) {
+      if (header.header_id == elementToCheck || header.name == elementToCheck) {
         return true;
       }
     }
@@ -113,8 +191,8 @@ class ConfigState extends ChangeNotifier {
   }
 
   bool containsTask(List<dynamic> list, elementToCheck) {
-    for (var header in list) {
-      if (header.id == elementToCheck || header.name == elementToCheck) {
+    for (var element in list) {
+      if (element.taskId == elementToCheck || element.name == elementToCheck) {
         return true;
       }
     }
@@ -174,7 +252,7 @@ class ConfigState extends ChangeNotifier {
   }
 
   void toggleBookmark(boardId) {
-    var bookmarkIndex = findIndexByID(bookmarkedBoards, boardId);
+    var bookmarkIndex = findBookmarkIndexByID(bookmarkedBoards, boardId);
     if (!containsBoard(bookmarkedBoards, boardId)) {
       bookmarkedBoards.add(boardId);
       databaseHelper

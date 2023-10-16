@@ -1,3 +1,6 @@
+import 'dart:html';
+
+import 'package:kanban_flt/config.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -267,9 +270,14 @@ class DatabaseHelper {
     headers.add(header);
   }
 
-  void addTaskToHeader(Task task, Header header) {
+  void addTask(Task task) {
+    task.orderIndex = tasks.length;
+    tasks.add(task);
+  }
+
+  void addTaskToHeader(Task task, int headerID) {
     final targetHeader = headers.firstWhere(
-      (h) => h.headerId == header.headerId,
+      (h) => h.headerId == headerID,
       orElse: () => throw Exception('Header not found'),
     );
     task.orderIndex = targetHeader.tasks.length;
@@ -305,19 +313,40 @@ class DatabaseHelper {
   }
 
   // Update the order_index of tasks in the database for a specific header
-  Future<void> updateTaskOrderInDatabase(Header header) async {
+  Future<void> updateTaskOrderInDatabase(Task task, Header oldHeader,
+      Header newHeader, int oldTaskIndex, int newTaskIndex) async {
     final Database db = await DatabaseHelper.instance.database;
 
-    // Update order_index for tasks within the specified header
-    for (int i = 0; i < header.tasks.length; i++) {
-      final task = header.tasks[i];
+    var updatedTask = task;
+    updatedTask.orderIndex = newTaskIndex;
+
+    if (oldHeader != newHeader) {
+      oldHeader.tasks.removeAt(oldTaskIndex);
+      newHeader.tasks.insert(newTaskIndex, task);
+
+      for (var header in headers) {
+        if (header.headerId == oldHeader.headerId) {
+          int index = headers.indexOf(header);
+          headers[index].tasks = oldHeader.tasks;
+        }
+        if (header.headerId == newHeader.headerId) {
+          int index = headers.indexOf(header);
+          headers[index].tasks = newHeader.tasks;
+        }
+      }
+
+      await db.update('Tasks', {'header_id': newHeader.headerId});
+    }
+    for (int i = 0; i < tasks.length; i++) {
+      final itbTask = tasks[i];
       await db.update(
         'Tasks',
         {'order_index': i},
         where: 'task_id = ?',
-        whereArgs: [task.taskId],
+        whereArgs: [itbTask.taskId],
       );
     }
+    await db.update('Tasks', {'order_index': newTaskIndex});
   }
 
   // Create a new header
