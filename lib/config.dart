@@ -26,6 +26,10 @@ class Constants {
     Edit,
     Delete,
   ];
+  static const List<String> boardListChoices = <String>[
+    Bookmark,
+    Delete,
+  ];
 }
 
 class ConfigState extends ChangeNotifier {
@@ -111,20 +115,6 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findBookmarkIndexByID(List<dynamic> list, int id) {
-    if (list.isEmpty) {
-      print("At FindIndexByID(): List is empty; returning index (-1)");
-      return -1;
-    }
-    for (int i = 0; i < list.length; i++) {
-      if (list[i].boardId == id) {
-        return i;
-      }
-    }
-    print("At FindIndexByElement(): Element not found; returning index (-1)");
-    return -1;
-  }
-
   int findHeaderIndexByID(List<dynamic> list, int id) {
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
@@ -171,7 +161,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsBoard(List<dynamic> list, elementToCheck) {
     for (var board in list) {
-      if (board.board_id == elementToCheck ||
+      if (board.boardId == elementToCheck ||
           board.name == elementToCheck ||
           board.description == elementToCheck) {
         return true;
@@ -248,18 +238,5 @@ class ConfigState extends ChangeNotifier {
 
     print('At getSequentialTaskID: New task ID is $id');
     return id;
-  }
-
-  void toggleBookmark(boardId) {
-    var bookmarkIndex = findBookmarkIndexByID(bookmarkedBoards, boardId);
-    if (!containsBoard(bookmarkedBoards, boardId)) {
-      bookmarkedBoards.add(boardId);
-      databaseHelper
-          .createBookmark(Bookmark(bookmarkId: boardId, boardId: boardId));
-    } else {
-      bookmarkedBoards.removeAt(bookmarkIndex);
-      databaseHelper.deleteBookmark(boardId);
-    }
-    notifyListeners();
   }
 }

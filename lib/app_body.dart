@@ -2,7 +2,6 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/boards_page.dart';
 import 'package:kanban_flt/config.dart';
-import 'package:kanban_flt/favorites_page.dart';
 import 'package:kanban_flt/settings_page.dart';
 import 'package:kanban_flt/home_page.dart';
 import 'package:provider/provider.dart';
@@ -26,9 +25,6 @@ class AppBodyState extends State<AppBody> {
         page = BoardsPage();
         break;
       case 2:
-        page = FavoritesPage();
-        break;
-      case 3:
         page = SettingsPage();
         break;
       default:
@@ -117,20 +113,10 @@ class AppBodyState extends State<AppBody> {
               ),
             if (selectedIndex == 2)
               NavigationDestination(
-                icon: Icon(Icons.bookmarks),
-                label: 'Bookmarks',
-              ),
-            if (selectedIndex != 2)
-              NavigationDestination(
-                icon: Icon(Icons.bookmarks_outlined),
-                label: 'Bookmarks',
-              ),
-            if (selectedIndex == 3)
-              NavigationDestination(
                 icon: Icon(Icons.settings),
                 label: 'Settings',
               ),
-            if (selectedIndex != 3)
+            if (selectedIndex != 2)
               NavigationDestination(
                 icon: Icon(Icons.settings_outlined),
                 label: 'Settings',

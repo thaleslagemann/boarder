@@ -469,7 +469,7 @@ class BoardScreenState extends State<BoardScreen> {
         );
       } else if (choice == Constants.Bookmark) {
         print('Toggle bookmark was activated');
-        configState.toggleBookmark(widget.board.boardId);
+        //configState.toggleBookmark(widget.board.boardId);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (!_bookmarkSwitch) {
           ScaffoldMessenger.of(context).showSnackBar(
