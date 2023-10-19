@@ -13,7 +13,7 @@ class AppBody extends StatefulWidget {
 }
 
 class AppBodyState extends State<AppBody> {
-  var selectedIndex = 2;
+  var selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +26,9 @@ class AppBodyState extends State<AppBody> {
         page = BoardsPage();
         break;
       case 2:
-        page = HomePage();
-        break;
-      case 3:
         page = FavoritesPage();
         break;
-      case 4:
+      case 3:
         page = SettingsPage();
         break;
       default:
@@ -97,27 +94,47 @@ class AppBodyState extends State<AppBody> {
           },
           indicatorColor: Color(0xFF4FC3F7),
           selectedIndex: selectedIndex,
-          destinations: const <Widget>[
-            NavigationDestination(
-              icon: Icon(Icons.terminal_sharp),
-              label: 'Test',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.space_dashboard_sharp),
-              label: 'Boards',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.home_sharp),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.bookmarks_sharp),
-              label: 'Bookmarks',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.settings_sharp),
-              label: 'Settings',
-            ),
+          destinations: <Widget>[
+            if (selectedIndex == 0)
+              NavigationDestination(
+                icon: Icon(Icons.home_sharp),
+                label: 'Home',
+              ),
+            if (selectedIndex != 0)
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+            if (selectedIndex == 1)
+              NavigationDestination(
+                icon: Icon(Icons.space_dashboard),
+                label: 'Boards',
+              ),
+            if (selectedIndex != 1)
+              NavigationDestination(
+                icon: Icon(Icons.space_dashboard_outlined),
+                label: 'Boards',
+              ),
+            if (selectedIndex == 2)
+              NavigationDestination(
+                icon: Icon(Icons.bookmarks),
+                label: 'Bookmarks',
+              ),
+            if (selectedIndex != 2)
+              NavigationDestination(
+                icon: Icon(Icons.bookmarks_outlined),
+                label: 'Bookmarks',
+              ),
+            if (selectedIndex == 3)
+              NavigationDestination(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            if (selectedIndex != 3)
+              NavigationDestination(
+                icon: Icon(Icons.settings_outlined),
+                label: 'Settings',
+              ),
           ],
         ),
         body: Container(
