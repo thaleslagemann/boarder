@@ -97,7 +97,7 @@ class AppBodyState extends State<AppBody> {
           destinations: <Widget>[
             if (selectedIndex == 0)
               NavigationDestination(
-                icon: Icon(Icons.home_sharp),
+                icon: Icon(Icons.home),
                 label: 'Home',
               ),
             if (selectedIndex != 0)
