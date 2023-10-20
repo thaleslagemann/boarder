@@ -294,13 +294,15 @@ class BoardsPageState extends State<BoardsPage> {
                                   Theme.of(context).colorScheme.inverseSurface),
                           borderRadius: BorderRadius.circular(10)),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BoardScreen(
-                                    board: board,
-                                  )),
-                        );
+                        setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BoardScreen(
+                                      board: board,
+                                    )),
+                          );
+                        });
                       },
                       trailing: PopupMenuButton<String>(
                         onOpened: () => {checkBookmarkState(board.boardId)},

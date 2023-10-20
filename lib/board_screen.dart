@@ -413,17 +413,6 @@ class BoardScreenState extends State<BoardScreen> {
       });
     }
 
-    checkBookmarkState(int bookmarkId) {
-      if (configState.containsBookmark(
-          configState.bookmarkedBoards, bookmarkId)) {
-        _bookmarkSwitch = true;
-      } else {
-        _bookmarkSwitch = false;
-      }
-    }
-
-    checkBookmarkState(widget.board.boardId);
-
     void headerChoiceAction(String choice, int headerID) {
       if (choice == Constants.Delete) {
         print(
@@ -441,10 +430,8 @@ class BoardScreenState extends State<BoardScreen> {
         return Icons.delete_outline_sharp;
       } else if (choice == 'Edit') {
         return Icons.edit_outlined;
-      } else if (choice == 'Bookmark') {
-        return bookmarkIconSwitch();
       } else if (choice == 'Details') {
-        return Icons.info_sharp;
+        return Icons.info_outlined;
       }
       return Icons.not_interested_outlined;
     }
@@ -467,19 +454,6 @@ class BoardScreenState extends State<BoardScreen> {
                         configState.databaseHelper.boards[index].description,
                   )),
         );
-      } else if (choice == Constants.Bookmark) {
-        print('Toggle bookmark was activated');
-        //configState.toggleBookmark(widget.board.boardId);
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        if (!_bookmarkSwitch) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Added bookmark')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Removed bookmark')),
-          );
-        }
       } else if (choice == Constants.Details) {
         _displayBoardDetailsDialog(context, boardID);
       }
