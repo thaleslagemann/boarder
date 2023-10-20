@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
-import 'package:kanban_flt/new_board_form.dart';
+import 'package:kanban_flt/db_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:kanban_flt/config.dart';
@@ -13,6 +13,10 @@ class BoardsPage extends StatefulWidget {
 }
 
 class BoardsPageState extends State<BoardsPage> {
+  final TextEditingController _boardNameInputController =
+      TextEditingController();
+  final TextEditingController _boardDescInputController =
+      TextEditingController();
   List<int> _bookmarks = [];
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,74 @@ class BoardsPageState extends State<BoardsPage> {
                   child: const Text('delete'),
                   onPressed: () {
                     setState(() {
-                      configState.databaseHelper.deleteHeader(boardID);
+                      configState.databaseHelper.deleteBoard(boardID);
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+              ],
+            );
+          });
+    }
+
+    Future<void> _displayBoardInputDialog(BuildContext context) async {
+      String newBoardName;
+      String newBoardDesc;
+      return showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Create a new board'),
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      newBoardName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _boardNameInputController,
+                  decoration: const InputDecoration(hintText: "Name"),
+                ),
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      newBoardName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _boardDescInputController,
+                  decoration: const InputDecoration(hintText: "Description"),
+                ),
+              ]),
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('cancel'),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+                TextButton(
+                  child: const Text('ok'),
+                  onPressed: () {
+                    setState(() {
+                      newBoardName = _boardNameInputController.text;
+                      newBoardDesc = _boardDescInputController.text;
+                      print(newBoardName);
+                      var newBoard = Board(
+                          boardId: configState.databaseHelper.boards.length,
+                          name: newBoardName,
+                          description: newBoardDesc,
+                          creationDate: DateTime.now(),
+                          lastUpdate: DateTime.now());
+                      configState.databaseHelper.insertBoard(newBoard);
+                      newBoardName = '';
+                      newBoardDesc = '';
+                      _boardNameInputController.clear();
+                      _boardDescInputController.clear();
                       Navigator.pop(context);
                     });
                   },
@@ -99,14 +170,13 @@ class BoardsPageState extends State<BoardsPage> {
 
     void boardChoiceAction(String choice, int boardID) {
       if (choice == Constants.Delete) {
-        print(
-            'Removing board ${configState.databaseHelper.boards[configState.findBoardIndexByID(configState.databaseHelper.boards, boardID)].name}');
+        print('Removing board');
         _displayBoardDeletionConfirmationDialog(context, boardID);
       } else if (choice == Constants.Bookmark) {
         print('Toggle bookmark was activated');
         toggleBookmark(boardID);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        if (!_bookmarks.contains(boardID)) {
+        if (_bookmarks.contains(boardID)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Added bookmark')),
           );
@@ -182,10 +252,7 @@ class BoardsPageState extends State<BoardsPage> {
           foregroundColor: Theme.of(context).colorScheme.surface,
           backgroundColor: Color(0xFF4FC3F7),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NewBoardForm()),
-            );
+            _displayBoardInputDialog(context);
           },
           child: Icon(Icons.add),
         ),
@@ -216,46 +283,52 @@ class BoardsPageState extends State<BoardsPage> {
                 ),
               for (var board in configState.databaseHelper.boards)
                 if (_bookmarks.contains(board.boardId))
-                  ListTile(
-                    tileColor: Theme.of(context).colorScheme.surface,
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                            width: 1,
-                            color:
-                                Theme.of(context).colorScheme.inverseSurface),
-                        borderRadius: BorderRadius.circular(10)),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BoardScreen(
-                                  board: board,
-                                )),
-                      );
-                    },
-                    trailing: PopupMenuButton<String>(
-                      onOpened: () => {checkBookmarkState(board.boardId)},
-                      icon: Icon(Icons.more_vert_sharp),
-                      itemBuilder: (BuildContext context) {
-                        return Constants.boardListChoices.map((String choice) {
-                          return PopupMenuItem<String>(
-                              value: choice,
-                              child: Row(
-                                children: [
-                                  Icon(choiceIcon(choice, board.boardId)),
-                                  Text(' $choice'),
-                                ],
-                              ),
-                              onTap: () => {
-                                    setState(() {
-                                      boardChoiceAction(choice, board.boardId);
-                                    })
-                                  });
-                        }).toList();
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ListTile(
+                      tileColor: Theme.of(context).colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              width: 1,
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface),
+                          borderRadius: BorderRadius.circular(10)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BoardScreen(
+                                    board: board,
+                                  )),
+                        );
                       },
+                      trailing: PopupMenuButton<String>(
+                        onOpened: () => {checkBookmarkState(board.boardId)},
+                        icon: Icon(Icons.more_vert_sharp),
+                        itemBuilder: (BuildContext context) {
+                          return Constants.boardListChoices
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                                value: choice,
+                                child: Row(
+                                  children: [
+                                    Icon(choiceIcon(choice, board.boardId)),
+                                    Text(' $choice'),
+                                  ],
+                                ),
+                                onTap: () => {
+                                      setState(() {
+                                        boardChoiceAction(
+                                            choice, board.boardId);
+                                      })
+                                    });
+                          }).toList();
+                        },
+                      ),
+                      title: Text(board.name),
+                      selectedColor:
+                          Theme.of(context).colorScheme.surfaceVariant,
                     ),
-                    title: Text(board.name),
-                    selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                   ),
               if (_bookmarks.isNotEmpty)
                 Padding(
@@ -275,46 +348,54 @@ class BoardsPageState extends State<BoardsPage> {
                 ),
               ),
               for (var board in configState.databaseHelper.boards)
-                ListTile(
-                  tileColor: Theme.of(context).colorScheme.surface,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          width: 1,
-                          color: Theme.of(context).colorScheme.inverseSurface),
-                      borderRadius: BorderRadius.circular(10)),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => BoardScreen(
-                                board: board,
-                              )),
-                    );
-                  },
-                  trailing: PopupMenuButton<String>(
-                    onOpened: () => {checkBookmarkState(board.boardId)},
-                    icon: Icon(Icons.more_vert_sharp),
-                    itemBuilder: (BuildContext context) {
-                      return Constants.boardListChoices.map((String choice) {
-                        return PopupMenuItem<String>(
-                            value: choice,
-                            child: Row(
-                              children: [
-                                Icon(choiceIcon(choice, board.boardId)),
-                                Text(' $choice'),
-                              ],
-                            ),
-                            onTap: () => {
-                                  setState(() {
-                                    boardChoiceAction(choice, board.boardId);
-                                  })
-                                });
-                      }).toList();
-                    },
+                if (!_bookmarks.contains(board.boardId))
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ListTile(
+                      tileColor: Theme.of(context).colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              width: 1,
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface),
+                          borderRadius: BorderRadius.circular(10)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BoardScreen(
+                                    board: board,
+                                  )),
+                        );
+                      },
+                      trailing: PopupMenuButton<String>(
+                        onOpened: () => {checkBookmarkState(board.boardId)},
+                        icon: Icon(Icons.more_vert_sharp),
+                        itemBuilder: (BuildContext context) {
+                          return Constants.boardListChoices
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                                value: choice,
+                                child: Row(
+                                  children: [
+                                    Icon(choiceIcon(choice, board.boardId)),
+                                    Text(' $choice'),
+                                  ],
+                                ),
+                                onTap: () => {
+                                      setState(() {
+                                        boardChoiceAction(
+                                            choice, board.boardId);
+                                      })
+                                    });
+                          }).toList();
+                        },
+                      ),
+                      title: Text(board.name),
+                      selectedColor:
+                          Theme.of(context).colorScheme.surfaceVariant,
+                    ),
                   ),
-                  title: Text(board.name),
-                  selectedColor: Theme.of(context).colorScheme.surfaceVariant,
-                ),
             ],
           ),
         ]),
@@ -326,10 +407,7 @@ class BoardsPageState extends State<BoardsPage> {
         foregroundColor: Theme.of(context).colorScheme.surface,
         backgroundColor: Color(0xFF4FC3F7),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => NewBoardForm()),
-          );
+          _displayBoardInputDialog(context);
         },
         child: Icon(Icons.add),
       ),
