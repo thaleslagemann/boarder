@@ -144,6 +144,7 @@ class DatabaseHelper {
   static Database? _database;
 
   List<Board> boards = [];
+  List<Bookmark> bookmarks = [];
   List<Header> headers = [];
   List<Task> tasks = [];
 
@@ -243,6 +244,17 @@ class DatabaseHelper {
   Future<void> createBookmark(Bookmark bookmark) async {
     final db = await database;
     await db.insert('Bookmarks', bookmark.toMap());
+    bookmarks.add(bookmark);
+    print('Added bookmark ${bookmark.bookmarkId}');
+  }
+
+  // Delete a bookmark
+  Future<void> deleteBookmark(int bookmarkId) async {
+    final db = await database;
+    await db
+        .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
+    bookmarks.removeAt(findBookmarkIndex(bookmarkId));
+    print('Deleted bookmark $bookmarkId');
   }
 
   // Get all bookmarked boards
@@ -257,11 +269,13 @@ class DatabaseHelper {
     });
   }
 
-  // Delete a bookmark
-  Future<void> deleteBookmark(int bookmarkId) async {
-    final db = await database;
-    await db
-        .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
+  int findBookmarkIndex(bookmarkId) {
+    for (var i = 0; i < bookmarks.length; i++) {
+      if (bookmarks[i].bookmarkId == bookmarkId) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   void addHeader(Header header) {

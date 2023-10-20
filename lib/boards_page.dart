@@ -17,7 +17,7 @@ class BoardsPageState extends State<BoardsPage> {
       TextEditingController();
   final TextEditingController _boardDescInputController =
       TextEditingController();
-  List<int> _bookmarks = [];
+
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
@@ -122,30 +122,29 @@ class BoardsPageState extends State<BoardsPage> {
 
     int findBookmarkIndex(int boardID) {
       int index = -1;
-      for (var i = 0; i < configState.bookmarkedBoards.length; i++) {
-        if (configState.bookmarkedBoards[i] == boardID) index = i;
+      for (var i = 0; i < configState.databaseHelper.bookmarks.length; i++) {
+        if (configState.databaseHelper.bookmarks[i].boardId == boardID) {
+          index = i;
+        }
       }
       return index;
     }
 
-    bool checkBookmarkState(int bookmarkId) {
-      if (_bookmarks.contains(bookmarkId)) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
     void toggleBookmark(int boardID) {
-      if (checkBookmarkState(boardID)) {
-        _bookmarks.remove(boardID);
+      if (configState.containsBookmark(
+          configState.databaseHelper.bookmarks, boardID)) {
+        print('Removing bookmark $boardID');
+        configState.databaseHelper.deleteBookmark(boardID);
       } else {
-        _bookmarks.add(boardID);
+        print('Adding bookmark $boardID');
+        configState.databaseHelper
+            .createBookmark(Bookmark(bookmarkId: boardID, boardId: boardID));
       }
     }
 
     IconData bookmarkIconSwitch(bookmarkId) {
-      switch (checkBookmarkState(bookmarkId)) {
+      switch (configState.containsBookmark(
+          configState.databaseHelper.bookmarks, bookmarkId)) {
         case true:
           return Icons.bookmark_remove_rounded;
         case false:
@@ -176,7 +175,8 @@ class BoardsPageState extends State<BoardsPage> {
         print('Toggle bookmark was activated');
         toggleBookmark(boardID);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        if (_bookmarks.contains(boardID)) {
+        if (!configState.containsBookmark(
+            configState.databaseHelper.bookmarks, boardID)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Added bookmark')),
           );
@@ -267,7 +267,7 @@ class BoardsPageState extends State<BoardsPage> {
             shrinkWrap: true,
             children: [
               SizedBox(height: 20),
-              if (_bookmarks.isNotEmpty)
+              if (configState.databaseHelper.bookmarks.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(
                       left: 10.0, right: 10.0, bottom: 10.0),
@@ -282,7 +282,8 @@ class BoardsPageState extends State<BoardsPage> {
                   ),
                 ),
               for (var board in configState.databaseHelper.boards)
-                if (_bookmarks.contains(board.boardId))
+                if (configState.containsBookmark(
+                    configState.databaseHelper.bookmarks, board.boardId))
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: ListTile(
@@ -305,7 +306,6 @@ class BoardsPageState extends State<BoardsPage> {
                         });
                       },
                       trailing: PopupMenuButton<String>(
-                        onOpened: () => {checkBookmarkState(board.boardId)},
                         icon: Icon(Icons.more_vert_sharp),
                         itemBuilder: (BuildContext context) {
                           return Constants.boardListChoices
@@ -318,12 +318,8 @@ class BoardsPageState extends State<BoardsPage> {
                                     Text(' $choice'),
                                   ],
                                 ),
-                                onTap: () => {
-                                      setState(() {
-                                        boardChoiceAction(
-                                            choice, board.boardId);
-                                      })
-                                    });
+                                onTap: () => setState(() =>
+                                    boardChoiceAction(choice, board.boardId)));
                           }).toList();
                         },
                       ),
@@ -332,7 +328,7 @@ class BoardsPageState extends State<BoardsPage> {
                           Theme.of(context).colorScheme.surfaceVariant,
                     ),
                   ),
-              if (_bookmarks.isNotEmpty)
+              if (configState.databaseHelper.bookmarks.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
                 ),
@@ -350,7 +346,8 @@ class BoardsPageState extends State<BoardsPage> {
                 ),
               ),
               for (var board in configState.databaseHelper.boards)
-                if (!_bookmarks.contains(board.boardId))
+                if (!configState.containsBookmark(
+                    configState.databaseHelper.bookmarks, board.boardId))
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: ListTile(
@@ -371,7 +368,6 @@ class BoardsPageState extends State<BoardsPage> {
                         );
                       },
                       trailing: PopupMenuButton<String>(
-                        onOpened: () => {checkBookmarkState(board.boardId)},
                         icon: Icon(Icons.more_vert_sharp),
                         itemBuilder: (BuildContext context) {
                           return Constants.boardListChoices
@@ -384,12 +380,8 @@ class BoardsPageState extends State<BoardsPage> {
                                     Text(' $choice'),
                                   ],
                                 ),
-                                onTap: () => {
-                                      setState(() {
-                                        boardChoiceAction(
-                                            choice, board.boardId);
-                                      })
-                                    });
+                                onTap: () => setState(() =>
+                                    boardChoiceAction(choice, board.boardId)));
                           }).toList();
                         },
                       ),

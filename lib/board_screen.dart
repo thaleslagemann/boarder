@@ -23,8 +23,6 @@ class BoardScreen extends StatefulWidget {
 }
 
 class BoardScreenState extends State<BoardScreen> {
-  late bool _bookmarkSwitch;
-
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskNameFieldController =
       TextEditingController();
@@ -36,16 +34,6 @@ class BoardScreenState extends State<BoardScreen> {
   String newTaskName = '';
   String newTaskDesc = '';
   String renameHeaderNewName = '';
-
-  IconData bookmarkIconSwitch() {
-    switch (_bookmarkSwitch) {
-      case true:
-        return Icons.bookmark_remove_rounded;
-      case false:
-        return Icons.bookmark_add_outlined;
-    }
-    return Icons.bookmark_sharp;
-  }
 
   @override
   Widget build(BuildContext context) {

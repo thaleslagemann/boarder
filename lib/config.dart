@@ -43,7 +43,7 @@ class ConfigState extends ChangeNotifier {
       await databaseHelper.initializeDatabase();
       databaseHelper.boards = await databaseHelper.getAllBoards();
       for (var board in databaseHelper.boards) {
-        print("Getting headers for board ${board.name}");
+        print("Searching headers for board [${board.name}]...");
         databaseHelper
             .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
             .headers = await databaseHelper.getHeadersForBoard(board.boardId);
@@ -51,8 +51,11 @@ class ConfigState extends ChangeNotifier {
           print("Header found: [${head.headerId}, ${head.name}]");
           databaseHelper.addHeader(head);
         }
+        if (board.headers.isEmpty) {
+          print('No headers found!');
+        }
         for (var header in board.headers) {
-          print("Getting tasks for header ${header.name}");
+          print("Searching tasks for header [${header.name}]...");
           databaseHelper
               .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
               .headers[
@@ -63,15 +66,24 @@ class ConfigState extends ChangeNotifier {
                 "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
             databaseHelper.addTask(task);
           }
+          if (header.tasks.isEmpty) {
+            print('No tasks found!');
+          }
         }
       }
+      databaseHelper.bookmarks = await databaseHelper.getAllBookmarks();
       print("Boards:");
       for (var board in databaseHelper.boards) {
-        print("[${board.boardId}, ${board.name}]");
+        print("[ID: ${board.boardId}, NAME: ${board.name}]");
+      }
+      print("Bookmarks:");
+      for (var bookmark in databaseHelper.bookmarks) {
+        print(
+            "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
       }
       print("Headers:");
       for (var header in databaseHelper.headers) {
-        print("[${header.headerId}, ${header.name}]");
+        print("[ID: ${header.headerId}, NAME: ${header.name}]");
       }
       print("Tasks:");
       for (var task in databaseHelper.tasks) {
@@ -149,20 +161,21 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
-  bool containsBookmark(List<int> bookmarkedBoards, elementToCheck) {
-    for (var item in bookmarkedBoards) {
-      if (item == elementToCheck) {
+  bool containsBoard(List<dynamic> list, elementToCheck) {
+    for (var board in list) {
+      if (board.boardId == elementToCheck ||
+          board.name == elementToCheck ||
+          board.description == elementToCheck) {
         return true;
       }
     }
     return false;
   }
 
-  bool containsBoard(List<dynamic> list, elementToCheck) {
-    for (var board in list) {
-      if (board.boardId == elementToCheck ||
-          board.name == elementToCheck ||
-          board.description == elementToCheck) {
+  bool containsBookmark(List<Bookmark> list, elementToCheck) {
+    for (var bookmark in list) {
+      if (bookmark.boardId == elementToCheck ||
+          bookmark.bookmarkId == elementToCheck) {
         return true;
       }
     }
