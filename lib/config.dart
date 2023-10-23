@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 library config.globals;
 
 import 'package:flutter/widgets.dart';
@@ -32,7 +34,6 @@ class Constants {
 }
 
 class ConfigState extends ChangeNotifier {
-  List<int> bookmarkedBoards = [];
   bool loadingDB = true;
 
   final databaseHelper = DatabaseHelper.instance;

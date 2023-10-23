@@ -130,7 +130,7 @@ class BoardsPageState extends State<BoardsPage> {
       return index;
     }
 
-    void toggleBookmark(int boardID) {
+    toggleBookmark(int boardID) {
       if (configState.containsBookmark(
           configState.databaseHelper.bookmarks, boardID)) {
         print('Removing bookmark $boardID');
@@ -167,7 +167,7 @@ class BoardsPageState extends State<BoardsPage> {
       return Icons.not_interested_outlined;
     }
 
-    void boardChoiceAction(String choice, int boardID) {
+    boardChoiceAction(String choice, int boardID) {
       if (choice == Constants.Delete) {
         print('Removing board');
         _displayBoardDeletionConfirmationDialog(context, boardID);
@@ -294,17 +294,15 @@ class BoardsPageState extends State<BoardsPage> {
                               color:
                                   Theme.of(context).colorScheme.inverseSurface),
                           borderRadius: BorderRadius.circular(10)),
-                      onTap: () {
-                        setState(() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BoardScreen(
-                                      board: board,
-                                    )),
-                          );
-                        });
-                      },
+                      onTap: () => setState(() {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BoardScreen(
+                                    board: board,
+                                  )),
+                        );
+                      }),
                       trailing: PopupMenuButton<String>(
                         icon: Icon(Icons.more_vert_sharp),
                         itemBuilder: (BuildContext context) {
@@ -318,8 +316,9 @@ class BoardsPageState extends State<BoardsPage> {
                                     Text(' $choice'),
                                   ],
                                 ),
-                                onTap: () => setState(() =>
-                                    boardChoiceAction(choice, board.boardId)));
+                                onTap: () => setState(() {
+                                      boardChoiceAction(choice, board.boardId);
+                                    }));
                           }).toList();
                         },
                       ),
@@ -380,8 +379,9 @@ class BoardsPageState extends State<BoardsPage> {
                                     Text(' $choice'),
                                   ],
                                 ),
-                                onTap: () => setState(() =>
-                                    boardChoiceAction(choice, board.boardId)));
+                                onTap: () => setState(() {
+                                      boardChoiceAction(choice, board.boardId);
+                                    }));
                           }).toList();
                         },
                       ),

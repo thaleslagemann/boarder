@@ -241,20 +241,27 @@ class DatabaseHelper {
     await db.delete('Boards', where: 'board_id = ?', whereArgs: [boardId]);
   }
 
-  Future<void> createBookmark(Bookmark bookmark) async {
+  // Create a bookmark
+  void createBookmark(Bookmark bookmark) async {
     final db = await database;
-    await db.insert('Bookmarks', bookmark.toMap());
     bookmarks.add(bookmark);
+    await db.insert('Bookmarks', bookmark.toMap());
     print('Added bookmark ${bookmark.bookmarkId}');
+    for (var bookmark in bookmarks) {
+      print('[${bookmark.boardId}]');
+    }
   }
 
   // Delete a bookmark
-  Future<void> deleteBookmark(int bookmarkId) async {
+  void deleteBookmark(int bookmarkId) async {
     final db = await database;
+    bookmarks.removeAt(findBookmarkIndex(bookmarkId));
     await db
         .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
-    bookmarks.removeAt(findBookmarkIndex(bookmarkId));
     print('Deleted bookmark $bookmarkId');
+    for (var bookmark in bookmarks) {
+      print('[${bookmark.boardId}]');
+    }
   }
 
   // Get all bookmarked boards
