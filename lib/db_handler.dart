@@ -226,7 +226,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteBoard(int boardId) async {
+  void deleteBoard(int boardId) async {
     final Database db = await DatabaseHelper.instance.database;
 
     final headers =
@@ -295,13 +295,29 @@ class DatabaseHelper {
     tasks.add(task);
   }
 
-  void addTaskToHeader(Task task, int headerID) {
-    final targetHeader = headers.firstWhere(
-      (h) => h.headerId == headerID,
-      orElse: () => throw Exception('Header not found'),
+  Future<void> createTask(Task task) async {
+    tasks.add(task);
+    Header parentHeader =
+        headers.firstWhere((b) => task.headerId == b.headerId);
+    List<Task> taskList = [];
+    for (var h in parentHeader.tasks) {
+      taskList.add(h);
+    }
+    taskList.add(task);
+    Header newParentHeader = Header(
+        headerId: parentHeader.headerId,
+        boardId: parentHeader.boardId,
+        name: parentHeader.name,
+        orderIndex: parentHeader.orderIndex,
+        tasks: taskList);
+    int index = headers.indexOf(parentHeader);
+    headers[index] = newParentHeader;
+    final Database db = await DatabaseHelper.instance.database;
+    await db.insert(
+      'Tasks',
+      task.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    task.orderIndex = targetHeader.tasks.length;
-    targetHeader.tasks.add(task);
   }
 
   Future<void> updateOrderInDatabase() async {
@@ -371,8 +387,28 @@ class DatabaseHelper {
 
   // Create a new header
   Future<void> createHeader(Header header) async {
+    headers.add(header);
+    Board parentBoard = boards.firstWhere((b) => header.boardId == b.boardId);
+    List<Header> headerList = [];
+    for (var h in parentBoard.headers) {
+      headerList.add(h);
+    }
+    headerList.add(header);
+    Board newParentBoard = Board(
+        boardId: parentBoard.boardId,
+        name: parentBoard.name,
+        description: parentBoard.description,
+        creationDate: parentBoard.creationDate,
+        lastUpdate: parentBoard.lastUpdate,
+        headers: headerList);
+    int index = boards.indexOf(parentBoard);
+    boards[index] = newParentBoard;
     final Database db = await DatabaseHelper.instance.database;
-    await db.insert('Headers', header.toMap());
+    await db.insert(
+      'Headers',
+      header.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   // Read headers for a specific board
@@ -390,7 +426,7 @@ class DatabaseHelper {
   }
 
   // Update a header's name
-  Future<void> updateHeaderName(int headerId, String newName) async {
+  void updateHeaderName(int headerId, String newName) async {
     final Database db = await DatabaseHelper.instance.database;
     await db.update(
       'Headers',
@@ -401,15 +437,9 @@ class DatabaseHelper {
   }
 
   // Delete a header
-  Future<void> deleteHeader(int headerId) async {
+  void deleteHeader(int headerId) async {
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
-  }
-
-  // Create a new task
-  Future<void> createTask(Task task) async {
-    final Database db = await DatabaseHelper.instance.database;
-    await db.insert('Tasks', task.toMap());
   }
 
   // Read tasks for a specific header
@@ -439,8 +469,9 @@ class DatabaseHelper {
   }
 
   // Delete a task
-  Future<void> deleteTask(int taskId) async {
+  void deleteTask(Task task) async {
+    tasks.remove(task);
     final Database db = await DatabaseHelper.instance.database;
-    await db.delete('Tasks', where: 'task_id = ?', whereArgs: [taskId]);
+    await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
   }
 }

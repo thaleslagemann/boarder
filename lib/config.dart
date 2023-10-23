@@ -190,7 +190,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsHeader(List<dynamic> list, elementToCheck) {
     for (var header in list) {
-      if (header.header_id == elementToCheck || header.name == elementToCheck) {
+      if (header.headerId == elementToCheck || header.name == elementToCheck) {
         return true;
       }
     }
@@ -238,10 +238,11 @@ class ConfigState extends ChangeNotifier {
     return id;
   }
 
-  int getSequentialHeaderID(List<dynamic> list, int id) {
+  int getSequentialHeaderID(int id) {
+    List<dynamic> list = databaseHelper.headers;
     if (containsHeader(list, id)) {
       id = id + 1;
-      return getSequentialHeaderID(list, id);
+      return getSequentialHeaderID(id);
     }
 
     print('At getSequentialHeaderID: New header ID is $id');

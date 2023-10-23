@@ -147,9 +147,8 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayTaskRenameDialog(
-        BuildContext context, int taskID) async {
-      _taskRenameFieldController.text = configState
-          .databaseHelper.tasks[configState.findTaskIndexByID(taskID)].name;
+        BuildContext context, Task task) async {
+      _taskRenameFieldController.text = task.name;
       return showDialog(
           context: context,
           builder: (context) {
@@ -189,7 +188,7 @@ class BoardScreenState extends State<BoardScreen> {
                       renameTaskNewName = _taskRenameFieldController.text;
                       print(renameTaskNewName);
                       configState.databaseHelper
-                          .updateTaskName(taskID, renameTaskNewName);
+                          .updateTaskName(task.taskId, renameTaskNewName);
                       Navigator.pop(context);
                       renameTaskNewName = '';
                       _taskRenameFieldController.clear();
@@ -239,6 +238,7 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayHeaderInputDialog(BuildContext context) async {
+      String newHeaderName;
       return showDialog(
           context: context,
           builder: (context) {
@@ -278,7 +278,7 @@ class BoardScreenState extends State<BoardScreen> {
                       newHeaderName = _headerFieldController.text;
                       print(newHeaderName);
                       final newHeader = Header(
-                          headerId: configState.databaseHelper.headers.length,
+                          headerId: configState.getSequentialHeaderID(0),
                           boardId: widget.board.boardId,
                           name: newHeaderName,
                           orderIndex: configState
@@ -288,7 +288,6 @@ class BoardScreenState extends State<BoardScreen> {
                               .headers
                               .length);
                       configState.databaseHelper.createHeader(newHeader);
-                      configState.databaseHelper.addHeader(newHeader);
                       newHeaderName = '';
                       _headerFieldController.clear();
                       Navigator.pop(context);
@@ -301,7 +300,7 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayTaskDeletionConfirmationDialog(
-        BuildContext context, int taskID) async {
+        BuildContext context, Task task) async {
       return showDialog(
           context: context,
           builder: (context) {
@@ -327,7 +326,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('delete'),
                   onPressed: () {
                     setState(() {
-                      configState.databaseHelper.deleteTask(taskID);
+                      configState.databaseHelper.deleteTask(task);
                       Navigator.pop(context);
                     });
                   },
@@ -405,8 +404,6 @@ class BoardScreenState extends State<BoardScreen> {
                             .length,
                       );
                       configState.databaseHelper.createTask(newTask);
-                      configState.databaseHelper.addTask(newTask);
-                      //configState.databaseHelper.addTaskToHeader(newTask, headerID);
                       newTaskName = '';
                       newTaskDesc = '';
                       _taskNameFieldController.clear();
@@ -571,13 +568,12 @@ class BoardScreenState extends State<BoardScreen> {
       }
     }
 
-    void taskChoiceAction(String choice, int taskID) {
+    void taskChoiceAction(String choice, Task task) {
       if (choice == Constants.Delete) {
-        print(
-            'Removing task ${configState.databaseHelper.tasks[configState.findTaskIndexByID(taskID)].name}');
-        _displayTaskDeletionConfirmationDialog(context, taskID);
+        print('Removing task ${task.name}');
+        _displayTaskDeletionConfirmationDialog(context, task);
       } else if (choice == Constants.Rename) {
-        _displayTaskRenameDialog(context, taskID);
+        _displayTaskRenameDialog(context, task);
       }
     }
 
@@ -595,8 +591,6 @@ class BoardScreenState extends State<BoardScreen> {
     void boardChoiceAction(String choice, int boardID) {
       var index = configState.findBoardIndexByID(boardID);
       if (choice == Constants.Delete) {
-        print(
-            'Removing board ${configState.databaseHelper.boards[index].name}');
         _displayBoardDeletionAlert(context, boardID);
       } else if (choice == Constants.Edit) {
         Navigator.push(
@@ -645,164 +639,157 @@ class BoardScreenState extends State<BoardScreen> {
                           child: Icon(Icons.drag_handle),
                         ),
                         children: [
-                          for (var header in configState.databaseHelper.headers)
-                            if (configState
-                                .databaseHelper
-                                .boards[configState
-                                    .findBoardIndexByID(widget.board.boardId)]
-                                .headers
-                                .contains(header))
-                              DragAndDropList(
-                                contentsWhenEmpty: Text('Empty header'),
-                                header: Padding(
-                                  padding: const EdgeInsets.only(right: 45.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      PopupMenuButton<String>(
-                                        icon: Icon(Icons.more_vert_sharp),
-                                        itemBuilder: (BuildContext context) {
-                                          return Constants.headerChoices
-                                              .map((String choice) {
-                                            return PopupMenuItem<String>(
-                                                value: choice,
-                                                child: Text(choice),
-                                                onTap: () => {
-                                                      setState(() {
-                                                        headerChoiceAction(
-                                                            choice,
-                                                            header.headerId);
-                                                      })
-                                                    });
-                                          }).toList();
-                                        },
+                          for (var header in configState
+                              .databaseHelper
+                              .boards[configState
+                                  .findBoardIndexByID(widget.board.boardId)]
+                              .headers)
+                            DragAndDropList(
+                              contentsWhenEmpty: Text('Empty header'),
+                              header: Padding(
+                                padding: const EdgeInsets.only(right: 45.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    PopupMenuButton<String>(
+                                      icon: Icon(Icons.more_vert_sharp),
+                                      itemBuilder: (BuildContext context) {
+                                        return Constants.headerChoices
+                                            .map((String choice) {
+                                          return PopupMenuItem<String>(
+                                              value: choice,
+                                              child: Text(choice),
+                                              onTap: () => {
+                                                    setState(() {
+                                                      headerChoiceAction(choice,
+                                                          header.headerId);
+                                                    })
+                                                  });
+                                        }).toList();
+                                      },
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Divider(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Divider(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                        ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      child: Text(header.name),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Divider(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                        child: Text(header.name),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Divider(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                                children: <DragAndDropItem>[
-                                  for (var task in header.tasks)
-                                    if (configState
-                                        .databaseHelper
-                                        .headers[
-                                            configState.findHeaderIndexByID(
-                                                header.headerId)]
-                                        .tasks
-                                        .contains(task))
-                                      DragAndDropItem(
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 20.0, vertical: 5.0),
-                                          padding: const EdgeInsets.all(5.0),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(7.5)),
-                                              border: Border.all(
-                                                  width: 0.5,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary)),
-                                          child: Stack(children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: Text(
-                                                      configState
-                                                          .databaseHelper
-                                                          .tasks[configState
-                                                              .findTaskIndexByID(
-                                                                  task.taskId)]
-                                                          .name,
-                                                      softWrap: true),
-                                                ),
-                                                Expanded(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      PopupMenuButton<String>(
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5)),
-                                                        ),
-                                                        icon: Icon(
-                                                            Icons
-                                                                .arrow_drop_down_sharp,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .primary),
-                                                        itemBuilder:
-                                                            (BuildContext
-                                                                context) {
-                                                          return Constants
-                                                              .taskChoices
-                                                              .map((String
-                                                                  choice) {
-                                                            return PopupMenuItem<
-                                                                    String>(
-                                                                value: choice,
-                                                                child: Text(
-                                                                    choice),
-                                                                onTap: () => {
-                                                                      setState(
-                                                                          () {
-                                                                        taskChoiceAction(
-                                                                            choice,
-                                                                            task.taskId);
-                                                                      })
-                                                                    });
-                                                          }).toList();
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ]),
-                                        ),
-                                      ),
-                                ],
                               ),
+                              children: <DragAndDropItem>[
+                                for (var task in header.tasks)
+                                  if (configState
+                                      .databaseHelper
+                                      .headers[configState
+                                          .findHeaderIndexByID(header.headerId)]
+                                      .tasks
+                                      .contains(task))
+                                    DragAndDropItem(
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 20.0, vertical: 5.0),
+                                        padding: const EdgeInsets.all(5.0),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(7.5)),
+                                            border: Border.all(
+                                                width: 0.5,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary)),
+                                        child: Stack(children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text(
+                                                    configState
+                                                        .databaseHelper
+                                                        .tasks[configState
+                                                            .findTaskIndexByID(
+                                                                task.taskId)]
+                                                        .name,
+                                                    softWrap: true),
+                                              ),
+                                              Expanded(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    PopupMenuButton<String>(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                      ),
+                                                      icon: Icon(
+                                                          Icons
+                                                              .arrow_drop_down_sharp,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary),
+                                                      itemBuilder: (BuildContext
+                                                          context) {
+                                                        return Constants
+                                                            .taskChoices
+                                                            .map((String
+                                                                choice) {
+                                                          return PopupMenuItem<
+                                                                  String>(
+                                                              value: choice,
+                                                              child:
+                                                                  Text(choice),
+                                                              onTap: () => {
+                                                                    setState(
+                                                                        () {
+                                                                      taskChoiceAction(
+                                                                          choice,
+                                                                          task.taskId);
+                                                                    })
+                                                                  });
+                                                        }).toList();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ]),
+                                      ),
+                                    ),
+                              ],
+                            ),
                         ],
                         onItemReorder: _onItemReorder,
                         onListReorder: _onListReorder,

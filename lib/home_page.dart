@@ -21,12 +21,19 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LoadingAnimationWidget.threeArchedCircle(
-                color: Theme.of(context).colorScheme.onInverseSurface,
+                color: Theme.of(context).colorScheme.primary,
                 size: 50,
               ),
-              Text('Loading...')
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              )
             ],
           ),
         ),

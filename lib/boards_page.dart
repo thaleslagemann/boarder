@@ -208,54 +208,59 @@ class BoardsPageState extends State<BoardsPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LoadingAnimationWidget.threeArchedCircle(
-                color: Theme.of(context).colorScheme.onInverseSurface,
+                color: Theme.of(context).colorScheme.primary,
                 size: 50,
               ),
-              Text('Loading...')
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Loading',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              )
             ],
           ),
         ),
       );
     } else if (configState.databaseHelper.boards.isEmpty) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
           children: [
             SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
+              child: Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.space_dashboard_sharp,
-                      size: 24,
-                    ),
-                    Text(
-                      'Boards',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                    ),
+                    Text('You have no boards yet.'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Try adding a new board by pressing the ['),
+                        Icon(Icons.add_circle_outline_sharp,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.primary),
+                        Text.rich(TextSpan(
+                            text: ' add button',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                            children: [
+                              TextSpan(
+                                text: '].',
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .inverseSurface),
+                              )
+                            ])),
+                      ],
+                    )
                   ],
                 ),
-              ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('You have no boards yet.'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Try adding a new board by pressing the ['),
-                      Icon(Icons.add_circle_outline_sharp, size: 14),
-                      Text(' add button ].'),
-                    ],
-                  )
-                ],
               ),
             ),
           ],
@@ -275,6 +280,7 @@ class BoardsPageState extends State<BoardsPage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Stack(children: [
