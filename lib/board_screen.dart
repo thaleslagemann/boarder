@@ -307,48 +307,74 @@ class BoardScreenState extends State<BoardScreen> {
                   children: <Widget>[
                     Row(
                       children: [
-                        Text(
-                          'ID: ${configState.databaseHelper.boards[index].boardId}',
-                          textAlign: TextAlign.left,
+                        Text.rich(
+                          TextSpan(text: 'ID: ', children: [
+                            TextSpan(
+                                text:
+                                    '${configState.databaseHelper.boards[index].boardId}',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                          ]),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Text(
-                          'Name: ${configState.databaseHelper.boards[index].name}',
-                          textAlign: TextAlign.left,
+                        Text.rich(
+                          TextSpan(text: 'Name: ', children: [
+                            TextSpan(
+                                text:
+                                    '${configState.databaseHelper.boards[index].name}',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                          ]),
                         ),
                       ],
                     ),
                     Row(
                       children: [
                         Flexible(
-                          child: Text(
-                            'Description: ${configState.databaseHelper.boards[index].description}',
-                            textAlign: TextAlign.left,
-                            softWrap: true,
+                          child: Text.rich(
+                            TextSpan(text: 'Description: ', children: [
+                              TextSpan(
+                                  text:
+                                      '${configState.databaseHelper.boards[index].description}',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary)),
+                            ]),
                           ),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Text(
-                          'Creation date: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate)}',
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                          softWrap: true,
+                        Text.rich(
+                          TextSpan(text: 'Creation date: ', children: [
+                            TextSpan(
+                                text:
+                                    '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate)}',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                          ]),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Text(
-                          'Last update: ${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate)}',
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                          softWrap: true,
+                        Text.rich(
+                          TextSpan(text: 'Last update: ', children: [
+                            TextSpan(
+                                text:
+                                    '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate)}',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                          ]),
                         ),
                       ],
                     ),
@@ -357,7 +383,11 @@ class BoardScreenState extends State<BoardScreen> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('ok'),
+                  child: Text(
+                    'ok',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.inverseSurface),
+                  ),
                   onPressed: () {
                     setState(() {
                       Navigator.pop(context);
@@ -454,7 +484,7 @@ class BoardScreenState extends State<BoardScreen> {
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
         foregroundColor: Theme.of(context).colorScheme.surface,
-        backgroundColor: Color(0xFF4FC3F7),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () {
           _displayHeaderInputDialog(context);
         },

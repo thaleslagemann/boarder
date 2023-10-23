@@ -73,21 +73,23 @@ class SettingsPageState extends State<SettingsPage> {
                                 selectedTheme!,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context).hintColor,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               items: _themeOptions
-                                  .map((String item) =>
-                                      DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Theme.of(context).hintColor,
-                                          ),
-                                        ),
-                                      ))
+                                  .map(
+                                      (String item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                            ),
+                                          ))
                                   .toList(),
                               value: selectedTheme,
                               onChanged: (String? value) {
@@ -124,6 +126,8 @@ class SettingsPageState extends State<SettingsPage> {
                       title: Text('Security'),
                       tiles: [
                         SettingsTile.switchTile(
+                          activeSwitchColor:
+                              Theme.of(context).colorScheme.primary,
                           initialValue: _encryptionSwitch,
                           title: Text('Encrypt data'),
                           leading: encryptionIconSwitch(),

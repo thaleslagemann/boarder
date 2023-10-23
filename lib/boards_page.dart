@@ -250,7 +250,7 @@ class BoardsPageState extends State<BoardsPage> {
             borderRadius: BorderRadius.all(Radius.circular(50.0)),
           ),
           foregroundColor: Theme.of(context).colorScheme.surface,
-          backgroundColor: Color(0xFF4FC3F7),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           onPressed: () {
             _displayBoardInputDialog(context);
           },
@@ -291,8 +291,7 @@ class BoardsPageState extends State<BoardsPage> {
                       shape: RoundedRectangleBorder(
                           side: BorderSide(
                               width: 1,
-                              color:
-                                  Theme.of(context).colorScheme.inverseSurface),
+                              color: Theme.of(context).colorScheme.primary),
                           borderRadius: BorderRadius.circular(10)),
                       onTap: () => setState(() {
                         Navigator.push(
@@ -354,8 +353,7 @@ class BoardsPageState extends State<BoardsPage> {
                       shape: RoundedRectangleBorder(
                           side: BorderSide(
                               width: 1,
-                              color:
-                                  Theme.of(context).colorScheme.inverseSurface),
+                              color: Theme.of(context).colorScheme.primary),
                           borderRadius: BorderRadius.circular(10)),
                       onTap: () {
                         Navigator.push(
@@ -399,7 +397,7 @@ class BoardsPageState extends State<BoardsPage> {
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
         foregroundColor: Theme.of(context).colorScheme.surface,
-        backgroundColor: Color(0xFF4FC3F7),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () {
           _displayBoardInputDialog(context);
         },

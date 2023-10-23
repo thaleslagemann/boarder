@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/boards_page.dart';
@@ -39,16 +40,17 @@ class AppBodyState extends State<AppBody> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              const UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Color(0xFF4FC3F7)),
+              UserAccountsDrawerHeader(
+                decoration:
+                    BoxDecoration(color: Theme.of(context).colorScheme.primary),
                 accountName: Text(
-                  "name",
+                  "${FirebaseAuth.instance.currentUser?.displayName}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 accountEmail: Text(
-                  "admin@email.com",
+                  "${FirebaseAuth.instance.currentUser?.email}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -88,7 +90,7 @@ class AppBodyState extends State<AppBody> {
               selectedIndex = index;
             });
           },
-          indicatorColor: Color(0xFF4FC3F7),
+          indicatorColor: Theme.of(context).primaryColor,
           selectedIndex: selectedIndex,
           destinations: <Widget>[
             if (selectedIndex == 0)

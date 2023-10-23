@@ -80,9 +80,21 @@ class HomePageState extends State<HomePage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                    child: Text(
-                      'Welcome to Kanban_flt, ${FirebaseAuth.instance.currentUser?.displayName}!',
-                      textAlign: TextAlign.center,
+                    child: Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Welcome to Kanban_flt, ',
+                          children: [
+                            TextSpan(
+                                text:
+                                    '${FirebaseAuth.instance.currentUser?.displayName}',
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                            TextSpan(text: '!'),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

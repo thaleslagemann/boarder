@@ -36,8 +36,10 @@ class AppState extends State<MyApp> {
       create: (context) => ConfigState(),
       child: MaterialApp(
         title: 'Kanban Flutter',
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
+        theme: ThemeData(
+            brightness: Brightness.light, colorSchemeSeed: Colors.deepPurple),
+        darkTheme: ThemeData(
+            brightness: Brightness.dark, colorSchemeSeed: Colors.deepPurple),
         themeMode: globalAppTheme.currentTheme(),
         home: const AuthGate(),
       ),
