@@ -19,8 +19,12 @@ class Constants {
 
   static const List<String> headerChoices = <String>[
     AddTask,
-    Delete,
     Rename,
+    Delete,
+  ];
+  static const List<String> taskChoices = <String>[
+    Rename,
+    Delete,
   ];
   static const List<String> boardChoices = <String>[
     Details,
@@ -45,9 +49,8 @@ class ConfigState extends ChangeNotifier {
       databaseHelper.boards = await databaseHelper.getAllBoards();
       for (var board in databaseHelper.boards) {
         print("Searching headers for board [${board.name}]...");
-        databaseHelper
-            .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
-            .headers = await databaseHelper.getHeadersForBoard(board.boardId);
+        databaseHelper.boards[findBoardIndexByID(board.boardId)].headers =
+            await databaseHelper.getHeadersForBoard(board.boardId);
         for (var head in board.headers) {
           print("Header found: [${head.headerId}, ${head.name}]");
           databaseHelper.addHeader(head);
@@ -58,9 +61,8 @@ class ConfigState extends ChangeNotifier {
         for (var header in board.headers) {
           print("Searching tasks for header [${header.name}]...");
           databaseHelper
-              .boards[findBoardIndexByID(databaseHelper.boards, board.boardId)]
-              .headers[
-                  findHeaderIndexByID(databaseHelper.headers, header.headerId)]
+              .boards[findBoardIndexByID(board.boardId)]
+              .headers[findHeaderIndexByID(header.headerId)]
               .tasks = await databaseHelper.getTasksForHeader(header.headerId);
           for (var task in header.tasks) {
             print(
@@ -113,7 +115,8 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findBoardIndexByID(List<dynamic> list, int id) {
+  int findBoardIndexByID(int id) {
+    List<dynamic> list = databaseHelper.boards;
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
@@ -127,7 +130,8 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findHeaderIndexByID(List<dynamic> list, int id) {
+  int findHeaderIndexByID(int id) {
+    List<dynamic> list = databaseHelper.headers;
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;
@@ -141,7 +145,8 @@ class ConfigState extends ChangeNotifier {
     return -1;
   }
 
-  int findTaskIndexByID(List<dynamic> list, int id) {
+  int findTaskIndexByID(int id) {
+    List<dynamic> list = databaseHelper.tasks;
     if (list.isEmpty) {
       print("At FindIndexByID(): List is empty; returning index (-1)");
       return -1;

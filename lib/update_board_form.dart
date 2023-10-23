@@ -141,9 +141,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                       updateBoardDescriptionController.text,
                                   creationDate: configState
                                       .databaseHelper
-                                      .boards[configState.findBoardIndexByID(
-                                          configState.databaseHelper.boards,
-                                          widget.boardID)]
+                                      .boards[configState
+                                          .findBoardIndexByID(widget.boardID)]
                                       .creationDate,
                                   lastUpdate: DateTime.now()));
                               Navigator.push(
@@ -152,10 +151,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                     builder: (context) => BoardScreen(
                                           board: configState
                                                   .databaseHelper.boards[
-                                              configState.findBoardIndexByID(
-                                                  configState
-                                                      .databaseHelper.boards,
-                                                  boardID)],
+                                              configState
+                                                  .findBoardIndexByID(boardID)],
                                         )),
                               );
                               ScaffoldMessenger.of(context)
@@ -188,10 +185,8 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                           updateBoardDescriptionController.text,
                                       creationDate: configState
                                           .databaseHelper
-                                          .boards[configState
-                                              .findBoardIndexByID(
-                                                  configState
-                                                      .databaseHelper.boards,
+                                          .boards[
+                                              configState.findBoardIndexByID(
                                                   widget.boardID)]
                                           .creationDate,
                                       lastUpdate: DateTime.now()));
@@ -203,9 +198,6 @@ class UpdateBoardFormState extends State<UpdateBoardForm> {
                                                       .databaseHelper.boards[
                                                   configState
                                                       .findBoardIndexByID(
-                                                          configState
-                                                              .databaseHelper
-                                                              .boards,
                                                           boardID)],
                                             )),
                                   );

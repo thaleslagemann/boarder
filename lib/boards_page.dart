@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, unused_element
+
 import 'package:flutter/material.dart';
 import 'package:kanban_flt/board_screen.dart';
 import 'package:kanban_flt/db_handler.dart';
@@ -28,9 +30,15 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
               title: const Text('Delete board?'),
               actions: <Widget>[
                 TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.inverseSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -60,6 +68,9 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
               title: const Text('Create a new board'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
                 TextField(
@@ -85,7 +96,9 @@ class BoardsPageState extends State<BoardsPage> {
               ]),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  style: TextButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.inverseSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -94,6 +107,8 @@ class BoardsPageState extends State<BoardsPage> {
                   },
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {

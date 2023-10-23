@@ -90,12 +90,15 @@ class AppBodyState extends State<AppBody> {
               selectedIndex = index;
             });
           },
-          indicatorColor: Theme.of(context).primaryColor,
+          indicatorColor: Theme.of(context).colorScheme.primary,
           selectedIndex: selectedIndex,
           destinations: <Widget>[
             if (selectedIndex == 0)
               NavigationDestination(
-                icon: Icon(Icons.home),
+                icon: Icon(
+                  Icons.home,
+                  color: Colors.black,
+                ),
                 label: 'Home',
               ),
             if (selectedIndex != 0)
@@ -105,7 +108,10 @@ class AppBodyState extends State<AppBody> {
               ),
             if (selectedIndex == 1)
               NavigationDestination(
-                icon: Icon(Icons.space_dashboard),
+                icon: Icon(
+                  Icons.space_dashboard,
+                  color: Colors.black,
+                ),
                 label: 'Boards',
               ),
             if (selectedIndex != 1)
@@ -115,7 +121,10 @@ class AppBodyState extends State<AppBody> {
               ),
             if (selectedIndex == 2)
               NavigationDestination(
-                icon: Icon(Icons.settings),
+                icon: Icon(
+                  Icons.settings,
+                  color: Colors.black,
+                ),
                 label: 'Settings',
               ),
             if (selectedIndex != 2)
