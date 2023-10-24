@@ -75,30 +75,55 @@ class ConfigState extends ChangeNotifier {
       }
       databaseHelper.sortHeadersAndTasks();
       databaseHelper.bookmarks = await databaseHelper.getAllBookmarks();
+      List<Bookmark> badBookmarks = [];
+      for (var bookmark in databaseHelper.bookmarks) {
+        if (!containsBoardId(bookmark.boardId)) {
+          badBookmarks.add(bookmark);
+        }
+      }
+      for (var b in badBookmarks) {
+        databaseHelper.bookmarks.remove(b);
+      }
       print("Boards:");
-      for (var board in databaseHelper.boards) {
-        print("[ID: ${board.boardId}, NAME: ${board.name}]");
+      if (databaseHelper.boards.isEmpty) {
+        print("No boards found!");
+      } else {
+        for (var board in databaseHelper.boards) {
+          print("[ID: ${board.boardId}, NAME: ${board.name}]");
+        }
       }
       print("Bookmarks:");
-      for (var bookmark in databaseHelper.bookmarks) {
-        print(
-            "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
+      if (databaseHelper.bookmarks.isEmpty) {
+        print("No bookmarks found!");
+      } else {
+        for (var bookmark in databaseHelper.bookmarks) {
+          print(
+              "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
+        }
       }
       print("Headers:");
-      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
-      for (var board in databaseHelper.boards) {
-        for (var header in board.headers) {
-          print(
-              "| ${header.headerId.toStringAsPrecision(7)}\t${header.name.padRight(14)}\t${header.boardId.toStringAsPrecision(7)}\t ${header.orderIndex.toStringAsPrecision(7)} |");
+      if (databaseHelper.headers.isEmpty) {
+        print("No headers found!");
+      } else {
+        print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+        for (var board in databaseHelper.boards) {
+          for (var header in board.headers) {
+            print(
+                "| ${header.headerId.toStringAsPrecision(7)}\t${header.name.padRight(14)}\t${header.boardId.toStringAsPrecision(7)}\t ${header.orderIndex.toStringAsPrecision(7)} |");
+          }
         }
       }
       print("Tasks:");
-      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
-      for (var board in databaseHelper.boards) {
-        for (var header in board.headers) {
-          for (var task in header.tasks) {
-            print(
-                "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
+      if (databaseHelper.tasks.isEmpty) {
+        print("No tasks found!");
+      } else {
+        print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+        for (var board in databaseHelper.boards) {
+          for (var header in board.headers) {
+            for (var task in header.tasks) {
+              print(
+                  "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
+            }
           }
         }
       }
@@ -181,6 +206,16 @@ class ConfigState extends ChangeNotifier {
       if (board.boardId == elementToCheck ||
           board.name == elementToCheck ||
           board.description == elementToCheck) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool containsBoardId(int elementToCheck) {
+    List<Board> list = databaseHelper.boards;
+    for (var board in list) {
+      if (board.boardId == elementToCheck) {
         return true;
       }
     }

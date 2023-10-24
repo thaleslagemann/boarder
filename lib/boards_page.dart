@@ -25,7 +25,7 @@ class BoardsPageState extends State<BoardsPage> {
     var configState = context.watch<ConfigState>();
 
     Future<void> _displayBoardDeletionConfirmationDialog(
-        BuildContext context, int boardID) async {
+        BuildContext context, Board board) async {
       return showDialog(
           context: context,
           builder: (context) {
@@ -51,7 +51,7 @@ class BoardsPageState extends State<BoardsPage> {
                   child: const Text('delete'),
                   onPressed: () {
                     setState(() {
-                      configState.databaseHelper.deleteBoard(boardID);
+                      configState.databaseHelper.deleteBoard(board);
                       Navigator.pop(context);
                     });
                   },
@@ -183,16 +183,16 @@ class BoardsPageState extends State<BoardsPage> {
       return Icons.not_interested_outlined;
     }
 
-    boardChoiceAction(String choice, int boardID) {
+    boardChoiceAction(String choice, Board board) {
       if (choice == Constants.Delete) {
         print('Removing board');
-        _displayBoardDeletionConfirmationDialog(context, boardID);
+        _displayBoardDeletionConfirmationDialog(context, board);
       } else if (choice == Constants.Bookmark) {
         print('Toggle bookmark was activated');
-        toggleBookmark(boardID);
+        toggleBookmark(board.boardId);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (!configState.containsBookmark(
-            configState.databaseHelper.bookmarks, boardID)) {
+            configState.databaseHelper.bookmarks, board.boardId)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Added bookmark')),
           );
@@ -338,7 +338,7 @@ class BoardsPageState extends State<BoardsPage> {
                                   ],
                                 ),
                                 onTap: () => setState(() {
-                                      boardChoiceAction(choice, board.boardId);
+                                      boardChoiceAction(choice, board);
                                     }));
                           }).toList();
                         },
@@ -400,7 +400,7 @@ class BoardsPageState extends State<BoardsPage> {
                                   ],
                                 ),
                                 onTap: () => setState(() {
-                                      boardChoiceAction(choice, board.boardId);
+                                      boardChoiceAction(choice, board);
                                     }));
                           }).toList();
                         },

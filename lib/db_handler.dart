@@ -226,43 +226,65 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteBoard(int boardId) async {
+  Future<void> deleteBoard(Board board) async {
     final Database db = await DatabaseHelper.instance.database;
 
-    int bookmarkIndex = findBookmarkIndex(boardId);
+    int boardId = board.boardId;
+    boards.remove(board);
+
+    // Search and delete the bookmark if it exists
+    int bookmarkIndex = findBookmarkIndex(board.boardId);
     print(bookmarkIndex);
     if (bookmarkIndex != -1) {
-      bookmarks.removeAt(bookmarkIndex);
-      await db
-          .query('Bookmarks', where: 'bookmark_id = ?', whereArgs: [boardId]);
+      Bookmark bookmark = bookmarks[bookmarkIndex];
+      bookmarks.remove(bookmark);
+      print("Bookmarks:");
+      for (var bookmark in bookmarks) {
+        print("[${bookmark.boardId}]");
+      }
+
       print('removed bookmark $bookmarkIndex');
     }
 
-    if (boards[findBoardIndexByID(boardId)].headers.isNotEmpty) {
-      print('boards headers not empty');
-      final headers = await db
-          .query('Headers', where: 'board_id = ?', whereArgs: [boardId]);
-      for (final header in headers) {
-        final headerId = header['header_id'] as int;
-        if (header.isNotEmpty) {
-          print('header tasks not empty');
-          await db
-              .delete('Tasks', where: 'header_id = ?', whereArgs: [headerId]);
+    List<Header> headerRemovalList = [];
+    List<Task> taskRemovalList = [];
+
+    for (var header in headers) {
+      if (header.boardId == boardId) {
+        for (var task in tasks) {
+          if (task.headerId == header.headerId) {
+            taskRemovalList.add(task);
+          }
         }
-        await db
-            .delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
+        headerRemovalList.add(header);
       }
     }
 
-    boards.removeAt(findBoardIndexByID(boardId));
-    print('removed board $boardId from list');
-    await db.delete('Boards', where: 'board_id = ?', whereArgs: [boardId]);
+    for (var i = 0; i < taskRemovalList.length; i++) {
+      tasks.remove(taskRemovalList[i]);
+      await db.delete('Tasks',
+          where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
+    }
+
+    for (var i = 0; i < headerRemovalList.length; i++) {
+      headers.remove(headerRemovalList[i]);
+      await db.delete('Headers',
+          where: 'header_id = ?', whereArgs: [headerRemovalList[i].headerId]);
+    }
+
+    if (bookmarkIndex != -1) {
+      await db.query('Bookmarks',
+          where: 'bookmark_id = ?', whereArgs: [board.boardId]);
+    }
+    print('removed board ${board.boardId} from list');
+    await db
+        .delete('Boards', where: 'board_id = ?', whereArgs: [board.boardId]);
   }
 
   // Create a bookmark
   void createBookmark(Bookmark bookmark) async {
-    final db = await database;
     bookmarks.add(bookmark);
+    final db = await database;
     await db.insert('Bookmarks', bookmark.toMap());
     print('Added bookmark ${bookmark.bookmarkId}');
     for (var bookmark in bookmarks) {
@@ -271,9 +293,9 @@ class DatabaseHelper {
   }
 
   // Delete a bookmark
-  void deleteBookmark(int bookmarkId) async {
-    final db = await database;
+  Future<void> deleteBookmark(int bookmarkId) async {
     bookmarks.removeAt(findBookmarkIndex(bookmarkId));
+    final db = await database;
     int rows = await db
         .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
     print('Deleted bookmark $bookmarkId, rows affected: $rows');
