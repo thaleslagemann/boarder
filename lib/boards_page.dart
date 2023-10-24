@@ -120,7 +120,8 @@ class BoardsPageState extends State<BoardsPage> {
                           name: newBoardName,
                           description: newBoardDesc,
                           creationDate: DateTime.now(),
-                          lastUpdate: DateTime.now());
+                          lastUpdate: DateTime.now(),
+                          headers: []);
                       configState.databaseHelper.insertBoard(newBoard);
                       newBoardName = '';
                       newBoardDesc = '';

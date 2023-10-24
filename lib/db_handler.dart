@@ -226,18 +226,36 @@ class DatabaseHelper {
     );
   }
 
-  void deleteBoard(int boardId) async {
+  Future<void> deleteBoard(int boardId) async {
     final Database db = await DatabaseHelper.instance.database;
 
-    final headers =
-        await db.query('Headers', where: 'board_id = ?', whereArgs: [boardId]);
-    for (final header in headers) {
-      final headerId = header['header_id'] as int;
-
-      await db.delete('Tasks', where: 'header_id = ?', whereArgs: [headerId]);
-      await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
+    int bookmarkIndex = findBookmarkIndex(boardId);
+    print(bookmarkIndex);
+    if (bookmarkIndex != -1) {
+      bookmarks.removeAt(bookmarkIndex);
+      await db
+          .query('Bookmarks', where: 'bookmark_id = ?', whereArgs: [boardId]);
+      print('removed bookmark $bookmarkIndex');
     }
 
+    if (boards[findBoardIndexByID(boardId)].headers.isNotEmpty) {
+      print('boards headers not empty');
+      final headers = await db
+          .query('Headers', where: 'board_id = ?', whereArgs: [boardId]);
+      for (final header in headers) {
+        final headerId = header['header_id'] as int;
+        if (header.isNotEmpty) {
+          print('header tasks not empty');
+          await db
+              .delete('Tasks', where: 'header_id = ?', whereArgs: [headerId]);
+        }
+        await db
+            .delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
+      }
+    }
+
+    boards.removeAt(findBoardIndexByID(boardId));
+    print('removed board $boardId from list');
     await db.delete('Boards', where: 'board_id = ?', whereArgs: [boardId]);
   }
 
@@ -256,9 +274,9 @@ class DatabaseHelper {
   void deleteBookmark(int bookmarkId) async {
     final db = await database;
     bookmarks.removeAt(findBookmarkIndex(bookmarkId));
-    await db
+    int rows = await db
         .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
-    print('Deleted bookmark $bookmarkId');
+    print('Deleted bookmark $bookmarkId, rows affected: $rows');
     for (var bookmark in bookmarks) {
       print('[${bookmark.boardId}]');
     }
@@ -285,33 +303,84 @@ class DatabaseHelper {
     return -1;
   }
 
+  int findBoardIndexByID(int id) {
+    List<dynamic> list = boards;
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].boardId == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findHeaderIndexByID(int id) {
+    List<dynamic> list = headers;
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].headerId == id) {
+        return i;
+      }
+    }
+    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    return -1;
+  }
+
   void addHeader(Header header) {
-    header.orderIndex = headers.length;
     headers.add(header);
   }
 
+  // Create a new header
+  Future<void> createHeader(Header header) async {
+    headers.add(header);
+    boards[findBoardIndexByID(header.boardId)].headers.add(header);
+    print("Board's headers:");
+    for (var header in boards[findBoardIndexByID(header.boardId)].headers) {
+      print('${header.headerId}, ${header.name}, ${header.orderIndex}');
+    }
+    final Database db = await DatabaseHelper.instance.database;
+    await db.insert(
+      'Headers',
+      header.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  void sortHeadersAndTasks() {
+    for (var board in boards) {
+      if (board.headers.isNotEmpty) {
+        board.headers.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+        print("Sorted headers by order_index:");
+        for (var header in board.headers) {
+          print("[${header.headerId}, ${header.name}, ${header.orderIndex}]");
+        }
+        for (var header in board.headers) {
+          if (header.tasks.isNotEmpty) {
+            header.tasks.sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+            print("Sorted tasks by order_index:");
+            for (var task in header.tasks) {
+              print("[${task.taskId}, ${task.name}, ${task.orderIndex}]");
+            }
+          }
+        }
+      }
+    }
+  }
+
   void addTask(Task task) {
-    task.orderIndex = tasks.length;
     tasks.add(task);
   }
 
   Future<void> createTask(Task task) async {
     tasks.add(task);
-    Header parentHeader =
-        headers.firstWhere((b) => task.headerId == b.headerId);
-    List<Task> taskList = [];
-    for (var h in parentHeader.tasks) {
-      taskList.add(h);
-    }
-    taskList.add(task);
-    Header newParentHeader = Header(
-        headerId: parentHeader.headerId,
-        boardId: parentHeader.boardId,
-        name: parentHeader.name,
-        orderIndex: parentHeader.orderIndex,
-        tasks: taskList);
-    int index = headers.indexOf(parentHeader);
-    headers[index] = newParentHeader;
+    headers[findHeaderIndexByID(task.headerId)].tasks.add(task);
     final Database db = await DatabaseHelper.instance.database;
     await db.insert(
       'Tasks',
@@ -385,32 +454,6 @@ class DatabaseHelper {
     await db.update('Tasks', {'order_index': newTaskIndex});
   }
 
-  // Create a new header
-  Future<void> createHeader(Header header) async {
-    headers.add(header);
-    Board parentBoard = boards.firstWhere((b) => header.boardId == b.boardId);
-    List<Header> headerList = [];
-    for (var h in parentBoard.headers) {
-      headerList.add(h);
-    }
-    headerList.add(header);
-    Board newParentBoard = Board(
-        boardId: parentBoard.boardId,
-        name: parentBoard.name,
-        description: parentBoard.description,
-        creationDate: parentBoard.creationDate,
-        lastUpdate: parentBoard.lastUpdate,
-        headers: headerList);
-    int index = boards.indexOf(parentBoard);
-    boards[index] = newParentBoard;
-    final Database db = await DatabaseHelper.instance.database;
-    await db.insert(
-      'Headers',
-      header.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
   // Read headers for a specific board
   Future<List<Header>> getHeadersForBoard(int boardId) async {
     final Database db = await DatabaseHelper.instance.database;
@@ -434,12 +477,6 @@ class DatabaseHelper {
       where: 'header_id = ?',
       whereArgs: [headerId],
     );
-  }
-
-  // Delete a header
-  void deleteHeader(int headerId) async {
-    final Database db = await DatabaseHelper.instance.database;
-    await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerId]);
   }
 
   // Read tasks for a specific header
@@ -468,9 +505,19 @@ class DatabaseHelper {
     );
   }
 
+  // Delete a header
+  void deleteHeader(Header header) async {
+    headers.remove(header);
+    boards[findBoardIndexByID(header.boardId)].headers.remove(header);
+    final Database db = await DatabaseHelper.instance.database;
+    await db.delete('Headers',
+        where: 'header_id = ?', whereArgs: [header.headerId]);
+  }
+
   // Delete a task
   void deleteTask(Task task) async {
     tasks.remove(task);
+    headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
   }

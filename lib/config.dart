@@ -51,29 +51,29 @@ class ConfigState extends ChangeNotifier {
         print("Searching headers for board [${board.name}]...");
         databaseHelper.boards[findBoardIndexByID(board.boardId)].headers =
             await databaseHelper.getHeadersForBoard(board.boardId);
-        for (var head in board.headers) {
-          print("Header found: [${head.headerId}, ${head.name}]");
-          databaseHelper.addHeader(head);
+        for (var header in board.headers) {
+          print("Header found: [${header.headerId}, ${header.name}]");
+          databaseHelper.addHeader(header);
         }
         if (board.headers.isEmpty) {
           print('No headers found!');
-        }
-        for (var header in board.headers) {
-          print("Searching tasks for header [${header.name}]...");
-          databaseHelper
-              .boards[findBoardIndexByID(board.boardId)]
-              .headers[findHeaderIndexByID(header.headerId)]
-              .tasks = await databaseHelper.getTasksForHeader(header.headerId);
-          for (var task in header.tasks) {
-            print(
-                "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
-            databaseHelper.addTask(task);
-          }
-          if (header.tasks.isEmpty) {
-            print('No tasks found!');
+        } else {
+          for (var header in board.headers) {
+            print("Searching tasks for header [${header.name}]...");
+            header.tasks =
+                await databaseHelper.getTasksForHeader(header.headerId);
+            for (var task in header.tasks) {
+              print(
+                  "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+              databaseHelper.addTask(task);
+            }
+            if (header.tasks.isEmpty) {
+              print('No tasks found!');
+            }
           }
         }
       }
+      databaseHelper.sortHeadersAndTasks();
       databaseHelper.bookmarks = await databaseHelper.getAllBookmarks();
       print("Boards:");
       for (var board in databaseHelper.boards) {
@@ -85,13 +85,22 @@ class ConfigState extends ChangeNotifier {
             "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
       }
       print("Headers:");
-      for (var header in databaseHelper.headers) {
-        print("[ID: ${header.headerId}, NAME: ${header.name}]");
+      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+      for (var board in databaseHelper.boards) {
+        for (var header in board.headers) {
+          print(
+              "| ${header.headerId.toStringAsPrecision(7)}\t${header.name.padRight(14)}\t${header.boardId.toStringAsPrecision(7)}\t ${header.orderIndex.toStringAsPrecision(7)} |");
+        }
       }
       print("Tasks:");
-      for (var task in databaseHelper.tasks) {
-        print(
-            "[ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+      for (var board in databaseHelper.boards) {
+        for (var header in board.headers) {
+          for (var task in header.tasks) {
+            print(
+                "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
+          }
+        }
       }
       print('DB loaded');
       loadingDB = false;

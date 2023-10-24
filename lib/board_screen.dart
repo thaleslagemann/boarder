@@ -201,7 +201,7 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayHeaderDeletionConfirmationDialog(
-        BuildContext context, int headerID) async {
+        BuildContext context, Header header) async {
       return showDialog(
           context: context,
           builder: (context) {
@@ -227,7 +227,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('delete'),
                   onPressed: () {
                     setState(() {
-                      configState.databaseHelper.deleteHeader(headerID);
+                      configState.databaseHelper.deleteHeader(header);
                       Navigator.pop(context);
                     });
                   },
@@ -281,12 +281,8 @@ class BoardScreenState extends State<BoardScreen> {
                           headerId: configState.getSequentialHeaderID(0),
                           boardId: widget.board.boardId,
                           name: newHeaderName,
-                          orderIndex: configState
-                              .databaseHelper
-                              .boards[configState
-                                  .findBoardIndexByID(widget.board.boardId)]
-                              .headers
-                              .length);
+                          orderIndex: widget.board.headers.length,
+                          tasks: []);
                       configState.databaseHelper.createHeader(newHeader);
                       newHeaderName = '';
                       _headerFieldController.clear();
@@ -388,7 +384,7 @@ class BoardScreenState extends State<BoardScreen> {
                     setState(() {
                       newTaskName = _taskNameFieldController.text;
                       newTaskDesc = _taskDescFieldController.text;
-                      print(newTaskName);
+                      print("Creating new task: [$newTaskName]");
                       var taskID = configState.getSequentialTaskID(
                           configState.databaseHelper.tasks, 0);
                       var newTask = Task(
@@ -556,15 +552,15 @@ class BoardScreenState extends State<BoardScreen> {
       });
     }
 
-    void headerChoiceAction(String choice, int headerID) {
+    void headerChoiceAction(String choice, Header header) {
       if (choice == Constants.Delete) {
         print(
-            'Removing header ${configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].name}');
-        _displayHeaderDeletionConfirmationDialog(context, headerID);
+            'Removing header ${configState.databaseHelper.headers[configState.findHeaderIndexByID(header.headerId)].name}');
+        _displayHeaderDeletionConfirmationDialog(context, header);
       } else if (choice == Constants.Rename) {
-        _displayHeaderRenameDialog(context, headerID);
+        _displayHeaderRenameDialog(context, header.headerId);
       } else if (choice == Constants.AddTask) {
-        _displayTaskInputDialog(context, headerID);
+        _displayTaskInputDialog(context, header.headerId);
       }
     }
 
@@ -639,11 +635,7 @@ class BoardScreenState extends State<BoardScreen> {
                           child: Icon(Icons.drag_handle),
                         ),
                         children: [
-                          for (var header in configState
-                              .databaseHelper
-                              .boards[configState
-                                  .findBoardIndexByID(widget.board.boardId)]
-                              .headers)
+                          for (var header in widget.board.headers)
                             DragAndDropList(
                               contentsWhenEmpty: Text('Empty header'),
                               header: Padding(
@@ -661,8 +653,8 @@ class BoardScreenState extends State<BoardScreen> {
                                               child: Text(choice),
                                               onTap: () => {
                                                     setState(() {
-                                                      headerChoiceAction(choice,
-                                                          header.headerId);
+                                                      headerChoiceAction(
+                                                          choice, header);
                                                     })
                                                   });
                                         }).toList();
@@ -774,7 +766,7 @@ class BoardScreenState extends State<BoardScreen> {
                                                                         () {
                                                                       taskChoiceAction(
                                                                           choice,
-                                                                          task.taskId);
+                                                                          task);
                                                                     })
                                                                   });
                                                         }).toList();
