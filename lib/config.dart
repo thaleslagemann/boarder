@@ -35,6 +35,7 @@ class Constants {
   ];
   static const List<String> boardListChoices = <String>[
     Bookmark,
+    Edit,
     Delete,
   ];
 }

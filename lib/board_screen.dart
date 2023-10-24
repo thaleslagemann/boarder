@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:kanban_flt/db_handler.dart';
-import 'package:kanban_flt/update_board_form.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -34,6 +33,13 @@ class BoardScreenState extends State<BoardScreen> {
       TextEditingController();
   final TextEditingController _headerRenameFieldController =
       TextEditingController();
+  final TextEditingController _boardNameEditFieldController =
+      TextEditingController();
+  final TextEditingController _boardDescEditFieldController =
+      TextEditingController();
+
+  String boardNewName = '';
+  String boardNewDesc = '';
   String newHeaderName = '';
   String newTaskName = '';
   String newTaskDesc = '';
@@ -415,6 +421,87 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
+    Future<void> _displayBoardEditDialog(
+        BuildContext context, Board board) async {
+      _boardNameEditFieldController.text = board.name;
+      _boardDescEditFieldController.text = board.description;
+      return showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              title: const Text('Edit board'),
+              content: 
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        boardNewName = value;
+                      });
+                    },
+                    autofocus: true,
+                    controller: _boardNameEditFieldController,
+                    decoration: const InputDecoration(hintText: "Board name"),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        boardNewDesc = value;
+                      });
+                    },
+                    autofocus: true,
+                    controller: _boardDescEditFieldController,
+                    decoration: const InputDecoration(hintText: "Board description"),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.inverseSurface),
+                  child: const Text('cancel'),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.primary),
+                  child: const Text('ok'),
+                  onPressed: () {
+                    setState(() {
+                      boardNewName = _boardNameEditFieldController.text;
+                      boardNewDesc = _boardDescEditFieldController.text;
+                      print(boardNewName);
+                      print(boardNewDesc);
+                      configState.databaseHelper
+                          .updateBoard(
+                            Board(
+                              boardId: board.boardId,
+                              name: boardNewName,
+                              description: boardNewDesc, 
+                              creationDate: board.creationDate,
+                              lastUpdate: DateTime.now()));
+                      Navigator.pop(context);
+                      boardNewName = '';
+                      boardNewDesc = '';
+                      _boardNameEditFieldController.clear();
+                      _boardDescEditFieldController.clear();
+                    });
+                  },
+                ),
+              ],
+            );
+          });
+    }
+
     Future<void> _displayBoardDetailsDialog(
         BuildContext context, int boardID) async {
       var index = configState.findBoardIndexByID(boardID);
@@ -618,23 +705,13 @@ class BoardScreenState extends State<BoardScreen> {
       return Icons.not_interested_outlined;
     }
 
-    void boardChoiceAction(String choice, int boardID) {
-      var index = configState.findBoardIndexByID(boardID);
+    void boardChoiceAction(String choice, Board board) {
       if (choice == Constants.Delete) {
-        _displayBoardDeletionAlert(context, boardID);
+        _displayBoardDeletionAlert(context, board.boardId);
       } else if (choice == Constants.Edit) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => UpdateBoardForm(
-                    boardID: boardID,
-                    boardName: configState.databaseHelper.boards[index].name,
-                    boardDescription:
-                        configState.databaseHelper.boards[index].description,
-                  )),
-        );
+        _displayBoardEditDialog(context, board);
       } else if (choice == Constants.Details) {
-        _displayBoardDetailsDialog(context, boardID);
+        _displayBoardDetailsDialog(context, board.boardId);
       }
     }
 
@@ -861,7 +938,7 @@ class BoardScreenState extends State<BoardScreen> {
                               onTap: () => {
                                     setState(() {
                                       boardChoiceAction(
-                                          choice, widget.board.boardId);
+                                          choice, widget.board);
                                     })
                                   });
                         }).toList();

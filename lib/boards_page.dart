@@ -19,6 +19,13 @@ class BoardsPageState extends State<BoardsPage> {
       TextEditingController();
   final TextEditingController _boardDescInputController =
       TextEditingController();
+  final TextEditingController _boardNameEditFieldController =
+      TextEditingController();
+  final TextEditingController _boardDescEditFieldController =
+      TextEditingController();
+
+  String boardNewName = '';
+  String boardNewDesc = '';
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +143,87 @@ class BoardsPageState extends State<BoardsPage> {
           });
     }
 
+    Future<void> _displayBoardEditDialog(
+        BuildContext context, Board board) async {
+      _boardNameEditFieldController.text = board.name;
+      _boardDescEditFieldController.text = board.description;
+      return showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              title: const Text('Edit board'),
+              content: 
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        boardNewName = value;
+                      });
+                    },
+                    autofocus: true,
+                    controller: _boardNameEditFieldController,
+                    decoration: const InputDecoration(hintText: "Board name"),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        boardNewDesc = value;
+                      });
+                    },
+                    autofocus: true,
+                    controller: _boardDescEditFieldController,
+                    decoration: const InputDecoration(hintText: "Board description"),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.inverseSurface),
+                  child: const Text('cancel'),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.primary),
+                  child: const Text('ok'),
+                  onPressed: () {
+                    setState(() {
+                      boardNewName = _boardNameEditFieldController.text;
+                      boardNewDesc = _boardDescEditFieldController.text;
+                      print(boardNewName);
+                      print(boardNewDesc);
+                      configState.databaseHelper
+                          .updateBoard(
+                            Board(
+                              boardId: board.boardId,
+                              name: boardNewName,
+                              description: boardNewDesc, 
+                              creationDate: board.creationDate,
+                              lastUpdate: DateTime.now()));
+                      Navigator.pop(context);
+                      boardNewName = '';
+                      boardNewDesc = '';
+                      _boardNameEditFieldController.clear();
+                      _boardDescEditFieldController.clear();
+                    });
+                  },
+                ),
+              ],
+            );
+          });
+    }
+
     int findBookmarkIndex(int boardID) {
       int index = -1;
       for (var i = 0; i < configState.databaseHelper.bookmarks.length; i++) {
@@ -187,6 +275,8 @@ class BoardsPageState extends State<BoardsPage> {
       if (choice == Constants.Delete) {
         print('Removing board');
         _displayBoardDeletionConfirmationDialog(context, board);
+      } else if (choice == Constants.Edit) {
+        _displayBoardEditDialog(context, board);
       } else if (choice == Constants.Bookmark) {
         print('Toggle bookmark was activated');
         toggleBookmark(board.boardId);

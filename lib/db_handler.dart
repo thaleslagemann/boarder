@@ -217,6 +217,9 @@ class DatabaseHelper {
   }
 
   Future<void> updateBoard(Board board) async {
+    int boardIndex = findBoardIndexByID(board.boardId); 
+    boards.removeAt(boardIndex);
+    boards.insert(boardIndex, board);
     final Database db = await DatabaseHelper.instance.database;
     await db.update(
       'Boards',
