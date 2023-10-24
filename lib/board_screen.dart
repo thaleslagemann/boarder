@@ -40,6 +40,8 @@ class BoardScreenState extends State<BoardScreen> {
   String renameHeaderNewName = '';
   String renameTaskNewName = '';
 
+  int currentReorderOption = reorderType.currentReorderInt();
+
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
@@ -524,31 +526,63 @@ class BoardScreenState extends State<BoardScreen> {
 
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
-      int taskIndex = configState.findTaskIndexByID(configState
-          .databaseHelper.headers[oldListIndex].tasks[oldItemIndex].taskId);
+      switch (currentReorderOption) {
+        case 0:
+          break;
+        case 1:
+          setState(() {
+            if (true) {
+            } else {}
+            // int buffer = widget
+            //     .board.headers[oldListIndex].tasks[oldItemIndex].orderIndex;
+            // widget.board.headers[oldListIndex].tasks[oldItemIndex].orderIndex =
+            //     widget
+            //         .board.headers[newListIndex].tasks[newItemIndex].orderIndex;
+            // widget.board.headers[newListIndex].tasks[newItemIndex].orderIndex =
+            //     buffer;
+            // configState.databaseHelper.sortHeadersAndTasks();
+            print(
+                '[${widget.board.headers[oldListIndex].headerId}, ${widget.board.headers[oldListIndex].tasks[oldItemIndex].orderIndex}] -> [${widget.board.headers[newListIndex].headerId}, ${widget.board.headers[newListIndex].tasks[newItemIndex].orderIndex}]');
+          });
+          break;
+      }
+      // int taskIndex = configState.findTaskIndexByID(configState
+      //     .databaseHelper.headers[oldListIndex].tasks[oldItemIndex].taskId);
       //int oldHeaderId = configState.databaseHelper.boards[].headerId;
       //int newHeaderId = configState.databaseHelper.tasks[taskIndex].headerId;
 
-      setState(() {
-        configState.databaseHelper.updateTaskOrderInDatabase(
-            configState.databaseHelper.tasks[taskIndex],
-            configState.databaseHelper.headers[oldListIndex],
-            configState.databaseHelper.headers[newListIndex],
-            oldItemIndex,
-            newItemIndex);
-        var movedItem = configState.databaseHelper.headers[oldListIndex].tasks
-            .removeAt(oldItemIndex);
-        configState.databaseHelper.headers[newListIndex].tasks
-            .insert(newItemIndex, movedItem);
-        print(
-            '[$oldItemIndex, $oldListIndex] -> [$newItemIndex, $newListIndex]');
-      });
+      // setState(() {
+      //    configState.databaseHelper.updateTaskOrderInDatabase(
+      //        configState.databaseHelper.tasks[taskIndex],
+      //        configState.databaseHelper.headers[oldListIndex],
+      //        configState.databaseHelper.headers[newListIndex],
+      //        oldItemIndex,
+      //        newItemIndex);
+      //    var movedItem = configState.databaseHelper.headers[oldListIndex].tasks
+      //        .removeAt(oldItemIndex);
+      //    configState.databaseHelper.headers[newListIndex].tasks
+      //        .insert(newItemIndex, movedItem);
+      //   print(
+      //       '[$oldItemIndex, $oldListIndex] -> [$newItemIndex, $newListIndex]');
+      // });
     }
 
     _onListReorder(int oldListIndex, int newListIndex) {
       setState(() {
-        var movedList = widget.board.headers.removeAt(oldListIndex);
-        widget.board.headers.insert(newListIndex, movedList);
+        switch (reorderType.currentReorderInt()) {
+          case 0:
+            break;
+          case 1:
+            setState(() {
+              Header buffer = widget.board.headers[newListIndex];
+              widget.board.headers[newListIndex] =
+                  widget.board.headers[oldListIndex];
+              widget.board.headers[oldListIndex] = buffer;
+            });
+            break;
+        }
+        // var movedList = widget.board.headers.removeAt(oldListIndex);
+        // widget.board.headers.insert(newListIndex, movedList);
       });
     }
 
@@ -686,100 +720,95 @@ class BoardScreenState extends State<BoardScreen> {
                               ),
                               children: <DragAndDropItem>[
                                 for (var task in header.tasks)
-                                  if (configState
-                                      .databaseHelper
-                                      .headers[configState
-                                          .findHeaderIndexByID(header.headerId)]
-                                      .tasks
-                                      .contains(task))
-                                    DragAndDropItem(
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 20.0, vertical: 5.0),
-                                        padding: const EdgeInsets.all(5.0),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(7.5)),
-                                            border: Border.all(
-                                                width: 0.5,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary)),
-                                        child: Stack(children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Text(
-                                                    configState
-                                                        .databaseHelper
-                                                        .tasks[configState
-                                                            .findTaskIndexByID(
-                                                                task.taskId)]
-                                                        .name,
-                                                    softWrap: true),
-                                              ),
-                                              Expanded(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    PopupMenuButton<String>(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    5)),
-                                                      ),
-                                                      icon: Icon(
-                                                          Icons
-                                                              .arrow_drop_down_sharp,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary),
-                                                      itemBuilder: (BuildContext
-                                                          context) {
-                                                        return Constants
-                                                            .taskChoices
-                                                            .map((String
-                                                                choice) {
-                                                          return PopupMenuItem<
-                                                                  String>(
-                                                              value: choice,
-                                                              child:
-                                                                  Text(choice),
-                                                              onTap: () => {
-                                                                    setState(
-                                                                        () {
-                                                                      taskChoiceAction(
-                                                                          choice,
-                                                                          task);
-                                                                    })
-                                                                  });
-                                                        }).toList();
-                                                      },
+                                  // if (configState
+                                  //     .databaseHelper
+                                  //     .headers[configState
+                                  //         .findHeaderIndexByID(header.headerId)]
+                                  //     .tasks
+                                  //     .contains(task))
+                                  DragAndDropItem(
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 5.0),
+                                      padding: const EdgeInsets.all(5.0),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(7.5)),
+                                          border: Border.all(
+                                              width: 0.5,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary)),
+                                      child: Stack(children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Text(
+                                                  configState
+                                                      .databaseHelper
+                                                      .tasks[configState
+                                                          .findTaskIndexByID(
+                                                              task.taskId)]
+                                                      .name,
+                                                  softWrap: true),
+                                            ),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  PopupMenuButton<String>(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  5)),
                                                     ),
-                                                  ],
-                                                ),
+                                                    icon: Icon(
+                                                        Icons
+                                                            .arrow_drop_down_sharp,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .primary),
+                                                    itemBuilder:
+                                                        (BuildContext context) {
+                                                      return Constants
+                                                          .taskChoices
+                                                          .map((String choice) {
+                                                        return PopupMenuItem<
+                                                                String>(
+                                                            value: choice,
+                                                            child: Text(choice),
+                                                            onTap: () => {
+                                                                  setState(() {
+                                                                    taskChoiceAction(
+                                                                        choice,
+                                                                        task);
+                                                                  })
+                                                                });
+                                                      }).toList();
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          )
-                                        ]),
-                                      ),
+                                            ),
+                                          ],
+                                        )
+                                      ]),
                                     ),
+                                  ),
                               ],
                             ),
                         ],

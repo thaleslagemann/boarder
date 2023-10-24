@@ -529,11 +529,25 @@ class DatabaseHelper {
 
   // Delete a header
   void deleteHeader(Header header) async {
+    List<Task> taskRemovalList = [];
+
+    for (var task in header.tasks) {
+      if (task.headerId == header.headerId) {
+        taskRemovalList.add(task);
+      }
+    }
+
     headers.remove(header);
     boards[findBoardIndexByID(header.boardId)].headers.remove(header);
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Headers',
         where: 'header_id = ?', whereArgs: [header.headerId]);
+
+    for (var i = 0; i < taskRemovalList.length; i++) {
+      tasks.remove(taskRemovalList[i]);
+      await db.delete('Tasks',
+          where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
+    }
   }
 
   // Delete a task

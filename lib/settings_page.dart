@@ -17,7 +17,13 @@ class SettingsPageState extends State<SettingsPage> {
     'Dark',
   ];
 
+  final List<String> _reorderOptions = [
+    'Insert',
+    'Swap',
+  ];
+
   String? selectedTheme = globalAppTheme.currentThemeString();
+  String? selectedReorder = reorderType.currentReorderString();
 
   var _encryptionSwitch = true;
 
@@ -122,6 +128,63 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                       ],
                     ),
+                    SettingsSection(title: Text('Boards'), tiles: [
+                      SettingsTile(
+                        title: Text('Reorder type'),
+                        leading: Icon(Icons.swap_vert_rounded),
+                        trailing: DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            hint: Text(
+                              selectedReorder!,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            items: _reorderOptions
+                                .map((String item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            value: selectedReorder,
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedReorder = value;
+                                print(
+                                    'Attempting to switch reorder type to $selectedReorder');
+                                reorderType.switchReorder();
+                                print(selectedReorder);
+                              });
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Reorder type changed')),
+                              );
+                            },
+                            buttonStyleData: const ButtonStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              height: 40,
+                              width: 120,
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                            ),
+                          ),
+                        ),
+                        onPressed: (value) {},
+                      ),
+                    ]),
                     SettingsSection(
                       title: Text('Security'),
                       tiles: [
