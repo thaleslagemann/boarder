@@ -611,6 +611,76 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
+    Future<void> _displayTaskScreen(BuildContext context, Task task) {
+      return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              title: Text("${task.name}"),
+              content: Container(
+                child:
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children:[
+                    Text.rich(
+                      TextSpan(
+                        text:'ID: ',
+                        style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.inverseSurface),
+                        children: [
+                          TextSpan(
+                            text: '${task.taskId}',
+                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                          ),
+                        ]),
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        text:'Description: ',
+                        style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.inverseSurface),
+                        children: [
+                          if(task.description != '')
+                            TextSpan(
+                              text: task.description,
+                              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                            ),
+                          if(task.description == '')
+                            TextSpan(
+                              text: 'No description found.',
+                              style: TextStyle(color: Theme.of(context).colorScheme.outline),
+                            ),
+                        ]),
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        text:'Assigned User: ',
+                        style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.inverseSurface),
+                        children: [
+                          TextSpan(
+                            text: 'unimplemented',
+                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                          ),
+                        ]),
+                    )
+                  ]
+                ),
+              )
+          );
+        }
+      );
+    }
+
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
       switch (currentReorderOption) {
@@ -818,70 +888,78 @@ class BoardScreenState extends State<BoardScreen> {
                                                   .colorScheme
                                                   .primary)),
                                       child: Stack(children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.max,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Text(
-                                                  configState
-                                                      .databaseHelper
-                                                      .tasks[configState
-                                                          .findTaskIndexByID(
-                                                              task.taskId)]
-                                                      .name,
-                                                  softWrap: true),
-                                            ),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  PopupMenuButton<String>(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  5)),
-                                                    ),
-                                                    icon: Icon(
-                                                        Icons
-                                                            .arrow_drop_down_sharp,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .primary),
-                                                    itemBuilder:
-                                                        (BuildContext context) {
-                                                      return Constants
-                                                          .taskChoices
-                                                          .map((String choice) {
-                                                        return PopupMenuItem<
-                                                                String>(
-                                                            value: choice,
-                                                            child: Text(choice),
-                                                            onTap: () => {
-                                                                  setState(() {
-                                                                    taskChoiceAction(
-                                                                        choice,
-                                                                        task);
-                                                                  })
-                                                                });
-                                                      }).toList();
-                                                    },
-                                                  ),
-                                                ],
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _displayTaskScreen(context, task);
+                                            });
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text(
+                                                    configState
+                                                        .databaseHelper
+                                                        .tasks[configState
+                                                            .findTaskIndexByID(
+                                                                task.taskId)]
+                                                        .name,
+                                                    style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                                                    softWrap: true),
                                               ),
-                                            ),
-                                          ],
+                                              Expanded(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  children: [
+                                                    PopupMenuButton<String>(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5)),
+                                                      ),
+                                                      icon: Icon(
+                                                          Icons
+                                                              .arrow_drop_down_sharp,
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .primary),
+                                                      itemBuilder:
+                                                          (BuildContext context) {
+                                                        return Constants
+                                                            .taskChoices
+                                                            .map((String choice) {
+                                                          return PopupMenuItem<
+                                                                  String>(
+                                                              value: choice,
+                                                              child: Text(choice),
+                                                              onTap: () => {
+                                                                    setState(() {
+                                                                      taskChoiceAction(
+                                                                          choice,
+                                                                          task);
+                                                                    })
+                                                                  });
+                                                        }).toList();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         )
                                       ]),
                                     ),
