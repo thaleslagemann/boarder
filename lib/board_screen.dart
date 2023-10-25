@@ -619,25 +619,13 @@ class BoardScreenState extends State<BoardScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                title: Column(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "${task.name}",
-                        ),
-                        CloseButton(),
-                      ],
+                    Text(
+                      "${task.name}",
                     ),
-                    Row(
-                      children: [
-                        Divider(
-                          thickness: 1.5,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ],
-                    )
+                    CloseButton(),
                   ],
                 ),
                 content: Container(
@@ -646,6 +634,10 @@ class BoardScreenState extends State<BoardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Divider(
+                          thickness: 1.5,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         Text.rich(
                           TextSpan(
                               text: 'ID: ',
