@@ -57,8 +57,9 @@ class BoardScreenState extends State<BoardScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
             title: Text('Delete the board?'),
             actions: <Widget>[
@@ -67,8 +68,7 @@ class BoardScreenState extends State<BoardScreen> {
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
-                    foregroundColor:
-                        Theme.of(context).colorScheme.inverseSurface),
+                    foregroundColor: Theme.of(context).colorScheme.primary),
                 child: Text('cancel'),
               ),
               TextButton(
@@ -107,8 +107,9 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Rename header'),
               content: TextField(
@@ -124,8 +125,7 @@ class BoardScreenState extends State<BoardScreen> {
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -161,8 +161,9 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Rename task'),
               content: TextField(
@@ -178,8 +179,7 @@ class BoardScreenState extends State<BoardScreen> {
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -214,15 +214,15 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete header?'),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -251,8 +251,9 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new header'),
               content: TextField(
@@ -268,8 +269,7 @@ class BoardScreenState extends State<BoardScreen> {
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -309,15 +309,15 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete task?'),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -346,8 +346,9 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new task'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -375,8 +376,7 @@ class BoardScreenState extends State<BoardScreen> {
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -429,12 +429,12 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Edit board'),
-              content: 
-              Column(
+              content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
@@ -455,15 +455,15 @@ class BoardScreenState extends State<BoardScreen> {
                     },
                     autofocus: true,
                     controller: _boardDescEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board description"),
+                    decoration:
+                        const InputDecoration(hintText: "Board description"),
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -481,14 +481,12 @@ class BoardScreenState extends State<BoardScreen> {
                       boardNewDesc = _boardDescEditFieldController.text;
                       print(boardNewName);
                       print(boardNewDesc);
-                      configState.databaseHelper
-                          .updateBoard(
-                            Board(
-                              boardId: board.boardId,
-                              name: boardNewName,
-                              description: boardNewDesc, 
-                              creationDate: board.creationDate,
-                              lastUpdate: DateTime.now()));
+                      configState.databaseHelper.updateBoard(Board(
+                          boardId: board.boardId,
+                          name: boardNewName,
+                          description: boardNewDesc,
+                          creationDate: board.creationDate,
+                          lastUpdate: DateTime.now()));
                       Navigator.pop(context);
                       boardNewName = '';
                       boardNewDesc = '';
@@ -509,8 +507,9 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Board details'),
               content: Container(
@@ -613,72 +612,104 @@ class BoardScreenState extends State<BoardScreen> {
 
     Future<void> _displayTaskScreen(BuildContext context, Task task) {
       return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              title: Text("${task.name}"),
-              content: Container(
-                child:
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children:[
-                    Text.rich(
-                      TextSpan(
-                        text:'ID: ',
-                        style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.inverseSurface),
-                        children: [
-                          TextSpan(
-                            text: '${task.taskId}',
-                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                          ),
-                        ]),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        text:'Description: ',
-                        style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.inverseSurface),
-                        children: [
-                          if(task.description != '')
-                            TextSpan(
-                              text: task.description,
-                              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                            ),
-                          if(task.description == '')
-                            TextSpan(
-                              text: 'No description found.',
-                              style: TextStyle(color: Theme.of(context).colorScheme.outline),
-                            ),
-                        ]),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        text:'Assigned User: ',
-                        style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.inverseSurface),
-                        children: [
-                          TextSpan(
-                            text: 'unimplemented',
-                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                          ),
-                        ]),
-                    )
-                  ]
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-              )
-          );
-        }
-      );
+                title: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${task.name}",
+                        ),
+                        CloseButton(),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Divider(
+                          thickness: 1.5,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                content: Container(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                              text: 'ID: ',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface),
+                              children: [
+                                TextSpan(
+                                  text: '${task.taskId}',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                ),
+                              ]),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                              text: 'Description: ',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface),
+                              children: [
+                                if (task.description != '')
+                                  TextSpan(
+                                    text: task.description,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                  ),
+                                if (task.description == '')
+                                  TextSpan(
+                                    text: 'No description found.',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline),
+                                  ),
+                              ]),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                              text: 'Assigned User: ',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface),
+                              children: [
+                                TextSpan(
+                                  text: 'unimplemented',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                ),
+                              ]),
+                        ),
+                        SizedBox(height: 15.0),
+                      ]),
+                ));
+          });
     }
 
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
@@ -688,8 +719,7 @@ class BoardScreenState extends State<BoardScreen> {
           break;
         case 1:
           setState(() {
-            if (true) {
-            } else {}
+            if (true) {}
             // int buffer = widget
             //     .board.headers[oldListIndex].tasks[oldItemIndex].orderIndex;
             // widget.board.headers[oldListIndex].tasks[oldItemIndex].orderIndex =
@@ -844,6 +874,7 @@ class BoardScreenState extends State<BoardScreen> {
                                     Expanded(
                                       flex: 1,
                                       child: Divider(
+                                        thickness: 1.5,
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary,
@@ -857,6 +888,7 @@ class BoardScreenState extends State<BoardScreen> {
                                     Expanded(
                                       flex: 1,
                                       child: Divider(
+                                        thickness: 1.5,
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary,
@@ -877,13 +909,12 @@ class BoardScreenState extends State<BoardScreen> {
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 20.0, vertical: 5.0),
-                                      padding: const EdgeInsets.all(5.0),
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(7.5)),
                                           border: Border.all(
-                                              width: 0.5,
+                                              width: 1.5,
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .primary)),
@@ -911,7 +942,10 @@ class BoardScreenState extends State<BoardScreen> {
                                                             .findTaskIndexByID(
                                                                 task.taskId)]
                                                         .name,
-                                                    style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .inverseSurface),
                                                     softWrap: true),
                                               ),
                                               Expanded(
@@ -920,7 +954,8 @@ class BoardScreenState extends State<BoardScreen> {
                                                       MainAxisAlignment.end,
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
-                                                  mainAxisSize: MainAxisSize.max,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
                                                   children: [
                                                     PopupMenuButton<String>(
                                                       shape:
@@ -933,20 +968,24 @@ class BoardScreenState extends State<BoardScreen> {
                                                       icon: Icon(
                                                           Icons
                                                               .arrow_drop_down_sharp,
-                                                          color: Theme.of(context)
-                                                              .colorScheme
-                                                              .primary),
-                                                      itemBuilder:
-                                                          (BuildContext context) {
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary),
+                                                      itemBuilder: (BuildContext
+                                                          context) {
                                                         return Constants
                                                             .taskChoices
-                                                            .map((String choice) {
+                                                            .map((String
+                                                                choice) {
                                                           return PopupMenuItem<
                                                                   String>(
                                                               value: choice,
-                                                              child: Text(choice),
+                                                              child:
+                                                                  Text(choice),
                                                               onTap: () => {
-                                                                    setState(() {
+                                                                    setState(
+                                                                        () {
                                                                       taskChoiceAction(
                                                                           choice,
                                                                           task);
@@ -1015,8 +1054,7 @@ class BoardScreenState extends State<BoardScreen> {
                               ),
                               onTap: () => {
                                     setState(() {
-                                      boardChoiceAction(
-                                          choice, widget.board);
+                                      boardChoiceAction(choice, widget.board);
                                     })
                                   });
                         }).toList();

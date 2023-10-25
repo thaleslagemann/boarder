@@ -37,15 +37,15 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete board?'),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -75,8 +75,9 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new board'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -104,8 +105,7 @@ class BoardsPageState extends State<BoardsPage> {
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -151,12 +151,12 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Edit board'),
-              content: 
-              Column(
+              content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
@@ -177,15 +177,15 @@ class BoardsPageState extends State<BoardsPage> {
                     },
                     autofocus: true,
                     controller: _boardDescEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board description"),
+                    decoration:
+                        const InputDecoration(hintText: "Board description"),
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor:
-                          Theme.of(context).colorScheme.inverseSurface),
+                      foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -203,14 +203,12 @@ class BoardsPageState extends State<BoardsPage> {
                       boardNewDesc = _boardDescEditFieldController.text;
                       print(boardNewName);
                       print(boardNewDesc);
-                      configState.databaseHelper
-                          .updateBoard(
-                            Board(
-                              boardId: board.boardId,
-                              name: boardNewName,
-                              description: boardNewDesc, 
-                              creationDate: board.creationDate,
-                              lastUpdate: DateTime.now()));
+                      configState.databaseHelper.updateBoard(Board(
+                          boardId: board.boardId,
+                          name: boardNewName,
+                          description: boardNewDesc,
+                          creationDate: board.creationDate,
+                          lastUpdate: DateTime.now()));
                       Navigator.pop(context);
                       boardNewName = '';
                       boardNewDesc = '';
@@ -402,7 +400,7 @@ class BoardsPageState extends State<BoardsPage> {
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1,
+                              width: 1.5,
                               color: Theme.of(context).colorScheme.primary),
                           borderRadius: BorderRadius.circular(10)),
                       onTap: () => setState(() {
@@ -464,7 +462,7 @@ class BoardsPageState extends State<BoardsPage> {
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1,
+                              width: 1.5,
                               color: Theme.of(context).colorScheme.primary),
                           borderRadius: BorderRadius.circular(10)),
                       onTap: () {
