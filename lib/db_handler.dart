@@ -217,7 +217,7 @@ class DatabaseHelper {
   }
 
   Future<void> updateBoard(Board board) async {
-    int boardIndex = findBoardIndexByID(board.boardId); 
+    int boardIndex = findBoardIndexByID(board.boardId);
     boards.removeAt(boardIndex);
     boards.insert(boardIndex, board);
     final Database db = await DatabaseHelper.instance.database;
@@ -358,6 +358,21 @@ class DatabaseHelper {
     return -1;
   }
 
+  int findTaskIndexByID(int id) {
+    List<dynamic> list = tasks;
+    if (list.isEmpty) {
+      print("At FindIndexByID(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].taskId == id) {
+        return i;
+      }
+    }
+    print("Element not found; returning index (-1)");
+    return -1;
+  }
+
   void addHeader(Header header) {
     headers.add(header);
   }
@@ -495,6 +510,7 @@ class DatabaseHelper {
 
   // Update a header's name
   void updateHeaderName(int headerId, String newName) async {
+    headers[findHeaderIndexByID(headerId)].name = newName;
     final Database db = await DatabaseHelper.instance.database;
     await db.update(
       'Headers',
@@ -521,6 +537,7 @@ class DatabaseHelper {
 
   // Update a task's name
   Future<void> updateTaskName(int taskId, String newName) async {
+    tasks[findTaskIndexByID(taskId)].name = newName;
     final Database db = await DatabaseHelper.instance.database;
     await db.update(
       'Tasks',
