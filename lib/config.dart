@@ -117,23 +117,27 @@ class ConfigState extends ChangeNotifier {
         }
       }
       print("Tasks:");
-      if (databaseHelper.tasks.isEmpty) {
-        print("No tasks found!");
-      } else {
-        print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
-        for (var board in databaseHelper.boards) {
-          for (var header in board.headers) {
-            for (var task in header.tasks) {
-              print(
-                  "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
-            }
-          }
-        }
-      }
+      printTasks();
       print('DB loaded');
       loadingDB = false;
       print('Loading DB: $loadingDB');
       notifyListeners();
+    }
+  }
+
+  void printTasks() {
+    if (databaseHelper.tasks.isEmpty) {
+      print("No tasks found!");
+    } else {
+      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+      for (var board in databaseHelper.boards) {
+        for (var header in board.headers) {
+          for (var task in header.tasks) {
+            print(
+                "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
+          }
+        }
+      }
     }
   }
 
@@ -170,7 +174,7 @@ class ConfigState extends ChangeNotifier {
   int findHeaderIndexByID(int id) {
     List<dynamic> list = databaseHelper.headers;
     if (list.isEmpty) {
-      print("At FindIndexByID(): List is empty; returning index (-1)");
+      print("At FindHeaderIndexByID(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
@@ -178,7 +182,25 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    print("At FindHeaderIndexByID(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findHeaderIndexByOrderId(int id, Board board) {
+    List<dynamic> list = board.headers;
+    print("Searching [$id] on board ${board.name}");
+    if (list.isEmpty) {
+      print(
+          "At FindHeaderIndexByOrderId(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].orderIndex == id) {
+        return i;
+      }
+    }
+    print(
+        "At FindHeaderIndexByOrderId(): Element not found; returning index (-1)");
     return -1;
   }
 
@@ -193,7 +215,30 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    print("At FindIndexByElement(): Element not found; returning index (-1)");
+    print("At FindIndexByID(): Element not found; returning index (-1)");
+    return -1;
+  }
+
+  int findTaskIndexByOrderId(int id, int listId, Board board) {
+    int headerIndex = findHeaderIndexByOrderId(listId, board);
+    List<dynamic> list = board.headers[headerIndex].tasks;
+    print(
+        "Searching [$id] on board ${board.name} on header ${board.headers[headerIndex].name}");
+
+    for (var task in list) {
+      print('[O.I.: ${task.orderIndex}, NAME: ${task.name}]');
+    }
+    if (list.isEmpty) {
+      print("At FindTaskIndexByOrderId(): List is empty; returning index (-1)");
+      return -1;
+    }
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].orderIndex == id) {
+        return i;
+      }
+    }
+    print(
+        "At FindTaskIndexByOrderId(): Element not found; returning index (-1)");
     return -1;
   }
 

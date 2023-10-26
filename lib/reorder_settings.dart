@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ReorderSettings with ChangeNotifier {
-  int _reorder = 0;
+  int _reorder = 1;
 
   int currentReorderInt() {
     switch (_reorder) {

@@ -410,8 +410,37 @@ class DatabaseHelper {
             }
           }
         }
+      } else {
+        print("Board is empty!");
       }
     }
+    updateOrderInDatabase();
+  }
+
+  void redefineTasksHeaders() {
+    List<Task> taskListToRedefine = [];
+    for (var board in boards) {
+      for (var header in board.headers) {
+        for (var task in header.tasks) {
+          if (task.headerId != header.headerId) {
+            print("Differing headerId found");
+            print(
+                "${task.name} has ${task.headerId}, parent Id is ${header.headerId}");
+            taskListToRedefine.add(task);
+          }
+        }
+      }
+    }
+    for (var task in taskListToRedefine) {
+      for (var header in headers) {
+        if (header.tasks.contains(task)) {
+          header.tasks.remove(task);
+        }
+      }
+      headers[findHeaderIndexByID(task.headerId)].tasks.add(task);
+    }
+    updateHeadersInDatabase();
+    updateTasksInDatabase();
   }
 
   void addTask(Task task) {
@@ -433,26 +462,22 @@ class DatabaseHelper {
     final Database db = await DatabaseHelper.instance.database;
 
     // Update order_index for headers
-    for (int i = 0; i < headers.length; i++) {
-      final header = headers[i];
-      await db.update(
-        'Headers',
-        {'order_index': i},
-        where: 'header_id = ?',
-        whereArgs: [header.headerId],
-      );
-    }
-
-    // Update order_index for tasks
-    for (final header in headers) {
-      for (int i = 0; i < header.tasks.length; i++) {
-        final task = header.tasks[i];
+    for (var board in boards) {
+      for (var header in board.headers) {
         await db.update(
-          'Tasks',
-          {'order_index': i},
-          where: 'task_id = ?',
-          whereArgs: [task.taskId],
+          'Headers',
+          {'order_index': header.orderIndex},
+          where: 'header_id = ?',
+          whereArgs: [header.headerId],
         );
+        for (var task in header.tasks) {
+          await db.update(
+            'Tasks',
+            {'order_index': task.orderIndex},
+            where: 'task_id = ?',
+            whereArgs: [task.taskId],
+          );
+        }
       }
     }
   }
@@ -492,6 +517,42 @@ class DatabaseHelper {
       );
     }
     await db.update('Tasks', {'order_index': newTaskIndex});
+  }
+
+  Future<void> updateHeadersInDatabase() async {
+    final Database db = await DatabaseHelper.instance.database;
+
+    print("Updating headers in database...");
+    for (var header in headers) {
+      db.update(
+        'Headers',
+        {'name': header.name, 'order_index': header.orderIndex},
+        where: 'header_id = ?',
+        whereArgs: [header.headerId],
+      );
+    }
+    print("Update complete.");
+  }
+
+  Future<void> updateTasksInDatabase() async {
+    final Database db = await DatabaseHelper.instance.database;
+
+    print("Updating tasks in database...");
+    for (var task in tasks) {
+      db.update(
+        'Tasks',
+        {
+          'header_id': task.headerId,
+          'name': task.name,
+          'description': task.description,
+          'assigned_user_id': task.assignedUserId,
+          'order_index': task.orderIndex
+        },
+        where: 'task_id = ?',
+        whereArgs: [task.taskId],
+      );
+    }
+    print("Update complete.");
   }
 
   // Read headers for a specific board
