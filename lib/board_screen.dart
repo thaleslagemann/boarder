@@ -741,7 +741,6 @@ class BoardScreenState extends State<BoardScreen> {
           case 0:
             break;
           case 1:
-
             // orderIdBuffer saves the orderIndex of the task that's being moved
             int orderIdBuffer = configState
                 .databaseHelper
@@ -806,44 +805,51 @@ class BoardScreenState extends State<BoardScreen> {
             break;
         }
       });
-      // int taskIndex = configState.findTaskIndexByID(configState
-      //     .databaseHelper.headers[oldListIndex].tasks[oldItemIndex].taskId);
-      //int oldHeaderId = configState.databaseHelper.boards[].headerId;
-      //int newHeaderId = configState.databaseHelper.tasks[taskIndex].headerId;
-
-      // setState(() {
-      //    configState.databaseHelper.updateTaskOrderInDatabase(
-      //        configState.databaseHelper.tasks[taskIndex],
-      //        configState.databaseHelper.headers[oldListIndex],
-      //        configState.databaseHelper.headers[newListIndex],
-      //        oldItemIndex,
-      //        newItemIndex);
-      //    var movedItem = configState.databaseHelper.headers[oldListIndex].tasks
-      //        .removeAt(oldItemIndex);
-      //    configState.databaseHelper.headers[newListIndex].tasks
-      //        .insert(newItemIndex, movedItem);
-      //   print(
-      //       '[$oldItemIndex, $oldListIndex] -> [$newItemIndex, $newListIndex]');
-      // });
     }
 
     _onListReorder(int oldListIndex, int newListIndex) {
       Board board = getCurrentBoard();
+      int oldHeaderIndex =
+          configState.findHeaderIndexByOrderId(oldListIndex, board);
+      int newHeaderIndex =
+          configState.findHeaderIndexByOrderId(newListIndex, board);
       setState(() {
         switch (reorderType.currentReorderInt()) {
           case 0:
             break;
           case 1:
-            setState(() {
-              Header buffer = widget.board.headers[newListIndex];
-              widget.board.headers[newListIndex] =
-                  widget.board.headers[oldListIndex];
-              widget.board.headers[oldListIndex] = buffer;
-            });
+            // orderIdBuffer saves the orderIndex of the task that's being moved
+            int orderIdBuffer = configState
+                .databaseHelper
+                .boards[configState.findBoardIndexByID(board.boardId)]
+                .headers[oldHeaderIndex]
+                .orderIndex;
+
+            // Sets the orderIndex of the task that's being moved to the orderIndex of the taget
+            configState
+                    .databaseHelper
+                    .boards[configState.findBoardIndexByID(board.boardId)]
+                    .headers[oldHeaderIndex]
+                    .orderIndex =
+                configState
+                    .databaseHelper
+                    .boards[configState.findBoardIndexByID(board.boardId)]
+                    .headers[newHeaderIndex]
+                    .orderIndex;
+
+            // Sets the target's orderIndex to the task that's being moved's orderIndex
+            configState
+                .databaseHelper
+                .boards[configState.findBoardIndexByID(board.boardId)]
+                .headers[newHeaderIndex]
+                .orderIndex = orderIdBuffer;
+
+            configState.databaseHelper.sortHeadersAndTasks();
+            configState.databaseHelper.redefineTasksHeaders();
+
+            configState.printTasks();
             break;
         }
-        // var movedList = widget.board.headers.removeAt(oldListIndex);
-        // widget.board.headers.insert(newListIndex, movedList);
       });
     }
 
