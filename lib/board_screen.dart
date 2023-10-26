@@ -711,6 +711,7 @@ class BoardScreenState extends State<BoardScreen> {
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex,
         int newListIndex) {
       Board board = getCurrentBoard();
+      int boardIndex = configState.findBoardIndexByID(board.boardId);
       print("Board: [${board.name}]");
 
       print("oldItemIndex: $oldItemIndex");
@@ -728,72 +729,101 @@ class BoardScreenState extends State<BoardScreen> {
           configState.findHeaderIndexByOrderId(newListIndex, board);
 
       Task oldTask = board.headers[oldHeaderIndex].tasks[oldTaskIndex];
-      Header oldHeader = board.headers[oldHeaderIndex];
-
-      Task newTask = board.headers[newHeaderIndex].tasks[newTaskIndex];
-      Header newHeader = board.headers[newHeaderIndex];
-
-      print('${oldTask.name} -> ${newTask.name}');
-      print('${oldHeader.name} -> ${newHeader.name}');
 
       setState(() {
         switch (currentReorderOption) {
           case 0:
+            // copy oldHeaderIndex.oldTaskIndex into a buffer
+            Task oldTaskBuffer = oldTask;
+            // delete oldHeaderIndex.oldTaskIndex from old position
+            if (configState.databaseHelper.boards[boardIndex]
+                .headers[oldHeaderIndex].tasks.isNotEmpty) {
+              configState.databaseHelper.boards[boardIndex]
+                  .headers[oldHeaderIndex].tasks
+                  .remove(oldTask);
+            }
+            // iterate through the remaining positions after old position
+            for (int i = 0;
+                i <
+                    configState.databaseHelper.boards[boardIndex]
+                        .headers[oldHeaderIndex].tasks.length;
+                i++) {
+              // decrement orderIndex of remaining positions
+              if (i >= oldTaskIndex) {
+                configState.databaseHelper.boards[boardIndex]
+                    .headers[oldHeaderIndex].tasks[i].orderIndex--;
+              }
+            }
+            if (configState.databaseHelper.boards[boardIndex]
+                .headers[newHeaderIndex].tasks.isEmpty) {
+              // insert oldHeaderIndex.oldTaskIndex into new position
+              oldTaskBuffer.headerId = configState.databaseHelper
+                  .boards[boardIndex].headers[newHeaderIndex].headerId;
+              configState.databaseHelper.boards[boardIndex]
+                  .headers[newHeaderIndex].tasks
+                  .add(oldTaskBuffer);
+            } else {
+              // insert oldHeaderIndex.oldTaskIndex into new position
+              oldTaskBuffer.headerId = configState.databaseHelper
+                  .boards[boardIndex].headers[newHeaderIndex].headerId;
+              configState.databaseHelper.boards[boardIndex]
+                  .headers[newHeaderIndex].tasks
+                  .insert(newTaskIndex, oldTaskBuffer);
+            }
+            // loop through the remaining positions
+            for (int i = 0;
+                i <
+                    configState.databaseHelper.boards[boardIndex]
+                        .headers[newHeaderIndex].tasks.length;
+                i++) {
+              // increment orderIndex of remaining positions
+              if (configState.databaseHelper.boards[boardIndex]
+                      .headers[newHeaderIndex].tasks[i] ==
+                  oldTaskBuffer) {
+                configState.databaseHelper.boards[boardIndex]
+                    .headers[newHeaderIndex].tasks[i].orderIndex = i;
+              }
+              if (i > newTaskIndex) {
+                configState.databaseHelper.boards[boardIndex]
+                    .headers[newHeaderIndex].tasks[i].orderIndex++;
+              }
+            }
+
+            configState.databaseHelper.sortHeadersAndTasks();
+            configState.databaseHelper.redefineTasksHeaders();
+
+            configState.printTasks();
             break;
           case 1:
             // orderIdBuffer saves the orderIndex of the task that's being moved
-            int orderIdBuffer = configState
-                .databaseHelper
-                .boards[configState.findBoardIndexByID(board.boardId)]
-                .headers[oldHeaderIndex]
-                .tasks[oldTaskIndex]
-                .orderIndex;
+            int orderIdBuffer = configState.databaseHelper.boards[boardIndex]
+                .headers[oldHeaderIndex].tasks[oldTaskIndex].orderIndex;
 
             // headerIdBuffer saves the headerId of the task that's being moved
-            int headerIdBuffer = configState
-                .databaseHelper
-                .boards[configState.findBoardIndexByID(board.boardId)]
-                .headers[oldHeaderIndex]
-                .tasks[oldTaskIndex]
-                .headerId;
+            int headerIdBuffer = configState.databaseHelper.boards[boardIndex]
+                .headers[oldHeaderIndex].tasks[oldTaskIndex].headerId;
 
             // Sets the orderIndex of the task that's being moved to the orderIndex of the taget
-            configState
-                    .databaseHelper
-                    .boards[configState.findBoardIndexByID(board.boardId)]
-                    .headers[oldHeaderIndex]
-                    .tasks[oldTaskIndex]
-                    .orderIndex =
-                configState
-                    .databaseHelper
-                    .boards[configState.findBoardIndexByID(board.boardId)]
-                    .headers[newHeaderIndex]
-                    .tasks[newTaskIndex]
-                    .orderIndex;
+            configState.databaseHelper.boards[boardIndex]
+                    .headers[oldHeaderIndex].tasks[oldTaskIndex].orderIndex =
+                configState.databaseHelper.boards[boardIndex]
+                    .headers[newHeaderIndex].tasks[newTaskIndex].orderIndex;
             // Sets the headerId of the task that's being moved to the headerId of the taget
-            configState
-                    .databaseHelper
-                    .boards[configState.findBoardIndexByID(board.boardId)]
-                    .headers[oldHeaderIndex]
-                    .tasks[oldTaskIndex]
-                    .headerId =
-                configState
-                    .databaseHelper
-                    .boards[configState.findBoardIndexByID(board.boardId)]
-                    .headers[newHeaderIndex]
-                    .tasks[newTaskIndex]
-                    .headerId;
+            configState.databaseHelper.boards[boardIndex]
+                    .headers[oldHeaderIndex].tasks[oldTaskIndex].headerId =
+                configState.databaseHelper.boards[boardIndex]
+                    .headers[newHeaderIndex].tasks[newTaskIndex].headerId;
             // Sets the target's orderIndex to the task that's being moved's orderIndex
             configState
                 .databaseHelper
-                .boards[configState.findBoardIndexByID(board.boardId)]
+                .boards[boardIndex]
                 .headers[newHeaderIndex]
                 .tasks[newTaskIndex]
                 .orderIndex = orderIdBuffer;
             // Sets the target's headerId to the task that's being moved's headerId
             configState
                 .databaseHelper
-                .boards[configState.findBoardIndexByID(board.boardId)]
+                .boards[boardIndex]
                 .headers[newHeaderIndex]
                 .tasks[newTaskIndex]
                 .headerId = headerIdBuffer;

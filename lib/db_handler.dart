@@ -434,9 +434,13 @@ class DatabaseHelper {
     for (var task in taskListToRedefine) {
       for (var header in headers) {
         if (header.tasks.contains(task)) {
+          print(
+              "Found task [${task.name}] in header [${header.name}], deleting...");
           header.tasks.remove(task);
         }
       }
+      print(
+          "Inserting [${task.name}] in header [${headers[findHeaderIndexByID(task.headerId)].name}]");
       headers[findHeaderIndexByID(task.headerId)].tasks.add(task);
     }
     updateHeadersInDatabase();

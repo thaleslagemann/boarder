@@ -65,6 +65,11 @@ class ConfigState extends ChangeNotifier {
             print("Searching tasks for header [${header.name}]...");
             header.tasks =
                 await databaseHelper.getTasksForHeader(header.headerId);
+            int orderIndex = 0;
+            for (var task in header.tasks) {
+              task.orderIndex = orderIndex;
+              orderIndex++;
+            }
             for (var task in header.tasks) {
               print(
                   "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
@@ -188,7 +193,7 @@ class ConfigState extends ChangeNotifier {
 
   int findHeaderIndexByOrderId(int id, Board board) {
     List<dynamic> list = board.headers;
-    print("Searching [$id] on board ${board.name}");
+    print("Searching header [$id] on board [${board.name}]");
     if (list.isEmpty) {
       print(
           "At FindHeaderIndexByOrderId(): List is empty; returning index (-1)");
@@ -223,14 +228,14 @@ class ConfigState extends ChangeNotifier {
     int headerIndex = findHeaderIndexByOrderId(listId, board);
     List<dynamic> list = board.headers[headerIndex].tasks;
     print(
-        "Searching [$id] on board ${board.name} on header ${board.headers[headerIndex].name}");
+        "Searching task [$id] on board [${board.name}] on header [${board.headers[headerIndex].name}]");
 
     for (var task in list) {
-      print('[O.I.: ${task.orderIndex}, NAME: ${task.name}]');
+      print('[OrderIndex: ${task.orderIndex}, NAME: ${task.name}]');
     }
     if (list.isEmpty) {
-      print("At FindTaskIndexByOrderId(): List is empty; returning index (-1)");
-      return -1;
+      print("At FindTaskIndexByOrderId(): List is empty; returning index (0)");
+      return 0;
     }
     for (int i = 0; i < list.length; i++) {
       if (list[i].orderIndex == id) {
