@@ -37,19 +37,23 @@ class BoardScreenState extends State<BoardScreen> {
       TextEditingController();
   final TextEditingController _boardDescEditFieldController =
       TextEditingController();
-
-  String boardNewName = '';
-  String boardNewDesc = '';
-  String newHeaderName = '';
-  String newTaskName = '';
-  String newTaskDesc = '';
-  String renameHeaderNewName = '';
-  String renameTaskNewName = '';
-
-  int currentReorderOption = reorderType.currentReorderInt();
+  final TextEditingController _taskDescriptionEditController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    String boardNewName = '';
+    String boardNewDesc = '';
+    String newHeaderName = '';
+    String newTaskName = '';
+    String newTaskDesc = '';
+    String renameHeaderNewName = '';
+    String renameTaskNewName = '';
+
+    int currentReorderOption = reorderType.currentReorderInt();
+    bool _isEditing = false;
+    FocusNode myFocusNode = FocusNode();
+
     var configState = context.watch<ConfigState>();
 
     _displayBoardDeletionAlert(BuildContext context, boardID) {
@@ -610,97 +614,161 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
+    _toggleEdit() {
+      print("Toggle edit");
+      _isEditing = !_isEditing;
+      print(_isEditing);
+    }
+
     Future<void> _displayTaskScreen(BuildContext context, Task task) {
       return showDialog(
           context: context,
           builder: (context) {
-            return AlertDialog(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${task.name}",
-                    ),
-                    CloseButton(),
-                  ],
-                ),
-                content: Container(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Divider(
-                          thickness: 1.5,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        Text.rich(
-                          TextSpan(
-                              text: 'ID: ',
+            _taskDescriptionEditController.text = task.description;
+            return StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                  titlePadding: EdgeInsets.only(top: 5, left: 20, right: 5),
+                  contentPadding:
+                      EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 0),
+                  insetPadding: EdgeInsets.symmetric(horizontal: 10),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${task.name}",
+                      ),
+                      IconButton(
+                        visualDensity:
+                            VisualDensity(horizontal: 0, vertical: 0),
+                        splashRadius: 20,
+                        iconSize: 20,
+                        padding: EdgeInsets.all(0),
+                        icon: Icon(Icons.close),
+                        onPressed: (() {
+                          setState(() {
+                            if (_isEditing) {
+                              _isEditing = false;
+                              _taskDescriptionEditController.text =
+                                  task.description;
+                            }
+                            Navigator.pop(context);
+                          });
+                        }),
+                      ),
+                    ],
+                  ),
+                  content: Container(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Divider(
+                            height: 5,
+                            thickness: 1.5,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Description:'),
+                                !_isEditing
+                                    ? Row(children: <IconButton>[
+                                        IconButton(
+                                            visualDensity: VisualDensity(
+                                                horizontal: 0, vertical: 0),
+                                            padding: EdgeInsets.zero,
+                                            splashRadius: 20,
+                                            iconSize: 20,
+                                            onPressed: (() {
+                                              setState(() {
+                                                _toggleEdit();
+                                                myFocusNode.requestFocus();
+                                              });
+                                            }),
+                                            icon: Icon(Icons.edit_outlined))
+                                      ])
+                                    : Row(children: <IconButton>[
+                                        IconButton(
+                                            visualDensity: VisualDensity(
+                                                horizontal: 0, vertical: 0),
+                                            padding: EdgeInsets.zero,
+                                            splashRadius: 20,
+                                            iconSize: 20,
+                                            onPressed: (() {
+                                              setState(() {
+                                                _toggleEdit();
+                                                _taskDescriptionEditController
+                                                    .text = task.description;
+                                              });
+                                            }),
+                                            icon: Icon(Icons.close)),
+                                        IconButton(
+                                            visualDensity: VisualDensity(
+                                                horizontal: 0, vertical: 0),
+                                            splashRadius: 20,
+                                            iconSize: 20,
+                                            onPressed: (() {
+                                              setState(() {
+                                                _toggleEdit();
+                                                task.description =
+                                                    _taskDescriptionEditController
+                                                        .text;
+                                              });
+                                            }),
+                                            icon: Icon(Icons.check)),
+                                      ]),
+                              ]),
+                          Container(
+                            margin: EdgeInsets.zero,
+                            padding: EdgeInsets.all(7),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10)),
+                            ),
+                            child: TextField(
+                              focusNode: myFocusNode,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 0),
+                              ),
+                              maxLines: 20,
+                              minLines: 5,
+                              readOnly: !_isEditing,
+                              textAlign: TextAlign.justify,
+                              controller:
+                                  _taskDescriptionEditController, //'${task.description.capitalizeFirst}',
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text('Assigned Users: ',
                               style: TextStyle(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .inverseSurface),
-                              children: [
-                                TextSpan(
-                                  text: '${task.taskId}',
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                ),
-                              ]),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                              text: 'Description: ',
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface),
-                              children: [
-                                if (task.description != '')
-                                  TextSpan(
-                                    text: task.description,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                  ),
-                                if (task.description == '')
-                                  TextSpan(
-                                    text: 'No description found.',
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outline),
-                                  ),
-                              ]),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                              text: 'Assigned User: ',
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface),
-                              children: [
-                                TextSpan(
-                                  text: 'unimplemented',
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                ),
-                              ]),
-                        ),
-                        SizedBox(height: 15.0),
-                      ]),
-                ));
+                                      .inverseSurface)),
+                          Text(
+                            'unimplemented',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                          ),
+                          SizedBox(height: 15.0),
+                        ]),
+                  ));
+            });
           });
     }
 
@@ -737,7 +805,6 @@ class BoardScreenState extends State<BoardScreen> {
                 newTaskIndex, boardIndex, oldHeaderIndex, newHeaderIndex);
             configState.databaseHelper.sortHeadersAndTasks();
             configState.databaseHelper.redefineTasksHeaders();
-
             configState.printTasks();
             break;
           case 1:
@@ -955,12 +1022,6 @@ class BoardScreenState extends State<BoardScreen> {
                               ),
                               children: <DragAndDropItem>[
                                 for (var task in header.tasks)
-                                  // if (configState
-                                  //     .databaseHelper
-                                  //     .headers[configState
-                                  //         .findHeaderIndexByID(header.headerId)]
-                                  //     .tasks
-                                  //     .contains(task))
                                   DragAndDropItem(
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
