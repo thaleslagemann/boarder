@@ -72,7 +72,7 @@ class ConfigState extends ChangeNotifier {
             }
             for (var task in header.tasks) {
               print(
-                  "Task found: [ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+                  "Task found: [TASK_ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
               databaseHelper.addTask(task);
             }
             if (header.tasks.isEmpty) {
@@ -109,19 +109,7 @@ class ConfigState extends ChangeNotifier {
               "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
         }
       }
-      print("Headers:");
-      if (databaseHelper.headers.isEmpty) {
-        print("No headers found!");
-      } else {
-        print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
-        for (var board in databaseHelper.boards) {
-          for (var header in board.headers) {
-            print(
-                "| ${header.headerId.toStringAsPrecision(7)}\t${header.name.padRight(14)}\t${header.boardId.toStringAsPrecision(7)}\t ${header.orderIndex.toStringAsPrecision(7)} |");
-          }
-        }
-      }
-      print("Tasks:");
+      printHeaders();
       printTasks();
       print('DB loaded');
       loadingDB = false;
@@ -130,19 +118,41 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
+  void printHeaders() {
+    if (databaseHelper.headers.isEmpty) {
+      print("No headers found!");
+    } else {
+      print('|======================================================|');
+      print('| HEADERS:\t\t\t\t\t\t  |');
+      print('|======================================================|');
+      print('| HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID |');
+      for (var board in databaseHelper.boards) {
+        for (var header in board.headers) {
+          print(
+              "| ${header.headerId.toString().padRight(8)} \t${header.name.padRight(12)} \t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+        }
+      }
+      print('|======================================================|');
+    }
+  }
+
   void printTasks() {
     if (databaseHelper.tasks.isEmpty) {
       print("No tasks found!");
     } else {
-      print('| ID  \tNAME    \tPARENT_ID\t ORDER_ID |');
+      print('|======================================================|');
+      print('| TASKS:\t\t\t\t\t\t  |');
+      print('|======================================================|');
+      print('| TASK_ID  \tTASK_NAME    \tHEADER_ID\t ORDER_ID |');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           for (var task in header.tasks) {
             print(
-                "| ${task.taskId.toStringAsPrecision(7)}\t${task.name.padRight(14)}\t${task.headerId.toStringAsPrecision(7)}\t ${task.orderIndex.toStringAsPrecision(7)} |");
+                "| ${task.taskId.toString().padRight(8)} \t${task.name.padRight(12)} \t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
           }
         }
       }
+      print('|======================================================|');
     }
   }
 
@@ -228,7 +238,7 @@ class ConfigState extends ChangeNotifier {
     int headerIndex = findHeaderIndexByOrderId(listId, board);
     List<dynamic> list = board.headers[headerIndex].tasks;
     print(
-        "Searching task [$id] on board [${board.name}] on header [${board.headers[headerIndex].name}]");
+        "Searching order_id [$id] on board [${board.name}] on header [${board.headers[headerIndex].name}]");
 
     for (var task in list) {
       print('[OrderIndex: ${task.orderIndex}, NAME: ${task.name}]');
@@ -243,8 +253,8 @@ class ConfigState extends ChangeNotifier {
       }
     }
     print(
-        "At FindTaskIndexByOrderId(): Element not found; returning index (-1)");
-    return -1;
+        "At FindTaskIndexByOrderId(): Element not found; returning same order_id");
+    return id;
   }
 
   void printAllElements(List<dynamic> list) {

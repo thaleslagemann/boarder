@@ -526,37 +526,81 @@ class DatabaseHelper {
   Future<void> updateHeadersInDatabase() async {
     final Database db = await DatabaseHelper.instance.database;
 
+    int changes = 0;
+
     print("Updating headers in database...");
     for (var header in headers) {
-      db.update(
+      final List<Map<String, dynamic>> maps = await db.query(
         'Headers',
-        {'name': header.name, 'order_index': header.orderIndex},
         where: 'header_id = ?',
         whereArgs: [header.headerId],
       );
+
+      final int dbHeaderOrderIndex = maps.first['order_index'];
+      if (dbHeaderOrderIndex != header.orderIndex) {
+        print(
+            'Header [${header.name}] O_I.: $dbHeaderOrderIndex | ${header.orderIndex}');
+        changes += await db.update(
+          'Headers',
+          {'name': header.name, 'order_index': header.orderIndex},
+          where: 'header_id = ?',
+          whereArgs: [header.headerId],
+        );
+      }
     }
-    print("Update complete.");
+    print("Headers update complete.");
+    if (changes > 0) {
+      print("$changes headers changed.");
+    } else if (changes == 1) {
+      print("$changes header changed.");
+    } else {
+      print("No header changed.");
+    }
   }
 
   Future<void> updateTasksInDatabase() async {
     final Database db = await DatabaseHelper.instance.database;
 
+    int changes = 0;
+
     print("Updating tasks in database...");
     for (var task in tasks) {
-      db.update(
+      final List<Map<String, dynamic>> maps = await db.query(
         'Tasks',
-        {
-          'header_id': task.headerId,
-          'name': task.name,
-          'description': task.description,
-          'assigned_user_id': task.assignedUserId,
-          'order_index': task.orderIndex
-        },
         where: 'task_id = ?',
         whereArgs: [task.taskId],
       );
+
+      final int dbTaskHeaderId = maps.first['header_id'];
+      final int dbTaskOrderIndex = maps.first['order_index'];
+      if (dbTaskHeaderId != task.headerId ||
+          dbTaskOrderIndex != task.orderIndex) {
+        print('Task [${task.name}] Head: $dbTaskHeaderId | ${task.headerId}');
+        print(
+            'Task [${task.name}] O_I.: $dbTaskOrderIndex | ${task.orderIndex}');
+        changes += await db.update(
+          'Tasks',
+          {
+            'header_id': task.headerId,
+            'name': task.name,
+            'description': task.description,
+            'assigned_user_id': task.assignedUserId,
+            'order_index': task.orderIndex
+          },
+          where: 'task_id = ?',
+          whereArgs: [task.taskId],
+        );
+      }
     }
-    print("Update complete.");
+
+    print("Tasks update complete.");
+    if (changes > 0) {
+      print("$changes tasks changed.");
+    } else if (changes == 1) {
+      print("$changes task changed.");
+    } else {
+      print("No task changed.");
+    }
   }
 
   // Read headers for a specific board
@@ -641,5 +685,45 @@ class DatabaseHelper {
     headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
+  }
+
+  void insertReorderTask(Task oldTask, int oldTaskIndex, int newTaskIndex,
+      int boardIndex, int oldHeaderIndex, int newHeaderIndex) {
+    // copy oldHeaderIndex.oldTaskIndex into a buffer
+    Task oldTaskBuffer = oldTask;
+    // delete oldHeaderIndex.oldTaskIndex from old position
+    boards[boardIndex].headers[oldHeaderIndex].tasks.remove(oldTask);
+    // iterate through the remaining positions after old position
+    for (int i = 0;
+        i < boards[boardIndex].headers[oldHeaderIndex].tasks.length;
+        i++) {
+      // decrement orderIndex of remaining positions
+      if (i >= oldTaskIndex) {
+        boards[boardIndex].headers[oldHeaderIndex].tasks[i].orderIndex = i;
+      }
+    }
+    // change the task's headerId if it's different
+    if (oldTaskBuffer.headerId !=
+        boards[boardIndex].headers[newHeaderIndex].headerId) {
+      oldTaskBuffer.headerId =
+          boards[boardIndex].headers[newHeaderIndex].headerId;
+    }
+    if (boards[boardIndex].headers[newHeaderIndex].tasks.isEmpty) {
+      // insert oldHeaderIndex.oldTaskIndex into new position
+      boards[boardIndex].headers[newHeaderIndex].tasks.add(oldTaskBuffer);
+    } else {
+      // insert oldHeaderIndex.oldTaskIndex into new position
+      boards[boardIndex]
+          .headers[newHeaderIndex]
+          .tasks
+          .insert(newTaskIndex, oldTaskBuffer);
+      // loop through the whole array adjusting the orderIndex
+      for (int i = 0;
+          i < boards[boardIndex].headers[newHeaderIndex].tasks.length;
+          i++) {
+        // increment orderIndex of remaining positions
+        boards[boardIndex].headers[newHeaderIndex].tasks[i].orderIndex = i;
+      }
+    }
   }
 }

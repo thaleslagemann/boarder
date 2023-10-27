@@ -733,51 +733,8 @@ class BoardScreenState extends State<BoardScreen> {
       setState(() {
         switch (currentReorderOption) {
           case 0:
-            // copy oldHeaderIndex.oldTaskIndex into a buffer
-            Task oldTaskBuffer = oldTask;
-            // delete oldHeaderIndex.oldTaskIndex from old position
-            configState
-                .databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks
-                .remove(oldTask);
-            // iterate through the remaining positions after old position
-            for (int i = 0;
-                i <
-                    configState.databaseHelper.boards[boardIndex]
-                        .headers[oldHeaderIndex].tasks.length;
-                i++) {
-              // decrement orderIndex of remaining positions
-              if (i >= oldTaskIndex) {
-                configState.databaseHelper.boards[boardIndex]
-                    .headers[oldHeaderIndex].tasks[i].orderIndex = i;
-              }
-            }
-            oldTaskBuffer.headerId = configState.databaseHelper
-                .boards[boardIndex].headers[newHeaderIndex].headerId;
-            if (configState.databaseHelper.boards[boardIndex]
-                .headers[newHeaderIndex].tasks.isEmpty) {
-              // insert oldHeaderIndex.oldTaskIndex into new position
-              configState.databaseHelper.boards[boardIndex]
-                  .headers[newHeaderIndex].tasks
-                  .add(oldTaskBuffer);
-            } else {
-              // insert oldHeaderIndex.oldTaskIndex into new position
-              configState.databaseHelper.boards[boardIndex]
-                  .headers[newHeaderIndex].tasks
-                  .insert(newTaskIndex, oldTaskBuffer);
-              // loop through the remaining positions
-              for (int i = 0;
-                  i <
-                      configState.databaseHelper.boards[boardIndex]
-                          .headers[newHeaderIndex].tasks.length;
-                  i++) {
-                // increment orderIndex of remaining positions
-                if (i >= newTaskIndex) {
-                  configState.databaseHelper.boards[boardIndex]
-                      .headers[newHeaderIndex].tasks[i].orderIndex = i;
-                }
-              }
-            }
-
+            configState.databaseHelper.insertReorderTask(oldTask, oldTaskIndex,
+                newTaskIndex, boardIndex, oldHeaderIndex, newHeaderIndex);
             configState.databaseHelper.sortHeadersAndTasks();
             configState.databaseHelper.redefineTasksHeaders();
 
