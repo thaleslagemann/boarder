@@ -656,6 +656,18 @@ class DatabaseHelper {
     );
   }
 
+  // Update a task's description
+  Future<void> updateTaskDescription(int taskId, String newDescription) async {
+    tasks[findTaskIndexByID(taskId)].description = newDescription;
+    final Database db = await DatabaseHelper.instance.database;
+    await db.update(
+      'Tasks',
+      {'description': newDescription},
+      where: 'task_id = ?',
+      whereArgs: [taskId],
+    );
+  }
+
   // Delete a header
   void deleteHeader(Header header) async {
     List<Task> taskRemovalList = [];

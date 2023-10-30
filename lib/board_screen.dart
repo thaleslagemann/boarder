@@ -520,6 +520,14 @@ class BoardScreenState extends State<BoardScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15.0),
+                      child: Divider(
+                        height: 5,
+                        thickness: 1.5,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                     Row(
                       children: [
                         Text.rich(
@@ -716,9 +724,15 @@ class BoardScreenState extends State<BoardScreen> {
                                             onPressed: (() {
                                               setState(() {
                                                 _toggleEdit();
-                                                task.description =
+                                                var _newDescription =
                                                     _taskDescriptionEditController
                                                         .text;
+                                                task.description =
+                                                    _newDescription;
+                                                configState.databaseHelper
+                                                    .updateTaskDescription(
+                                                        task.taskId,
+                                                        _newDescription);
                                               });
                                             }),
                                             icon: Icon(Icons.check)),
@@ -737,6 +751,7 @@ class BoardScreenState extends State<BoardScreen> {
                                   bottomLeft: Radius.circular(10)),
                             ),
                             child: TextField(
+                              textCapitalization: TextCapitalization.sentences,
                               focusNode: myFocusNode,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
@@ -1051,19 +1066,20 @@ class BoardScreenState extends State<BoardScreen> {
                                             children: [
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Text(
-                                                    configState
-                                                        .databaseHelper
-                                                        .tasks[configState
-                                                            .findTaskIndexByID(
-                                                                task.taskId)]
-                                                        .name,
+                                                    const EdgeInsets.all(5.0),
+                                                child: FittedBox(
+                                                  child: Text(
+                                                    "[${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].taskId}] ${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
                                                     style: TextStyle(
                                                         color: Theme.of(context)
                                                             .colorScheme
                                                             .inverseSurface),
-                                                    softWrap: true),
+                                                    softWrap: true,
+                                                    maxLines: 3,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
                                               ),
                                               Expanded(
                                                 child: Row(
