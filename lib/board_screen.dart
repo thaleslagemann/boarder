@@ -39,6 +39,8 @@ class BoardScreenState extends State<BoardScreen> {
       TextEditingController();
   final TextEditingController _taskDescriptionEditController =
       TextEditingController();
+  final TextEditingController _taskTitleEditController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,7 @@ class BoardScreenState extends State<BoardScreen> {
 
     int currentReorderOption = reorderType.currentReorderInt();
     bool _isEditing = false;
+    bool _isEditingTitle = false;
     FocusNode myFocusNode = FocusNode();
 
     var configState = context.watch<ConfigState>();
@@ -633,8 +636,10 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             _taskDescriptionEditController.text = task.description;
+            _taskTitleEditController.text = task.name;
             return StatefulBuilder(builder: (context, setState) {
               return AlertDialog(
+                  scrollable: true,
                   titlePadding: EdgeInsets.only(top: 5, left: 20, right: 5),
                   contentPadding:
                       EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 0),
@@ -644,29 +649,100 @@ class BoardScreenState extends State<BoardScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  title: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        "${task.name}",
-                      ),
-                      IconButton(
-                        visualDensity:
-                            VisualDensity(horizontal: 0, vertical: 0),
-                        splashRadius: 20,
-                        iconSize: 20,
-                        padding: EdgeInsets.all(0),
-                        icon: Icon(Icons.close),
-                        onPressed: (() {
-                          setState(() {
-                            if (_isEditing) {
-                              _isEditing = false;
-                              _taskDescriptionEditController.text =
-                                  task.description;
-                            }
-                            Navigator.pop(context);
-                          });
-                        }),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (_isEditingTitle)
+                            IconButton(
+                              visualDensity:
+                                  VisualDensity(horizontal: -4, vertical: -4),
+                              splashRadius: 20,
+                              iconSize: 20,
+                              padding: EdgeInsets.all(0),
+                              icon: Icon(Icons.check),
+                              onPressed: (() {
+                                setState(() {
+                                  if (_isEditingTitle) {
+                                    _isEditingTitle = false;
+                                    task.name = _taskTitleEditController.text;
+                                    configState.databaseHelper
+                                        .updateTaskName(task.taskId, task.name);
+                                  }
+                                });
+                              }),
+                            ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            width: MediaQuery.of(context).size.width - 140,
+                            child: TextField(
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 0),
+                              ),
+                              maxLines: 3,
+                              minLines: 1,
+                              readOnly: !_isEditingTitle,
+                              textAlign: TextAlign.left,
+                              controller:
+                                  _taskTitleEditController, //'${task.description.capitalizeFirst}',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface,
+                                  fontSize: 24),
+                              onTap: (() {
+                                setState(() {
+                                  _isEditingTitle = true;
+                                });
+                              }),
+                              onEditingComplete: (() {
+                                setState(() {
+                                  _isEditingTitle = false;
+                                  task.name = _taskTitleEditController.text;
+                                  configState.databaseHelper
+                                      .updateTaskName(task.taskId, task.name);
+                                });
+                              }),
+                              onSubmitted: ((value) {
+                                setState(() {
+                                  _isEditingTitle = false;
+                                  task.name = _taskTitleEditController.text;
+                                  configState.databaseHelper
+                                      .updateTaskName(task.taskId, task.name);
+                                });
+                              }),
+                            ),
+                          ),
+                          IconButton(
+                            visualDensity:
+                                VisualDensity(horizontal: 0, vertical: 0),
+                            splashRadius: 20,
+                            iconSize: 20,
+                            padding: EdgeInsets.all(0),
+                            icon: Icon(Icons.close),
+                            onPressed: (() {
+                              setState(() {
+                                if (_isEditingTitle) {
+                                  _isEditingTitle = false;
+                                  _taskTitleEditController.text = task.name;
+                                }
+                                if (_isEditing) {
+                                  _isEditing = false;
+                                  _taskDescriptionEditController.text =
+                                      task.description;
+                                }
+                                Navigator.pop(context);
+                              });
+                            }),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -1038,102 +1114,90 @@ class BoardScreenState extends State<BoardScreen> {
                               children: <DragAndDropItem>[
                                 for (var task in header.tasks)
                                   DragAndDropItem(
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 20.0, vertical: 5.0),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(7.5)),
-                                          border: Border.all(
-                                              width: 1.5,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary)),
-                                      child: Stack(children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _displayTaskScreen(context, task);
-                                            });
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: FittedBox(
-                                                  child: Text(
-                                                    "[${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].taskId}] ${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .inverseSurface),
-                                                    softWrap: true,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 5.0),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(7.5)),
+                                              border: Border.all(
+                                                  width: 1.5,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary)),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _displayTaskScreen(
+                                                    context, task);
+                                              });
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Flexible(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: Text(
+                                                      "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
+                                                      softWrap: true,
+                                                      maxLines: 3,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .inverseSurface),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Expanded(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    PopupMenuButton<String>(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    5)),
-                                                      ),
-                                                      icon: Icon(
-                                                          Icons
-                                                              .arrow_drop_down_sharp,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary),
-                                                      itemBuilder: (BuildContext
-                                                          context) {
-                                                        return Constants
-                                                            .taskChoices
-                                                            .map((String
-                                                                choice) {
-                                                          return PopupMenuItem<
-                                                                  String>(
-                                                              value: choice,
-                                                              child:
-                                                                  Text(choice),
-                                                              onTap: () => {
-                                                                    setState(
-                                                                        () {
-                                                                      taskChoiceAction(
-                                                                          choice,
-                                                                          task);
-                                                                    })
-                                                                  });
-                                                        }).toList();
-                                                      },
-                                                    ),
-                                                  ],
+                                                PopupMenuButton<String>(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(5)),
+                                                  ),
+                                                  icon: Icon(
+                                                      Icons
+                                                          .arrow_drop_down_sharp,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary),
+                                                  itemBuilder:
+                                                      (BuildContext context) {
+                                                    return Constants.taskChoices
+                                                        .map((String choice) {
+                                                      return PopupMenuItem<
+                                                              String>(
+                                                          value: choice,
+                                                          child: Text(choice),
+                                                          onTap: () => {
+                                                                setState(() {
+                                                                  taskChoiceAction(
+                                                                      choice,
+                                                                      task);
+                                                                })
+                                                              });
+                                                    }).toList();
+                                                  },
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        )
-                                      ]),
+                                        ),
+                                      ],
                                     ),
                                   ),
                               ],
