@@ -128,8 +128,13 @@ class ConfigState extends ChangeNotifier {
       print('| HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID |');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
-          print(
-              "| ${header.headerId.toString().padRight(8)} \t${header.name.padRight(12)} \t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+          if (header.name.length > 15) {
+            print(
+                "| ${header.headerId.toString().padRight(8)} \t${header.name.substring(0, 12)}...\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+          } else {
+            print(
+                "| ${header.headerId.toString().padRight(8)} \t${header.name.padRight(15)}\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+          }
         }
       }
       print('|======================================================|');
@@ -147,8 +152,13 @@ class ConfigState extends ChangeNotifier {
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           for (var task in header.tasks) {
-            print(
-                "| ${task.taskId.toString().padRight(8)} \t${task.name.padRight(12)} \t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
+            if (task.name.length > 15) {
+              print(
+                  "| ${task.taskId.toString().padRight(8)} \t${task.name.substring(0, 12)}...\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
+            } else {
+              print(
+                  "| ${task.taskId.toString().padRight(8)} \t${task.name.padRight(15)}\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
+            }
           }
         }
       }

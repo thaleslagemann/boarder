@@ -1062,7 +1062,10 @@ class BoardScreenState extends State<BoardScreen> {
                         children: [
                           for (var header in widget.board.headers)
                             DragAndDropList(
-                              contentsWhenEmpty: Text('Empty header'),
+                              contentsWhenEmpty: Row(children: [
+                                Text('Empty header',
+                                    style: TextStyle(fontSize: 10))
+                              ]),
                               header: Padding(
                                 padding: const EdgeInsets.only(right: 45.0),
                                 child: Row(
@@ -1097,7 +1100,8 @@ class BoardScreenState extends State<BoardScreen> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 5),
-                                      child: Text(header.name),
+                                      child: Text(header.name,
+                                          style: TextStyle(fontSize: 18)),
                                     ),
                                     Expanded(
                                       flex: 1,
@@ -1148,7 +1152,7 @@ class BoardScreenState extends State<BoardScreen> {
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            5.0),
+                                                            10.0),
                                                     child: Text(
                                                       "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
                                                       softWrap: true,
@@ -1156,6 +1160,7 @@ class BoardScreenState extends State<BoardScreen> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
+                                                          fontSize: 16,
                                                           color: Theme.of(
                                                                   context)
                                                               .colorScheme
