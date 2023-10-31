@@ -77,14 +77,28 @@ class SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.primary)),
                   SizedBox(height: 20),
-                  OutlinedButton(
-                    onPressed: () async {
-                      _launchURL('https://github.com/thaleslagemann/');
-                    },
-                    child: Text(
-                      'GitHub',
-                      style: TextStyle(color: Colors.indigo[400]),
-                    ),
+                  Row(
+                    children: [
+                      OutlinedButton(
+                        onPressed: () async {
+                          _launchURL('https://github.com/thaleslagemann/');
+                        },
+                        child: Text(
+                          'GitHub',
+                          style: TextStyle(color: Colors.indigo[400]),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      OutlinedButton(
+                        onPressed: () async {
+                          _launchURL('https://google.com/');
+                        },
+                        child: Text(
+                          'Google',
+                          style: TextStyle(color: Colors.indigo[400]),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ));

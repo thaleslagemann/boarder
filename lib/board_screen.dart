@@ -1188,8 +1188,11 @@ class BoardScreenState extends State<BoardScreen> {
                                                 vertical: 5.0),
                                             alignment: Alignment.center,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(7.5)),
+                                                borderRadius: BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    bottomLeft:
+                                                        Radius.circular(10)),
                                                 border: Border.all(
                                                     width: 1.5,
                                                     color: Theme.of(context)
