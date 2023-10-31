@@ -97,39 +97,48 @@ class AppBodyState extends State<AppBody> {
               NavigationDestination(
                 icon: Icon(
                   Icons.home,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
                 label: 'Home',
               ),
             if (selectedIndex != 0)
               NavigationDestination(
-                icon: Icon(Icons.home_outlined),
+                icon: Icon(
+                  Icons.home_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 label: 'Home',
               ),
             if (selectedIndex == 1)
               NavigationDestination(
                 icon: Icon(
                   Icons.space_dashboard,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
                 label: 'Boards',
               ),
             if (selectedIndex != 1)
               NavigationDestination(
-                icon: Icon(Icons.space_dashboard_outlined),
+                icon: Icon(
+                  Icons.space_dashboard_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 label: 'Boards',
               ),
             if (selectedIndex == 2)
               NavigationDestination(
                 icon: Icon(
                   Icons.settings,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
                 label: 'Settings',
               ),
             if (selectedIndex != 2)
               NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 label: 'Settings',
               ),
           ],
