@@ -1,7 +1,10 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:kanban_flt/config.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({super.key});
@@ -35,6 +38,57 @@ class SettingsPageState extends State<SettingsPage> {
         return Icon(Icons.lock_open);
     }
     return Icon(Icons.lock_open);
+  }
+
+  _launchURL(String url) async {
+    final Uri _url = Uri.parse(url);
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
+
+  _showCredits(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              title: Text('Credits'),
+              actions: [
+                TextButton(
+                    onPressed: (() {
+                      setState(() {
+                        Navigator.of(context).pop();
+                      });
+                    }),
+                    child: Text('ok',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary)))
+              ],
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Project by:'),
+                  Text('Thales Lagemann',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary)),
+                  SizedBox(height: 20),
+                  OutlinedButton(
+                    onPressed: () async {
+                      _launchURL('https://github.com/thaleslagemann/');
+                    },
+                    child: Text(
+                      'GitHub',
+                      style: TextStyle(color: Colors.indigo[400]),
+                    ),
+                  ),
+                ],
+              ));
+        });
   }
 
   @override
@@ -205,6 +259,18 @@ class SettingsPageState extends State<SettingsPage> {
                             }));
                           },
                         ),
+                      ],
+                    ),
+                    SettingsSection(
+                      title: Text('Other'),
+                      tiles: [
+                        SettingsTile(
+                            leading: Icon(Icons.people_sharp),
+                            title: Text('Credits'),
+                            trailing: Icon(Icons.arrow_right),
+                            onPressed: ((context) {
+                              _showCredits(context);
+                            })),
                       ],
                     ),
                   ],

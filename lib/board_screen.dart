@@ -64,7 +64,7 @@ class BoardScreenState extends State<BoardScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
@@ -114,7 +114,7 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
@@ -168,7 +168,7 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
@@ -644,8 +644,7 @@ class BoardScreenState extends State<BoardScreen> {
                   contentPadding:
                       EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 0),
                   insetPadding: EdgeInsets.symmetric(horizontal: 10),
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
@@ -696,7 +695,7 @@ class BoardScreenState extends State<BoardScreen> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .inverseSurface,
-                                  fontSize: 24),
+                                  fontSize: 20),
                               onTap: (() {
                                 setState(() {
                                   _isEditingTitle = true;
@@ -1045,175 +1044,6 @@ class BoardScreenState extends State<BoardScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Row(
-                children: [
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top -
-                          50,
-                      width: MediaQuery.of(context).size.width,
-                      child: DragAndDropLists(
-                        listDragHandle: DragHandle(
-                          verticalAlignment: DragHandleVerticalAlignment.top,
-                          child: Icon(Icons.drag_handle),
-                        ),
-                        children: [
-                          for (var header in widget.board.headers)
-                            DragAndDropList(
-                              contentsWhenEmpty: Row(children: [
-                                Text('Empty header',
-                                    style: TextStyle(fontSize: 10))
-                              ]),
-                              header: Padding(
-                                padding: const EdgeInsets.only(right: 45.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    PopupMenuButton<String>(
-                                      icon: Icon(Icons.more_vert_sharp),
-                                      itemBuilder: (BuildContext context) {
-                                        return Constants.headerChoices
-                                            .map((String choice) {
-                                          return PopupMenuItem<String>(
-                                              value: choice,
-                                              child: Text(choice),
-                                              onTap: () => {
-                                                    setState(() {
-                                                      headerChoiceAction(
-                                                          choice, header);
-                                                    })
-                                                  });
-                                        }).toList();
-                                      },
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Divider(
-                                        thickness: 1.5,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 5),
-                                      child: Text(header.name,
-                                          style: TextStyle(fontSize: 18)),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Divider(
-                                        thickness: 1.5,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              children: <DragAndDropItem>[
-                                for (var task in header.tasks)
-                                  DragAndDropItem(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 20.0, vertical: 5.0),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(7.5)),
-                                              border: Border.all(
-                                                  width: 1.5,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary)),
-                                          child: TextButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                _displayTaskScreen(
-                                                    context, task);
-                                              });
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Flexible(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: Text(
-                                                      "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
-                                                      softWrap: true,
-                                                      maxLines: 3,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .inverseSurface),
-                                                    ),
-                                                  ),
-                                                ),
-                                                PopupMenuButton<String>(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(5)),
-                                                  ),
-                                                  icon: Icon(
-                                                      Icons
-                                                          .arrow_drop_down_sharp,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .primary),
-                                                  itemBuilder:
-                                                      (BuildContext context) {
-                                                    return Constants.taskChoices
-                                                        .map((String choice) {
-                                                      return PopupMenuItem<
-                                                              String>(
-                                                          value: choice,
-                                                          child: Text(choice),
-                                                          onTap: () => {
-                                                                setState(() {
-                                                                  taskChoiceAction(
-                                                                      choice,
-                                                                      task);
-                                                                })
-                                                              });
-                                                    }).toList();
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                        ],
-                        onItemReorder: _onItemReorder,
-                        onListReorder: _onListReorder,
-                      )),
-                ],
-              ),
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1265,6 +1095,190 @@ class BoardScreenState extends State<BoardScreen> {
                   ],
                 )
               ],
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                        top: BorderSide(
+                            width: 1.5,
+                            color: Theme.of(context).colorScheme.primary))),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.top -
+                            50,
+                        width: MediaQuery.of(context).size.width,
+                        child: DragAndDropLists(
+                          listDragHandle: DragHandle(
+                            verticalAlignment: DragHandleVerticalAlignment.top,
+                            child: Icon(Icons.drag_handle),
+                          ),
+                          children: [
+                            for (var header in widget.board.headers)
+                              DragAndDropList(
+                                contentsWhenEmpty: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Empty header',
+                                          style: TextStyle(fontSize: 10))
+                                    ]),
+                                header: Padding(
+                                  padding: const EdgeInsets.only(right: 45.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      PopupMenuButton<String>(
+                                        icon: Icon(Icons.more_vert_sharp),
+                                        itemBuilder: (BuildContext context) {
+                                          return Constants.headerChoices
+                                              .map((String choice) {
+                                            return PopupMenuItem<String>(
+                                                value: choice,
+                                                child: Text(choice),
+                                                onTap: () => {
+                                                      setState(() {
+                                                        headerChoiceAction(
+                                                            choice, header);
+                                                      })
+                                                    });
+                                          }).toList();
+                                        },
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Divider(
+                                          thickness: 1.5,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        child: Container(
+                                          child: Text(header.name,
+                                              style: TextStyle(fontSize: 18)),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Divider(
+                                          thickness: 1.5,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                children: <DragAndDropItem>[
+                                  for (var task in header.tasks)
+                                    DragAndDropItem(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                                vertical: 5.0),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(7.5)),
+                                                border: Border.all(
+                                                    width: 1.5,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .primary)),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _displayTaskScreen(
+                                                      context, task);
+                                                });
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  Flexible(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: Text(
+                                                        "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
+                                                        softWrap: true,
+                                                        maxLines: 3,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .inverseSurface),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  PopupMenuButton<String>(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  5)),
+                                                    ),
+                                                    icon: Icon(
+                                                        Icons
+                                                            .arrow_drop_down_sharp,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .primary),
+                                                    itemBuilder:
+                                                        (BuildContext context) {
+                                                      return Constants
+                                                          .taskChoices
+                                                          .map((String choice) {
+                                                        return PopupMenuItem<
+                                                                String>(
+                                                            value: choice,
+                                                            child: Text(choice),
+                                                            onTap: () => {
+                                                                  setState(() {
+                                                                    taskChoiceAction(
+                                                                        choice,
+                                                                        task);
+                                                                  })
+                                                                });
+                                                      }).toList();
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                          ],
+                          onItemReorder: _onItemReorder,
+                          onListReorder: _onListReorder,
+                        )),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
