@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,58 @@ class AppBody extends StatefulWidget {
 
 class AppBodyState extends State<AppBody> {
   var selectedIndex = 0;
+
+  Color _randomColorPicker() {
+    int randomNumber = Random().nextInt(7);
+
+    switch (randomNumber) {
+      case 0:
+        return Colors.amber;
+      case 1:
+        return Colors.cyan;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.red;
+      case 4:
+        return Colors.purple[300]!;
+      case 5:
+        return Colors.indigo[300]!;
+      case 6:
+        return Colors.brown;
+    }
+    return Colors.white;
+  }
+
+  _currentUserPicture() {
+    if (FirebaseAuth.instance.currentUser?.photoURL! != null) {
+      return Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(color: Colors.black, width: 2),
+            ),
+            child: CircleAvatar(
+              radius: 100,
+              backgroundColor: Colors.transparent,
+              backgroundImage:
+                  NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(color: Colors.black, width: 2),
+            color: _randomColorPicker(),
+          ),
+          child: Image(image: AssetImage('lib/assets/boar.png')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +104,12 @@ class AppBodyState extends State<AppBody> {
                   ),
                 ),
                 accountEmail: Text(
-                  "${FirebaseAuth.instance.currentUser?.email}",
+                  "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                currentAccountPicture: FlutterLogo(),
+                currentAccountPicture: _currentUserPicture(),
               ),
               ListTile(
                 leading: Icon(Icons.person),
