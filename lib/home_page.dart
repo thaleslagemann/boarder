@@ -90,7 +90,7 @@ class HomePageState extends State<HomePage> {
                     child: Center(
                       child: Text.rich(
                         TextSpan(
-                          text: 'Welcome to Kanban_flt, ',
+                          text: 'Welcome to Boarder, ',
                           children: [
                             TextSpan(
                                 text:
