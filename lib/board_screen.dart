@@ -6,8 +6,8 @@ library config.globals;
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kanban_flt/config.dart';
-import 'package:kanban_flt/db_handler.dart';
+import 'package:boarder/config.dart';
+import 'package:boarder/db_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 

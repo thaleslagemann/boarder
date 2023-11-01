@@ -1,4 +1,4 @@
-name: kanban_flt
+name: boarder
 description: A Kanban Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

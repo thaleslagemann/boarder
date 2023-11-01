@@ -1,11 +1,11 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, unused_element
 
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/board_screen.dart';
-import 'package:kanban_flt/db_handler.dart';
+import 'package:boarder/board_screen.dart';
+import 'package:boarder/db_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:kanban_flt/config.dart';
+import 'package:boarder/config.dart';
 
 class BoardsPage extends StatefulWidget {
   BoardsPage({super.key});

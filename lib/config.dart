@@ -4,9 +4,9 @@ library config.globals;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/db_handler.dart';
-import 'package:kanban_flt/reorder_settings.dart';
-import 'package:kanban_flt/themes.dart';
+import 'package:boarder/db_handler.dart';
+import 'package:boarder/reorder_settings.dart';
+import 'package:boarder/themes.dart';
 
 MyTheme globalAppTheme = MyTheme();
 ReorderSettings reorderType = ReorderSettings();

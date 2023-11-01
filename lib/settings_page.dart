@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:kanban_flt/config.dart';
+import 'package:boarder/config.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:url_launcher/url_launcher.dart';
 
