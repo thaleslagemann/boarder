@@ -35,7 +35,7 @@ class AppState extends State<MyApp> {
     return ChangeNotifierProvider(
       create: (context) => ConfigState(),
       child: MaterialApp(
-        title: 'Kanban Flutter',
+        title: 'Boarder',
         theme: ThemeData(
             brightness: Brightness.light,
             colorSchemeSeed: Colors.deepPurple,

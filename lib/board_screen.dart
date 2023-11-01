@@ -253,7 +253,6 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayHeaderInputDialog(BuildContext context) async {
-      String newHeaderName;
       return showDialog(
           context: context,
           builder: (context) {

@@ -26,7 +26,7 @@ class AuthGate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'KANBAN FLT',
+                        'Boarder',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 40),
                         textAlign: TextAlign.center,
@@ -46,7 +46,7 @@ class AuthGate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'KANBAN FLT',
+                        'Boarder',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 40),
                         textAlign: TextAlign.center,

@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for windows - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,17 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDWblH8BC1ATlqrTTfLbAXa_YfPExcMOyI',
-    appId: '1:279286220681:web:2844a9aa4879393f330358',
-    messagingSenderId: '279286220681',
-    projectId: 'kaban-flt',
-    authDomain: 'kaban-flt.firebaseapp.com',
-    databaseURL: 'https://kaban-flt-default-rtdb.firebaseio.com',
-    storageBucket: 'kaban-flt.appspot.com',
-    measurementId: 'G-VMR75LZEZ8',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDifrJSZJXjXVnr5tkKGneEBSkAyI6X4J4',
     appId: '1:279286220681:android:6eb0014421b0534a330358',
@@ -70,18 +65,8 @@ class DefaultFirebaseOptions {
     projectId: 'kaban-flt',
     databaseURL: 'https://kaban-flt-default-rtdb.firebaseio.com',
     storageBucket: 'kaban-flt.appspot.com',
-    iosClientId: '279286220681-a26a8uupdqhjslj7tuup26sgo155875t.apps.googleusercontent.com',
+    iosClientId:
+        '279286220681-a26a8uupdqhjslj7tuup26sgo155875t.apps.googleusercontent.com',
     iosBundleId: 'com.example.kanbanFlt',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDgdLYpn1eotBiVNafo7iaNpSABopUsmBM',
-    appId: '1:279286220681:ios:d35ae9cdfe4a7178330358',
-    messagingSenderId: '279286220681',
-    projectId: 'kaban-flt',
-    databaseURL: 'https://kaban-flt-default-rtdb.firebaseio.com',
-    storageBucket: 'kaban-flt.appspot.com',
-    iosClientId: '279286220681-nse3r6qhga2egg9ri6boko4155cemm36.apps.googleusercontent.com',
-    iosBundleId: 'com.example.kanbanFlt.RunnerTests',
   );
 }
