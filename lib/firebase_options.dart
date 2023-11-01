@@ -18,7 +18,7 @@ class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for windows - '
+        'DefaultFirebaseOptions have not been configured for web - '
         'you can reconfigure this by running the FlutterFire CLI again.',
       );
     }
@@ -26,10 +26,13 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
+          'DefaultFirebaseOptions have not been configured for macos - '
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
@@ -50,23 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDifrJSZJXjXVnr5tkKGneEBSkAyI6X4J4',
-    appId: '1:279286220681:android:6eb0014421b0534a330358',
-    messagingSenderId: '279286220681',
-    projectId: 'kaban-flt',
-    databaseURL: 'https://kaban-flt-default-rtdb.firebaseio.com',
-    storageBucket: 'kaban-flt.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDgdLYpn1eotBiVNafo7iaNpSABopUsmBM',
-    appId: '1:279286220681:ios:987782a670f8217d330358',
-    messagingSenderId: '279286220681',
-    projectId: 'kaban-flt',
-    databaseURL: 'https://kaban-flt-default-rtdb.firebaseio.com',
-    storageBucket: 'kaban-flt.appspot.com',
-    iosClientId:
-        '279286220681-a26a8uupdqhjslj7tuup26sgo155875t.apps.googleusercontent.com',
-    iosBundleId: 'com.example.kanbanFlt',
+    apiKey: 'AIzaSyDUzW6Fwi1RhPBLV1DrOKXBMtkDMBN9oFM',
+    appId: '1:1025052526314:android:462d323f654fe605917993',
+    messagingSenderId: '1025052526314',
+    projectId: 'boarder-kanban',
+    storageBucket: 'boarder-kanban.appspot.com',
   );
 }

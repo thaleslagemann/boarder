@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban_flt/boards_page.dart';
-import 'package:kanban_flt/config.dart';
-import 'package:kanban_flt/settings_page.dart';
-import 'package:kanban_flt/home_page.dart';
+import 'package:boarder/boards_page.dart';
+import 'package:boarder/config.dart';
+import 'package:boarder/settings_page.dart';
+import 'package:boarder/home_page.dart';
 import 'package:provider/provider.dart';
 
 class AppBody extends StatefulWidget {
@@ -100,13 +100,14 @@ class AppBodyState extends State<AppBody> {
                 accountName: Text(
                   "${FirebaseAuth.instance.currentUser?.displayName}",
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primaryContainer),
                 ),
                 accountEmail: Text(
                   "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                   ),
                 ),
                 currentAccountPicture: _currentUserPicture(),
@@ -119,6 +120,7 @@ class AppBodyState extends State<AppBody> {
                     context,
                     MaterialPageRoute<ProfileScreen>(
                       builder: (context) => ProfileScreen(
+                        avatarPlaceholderColor: _randomColorPicker(),
                         appBar: AppBar(
                           title: const Text('User Profile'),
                         ),

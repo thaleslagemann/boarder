@@ -1,7 +1,7 @@
 {
   "file_generated_by": "FlutterFire CLI",
   "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
-  "GOOGLE_APP_ID": "1:279286220681:ios:987782a670f8217d330358",
-  "FIREBASE_PROJECT_ID": "kaban-flt",
-  "GCM_SENDER_ID": "279286220681"
+  "GOOGLE_APP_ID": "1:1025052526314:ios:e2416860620733e4917993",
+  "FIREBASE_PROJECT_ID": "boarder-kanban",
+  "GCM_SENDER_ID": "1025052526314"
 }

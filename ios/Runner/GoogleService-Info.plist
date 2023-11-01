@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.kanbanFlt</string>
+	<string>com.example.boarder</string>
 	<key>PROJECT_ID</key>
 	<string>kaban-flt</string>
 	<key>STORAGE_BUCKET</key>

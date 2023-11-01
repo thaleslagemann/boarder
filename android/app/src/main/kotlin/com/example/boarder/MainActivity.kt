@@ -1,4 +1,4 @@
-package com.example.kanban_flt
+package com.example.boarder
 
 import io.flutter.embedding.android.FlutterActivity
 
