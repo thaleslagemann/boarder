@@ -1,5 +1,3 @@
-// ignore_for_file: constant_identifier_names
-
 library config.globals;
 
 import 'package:flutter/widgets.dart';
@@ -12,31 +10,31 @@ MyTheme globalAppTheme = MyTheme();
 ReorderSettings reorderType = ReorderSettings();
 
 class Constants {
-  static const String AddTask = 'Add Task';
-  static const String Delete = 'Delete';
-  static const String Rename = 'Rename';
-  static const String Edit = 'Edit';
-  static const String Bookmark = 'Bookmark';
-  static const String Details = 'Details';
+  static const String addTask = 'Add Task';
+  static const String delete = 'Delete';
+  static const String rename = 'Rename';
+  static const String edit = 'Edit';
+  static const String bookmark = 'Bookmark';
+  static const String details = 'Details';
 
   static const List<String> headerChoices = <String>[
-    AddTask,
-    Rename,
-    Delete,
+    addTask,
+    rename,
+    delete,
   ];
   static const List<String> taskChoices = <String>[
-    Rename,
-    Delete,
+    rename,
+    delete,
   ];
   static const List<String> boardChoices = <String>[
-    Details,
-    Edit,
-    Delete,
+    details,
+    edit,
+    delete,
   ];
   static const List<String> boardListChoices = <String>[
-    Bookmark,
-    Edit,
-    Delete,
+    bookmark,
+    edit,
+    delete,
   ];
 }
 
@@ -52,8 +50,7 @@ class ConfigState extends ChangeNotifier {
       databaseHelper.boards = await databaseHelper.getAllBoards();
       for (var board in databaseHelper.boards) {
         print("Searching headers for board [${board.name}]...");
-        databaseHelper.boards[findBoardIndexByID(board.boardId)].headers =
-            await databaseHelper.getHeadersForBoard(board.boardId);
+        databaseHelper.boards[findBoardIndexByID(board.boardId)].headers = await databaseHelper.getHeadersForBoard(board.boardId);
         for (var header in board.headers) {
           print("Header found: [${header.headerId}, ${header.name}]");
           databaseHelper.addHeader(header);
@@ -63,16 +60,14 @@ class ConfigState extends ChangeNotifier {
         } else {
           for (var header in board.headers) {
             print("Searching tasks for header [${header.name}]...");
-            header.tasks =
-                await databaseHelper.getTasksForHeader(header.headerId);
+            header.tasks = await databaseHelper.getTasksForHeader(header.headerId);
             int orderIndex = 0;
             for (var task in header.tasks) {
               task.orderIndex = orderIndex;
               orderIndex++;
             }
             for (var task in header.tasks) {
-              print(
-                  "Task found: [TASK_ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
+              print("Task found: [TASK_ID: ${task.taskId}, NAME: ${task.name}, ORDER_ID: ${task.orderIndex}]");
               databaseHelper.addTask(task);
             }
             if (header.tasks.isEmpty) {
@@ -105,8 +100,7 @@ class ConfigState extends ChangeNotifier {
         print("No bookmarks found!");
       } else {
         for (var bookmark in databaseHelper.bookmarks) {
-          print(
-              "[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
+          print("[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
         }
       }
       printHeaders();
@@ -172,8 +166,7 @@ class ConfigState extends ChangeNotifier {
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
-      if (list[i].name == elementToFind ||
-          list[i].description == elementToFind) {
+      if (list[i].name == elementToFind || list[i].description == elementToFind) {
         return i;
       }
     }
@@ -215,8 +208,7 @@ class ConfigState extends ChangeNotifier {
     List<dynamic> list = board.headers;
     print("Searching header [$id] on board [${board.name}]");
     if (list.isEmpty) {
-      print(
-          "At FindHeaderIndexByOrderId(): List is empty; returning index (-1)");
+      print("At FindHeaderIndexByOrderId(): List is empty; returning index (-1)");
       return -1;
     }
     for (int i = 0; i < list.length; i++) {
@@ -224,8 +216,7 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    print(
-        "At FindHeaderIndexByOrderId(): Element not found; returning index (-1)");
+    print("At FindHeaderIndexByOrderId(): Element not found; returning index (-1)");
     return -1;
   }
 
@@ -247,8 +238,7 @@ class ConfigState extends ChangeNotifier {
   int findTaskIndexByOrderId(int id, int listId, Board board) {
     int headerIndex = findHeaderIndexByOrderId(listId, board);
     List<dynamic> list = board.headers[headerIndex].tasks;
-    print(
-        "Searching order_id [$id] on board [${board.name}] on header [${board.headers[headerIndex].name}]");
+    print("Searching order_id [$id] on board [${board.name}] on header [${board.headers[headerIndex].name}]");
 
     for (var task in list) {
       print('[OrderIndex: ${task.orderIndex}, NAME: ${task.name}]');
@@ -262,8 +252,7 @@ class ConfigState extends ChangeNotifier {
         return i;
       }
     }
-    print(
-        "At FindTaskIndexByOrderId(): Element not found; returning same order_id");
+    print("At FindTaskIndexByOrderId(): Element not found; returning same order_id");
     return id;
   }
 
@@ -276,9 +265,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsBoard(List<dynamic> list, elementToCheck) {
     for (var board in list) {
-      if (board.boardId == elementToCheck ||
-          board.name == elementToCheck ||
-          board.description == elementToCheck) {
+      if (board.boardId == elementToCheck || board.name == elementToCheck || board.description == elementToCheck) {
         return true;
       }
     }
@@ -297,8 +284,7 @@ class ConfigState extends ChangeNotifier {
 
   bool containsBookmark(List<Bookmark> list, elementToCheck) {
     for (var bookmark in list) {
-      if (bookmark.boardId == elementToCheck ||
-          bookmark.bookmarkId == elementToCheck) {
+      if (bookmark.boardId == elementToCheck || bookmark.bookmarkId == elementToCheck) {
         return true;
       }
     }

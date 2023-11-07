@@ -198,8 +198,11 @@ class DatabaseHelper {
         'FOREIGN KEY (assigned_user_id) REFERENCES Users(user_id));');
   }
 
-  Future<void> insertBoard(Board board) async {
+  void addBoard(Board board) {
     boards.add(board);
+  }
+
+  Future<void> insertBoard(Board board) async {
     final Database db = await DatabaseHelper.instance.database;
     await db.insert(
       'Boards',
@@ -230,11 +233,10 @@ class DatabaseHelper {
   }
 
   Future<void> deleteBoard(Board board) async {
-    final Database db = await DatabaseHelper.instance.database;
-
     int boardId = board.boardId;
     boards.remove(board);
 
+    final Database db = await DatabaseHelper.instance.database;
     // Search and delete the bookmark if it exists
     int bookmarkIndex = findBookmarkIndex(board.boardId);
     print(bookmarkIndex);
@@ -265,23 +267,19 @@ class DatabaseHelper {
 
     for (var i = 0; i < taskRemovalList.length; i++) {
       tasks.remove(taskRemovalList[i]);
-      await db.delete('Tasks',
-          where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
+      await db.delete('Tasks', where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
     }
 
     for (var i = 0; i < headerRemovalList.length; i++) {
       headers.remove(headerRemovalList[i]);
-      await db.delete('Headers',
-          where: 'header_id = ?', whereArgs: [headerRemovalList[i].headerId]);
+      await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerRemovalList[i].headerId]);
     }
 
     if (bookmarkIndex != -1) {
-      await db.query('Bookmarks',
-          where: 'bookmark_id = ?', whereArgs: [board.boardId]);
+      await db.query('Bookmarks', where: 'bookmark_id = ?', whereArgs: [board.boardId]);
     }
     print('removed board ${board.boardId} from list');
-    await db
-        .delete('Boards', where: 'board_id = ?', whereArgs: [board.boardId]);
+    await db.delete('Boards', where: 'board_id = ?', whereArgs: [board.boardId]);
   }
 
   // Create a bookmark
@@ -299,8 +297,7 @@ class DatabaseHelper {
   Future<void> deleteBookmark(int bookmarkId) async {
     bookmarks.removeAt(findBookmarkIndex(bookmarkId));
     final db = await database;
-    int rows = await db
-        .delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
+    int rows = await db.delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
     print('Deleted bookmark $bookmarkId, rows affected: $rows');
     for (var bookmark in bookmarks) {
       print('[${bookmark.boardId}]');
@@ -378,12 +375,14 @@ class DatabaseHelper {
   }
 
   // Create a new header
-  Future<void> createHeader(Header header) async {
-    headers.add(header);
-    boards[findBoardIndexByID(header.boardId)].headers.add(header);
-    print("Board's headers:");
-    for (var header in boards[findBoardIndexByID(header.boardId)].headers) {
-      print('${header.headerId}, ${header.name}, ${header.orderIndex}');
+  Future<void> insertHeader(Header header) async {
+    int boardIndex = findBoardIndexByID(header.boardId);
+    if (boardIndex != -1) {
+      boards[boardIndex].headers.add(header);
+      print("Board's headers:");
+      for (var header in boards[findBoardIndexByID(header.boardId)].headers) {
+        print('${header.headerId}, ${header.name}, ${header.orderIndex}');
+      }
     }
     final Database db = await DatabaseHelper.instance.database;
     await db.insert(
@@ -391,6 +390,31 @@ class DatabaseHelper {
       header.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  void addKanbanPresetHeadersToBoard(Board board) {
+    List<Header> presetHeaders = [];
+    int headersLength = headers.length;
+
+    Header presetHeader1 = Header(headerId: headersLength, boardId: board.boardId, name: 'Backlog', orderIndex: 0);
+    presetHeaders.add(presetHeader1);
+
+    Header presetHeader2 = Header(headerId: headersLength + 1, boardId: board.boardId, name: 'To do', orderIndex: 1);
+    presetHeaders.add(presetHeader2);
+
+    Header presetHeader3 = Header(headerId: headersLength + 2, boardId: board.boardId, name: 'In progress', orderIndex: 2);
+    presetHeaders.add(presetHeader3);
+
+    Header presetHeader4 = Header(headerId: headersLength + 3, boardId: board.boardId, name: 'Testing', orderIndex: 3);
+    presetHeaders.add(presetHeader4);
+
+    Header presetHeader5 = Header(headerId: headersLength + 4, boardId: board.boardId, name: 'Done', orderIndex: 4);
+    presetHeaders.add(presetHeader5);
+
+    for (Header header in presetHeaders) {
+      addHeader(header);
+      insertHeader(header);
+    }
   }
 
   void sortHeadersAndTasks() {
@@ -424,8 +448,7 @@ class DatabaseHelper {
         for (var task in header.tasks) {
           if (task.headerId != header.headerId) {
             print("Differing headerId found");
-            print(
-                "${task.name} has ${task.headerId}, parent Id is ${header.headerId}");
+            print("${task.name} has ${task.headerId}, parent Id is ${header.headerId}");
             taskListToRedefine.add(task);
           }
         }
@@ -434,13 +457,11 @@ class DatabaseHelper {
     for (var task in taskListToRedefine) {
       for (var header in headers) {
         if (header.tasks.contains(task)) {
-          print(
-              "Found task [${task.name}] in header [${header.name}], deleting...");
+          print("Found task [${task.name}] in header [${header.name}], deleting...");
           header.tasks.remove(task);
         }
       }
-      print(
-          "Inserting [${task.name}] in header [${headers[findHeaderIndexByID(task.headerId)].name}]");
+      print("Inserting [${task.name}] in header [${headers[findHeaderIndexByID(task.headerId)].name}]");
       headers[findHeaderIndexByID(task.headerId)].tasks.add(task);
     }
     updateHeadersInDatabase();
@@ -487,8 +508,7 @@ class DatabaseHelper {
   }
 
   // Update the order_index of tasks in the database for a specific header
-  Future<void> updateTaskOrderInDatabase(Task task, Header oldHeader,
-      Header newHeader, int oldTaskIndex, int newTaskIndex) async {
+  Future<void> updateTaskOrderInDatabase(Task task, Header oldHeader, Header newHeader, int oldTaskIndex, int newTaskIndex) async {
     final Database db = await DatabaseHelper.instance.database;
 
     var updatedTask = task;
@@ -538,8 +558,7 @@ class DatabaseHelper {
 
       final int dbHeaderOrderIndex = maps.first['order_index'];
       if (dbHeaderOrderIndex != header.orderIndex) {
-        print(
-            'Header [${header.name}] O_I.: $dbHeaderOrderIndex | ${header.orderIndex}');
+        print('Header [${header.name}] O_I.: $dbHeaderOrderIndex | ${header.orderIndex}');
         changes += await db.update(
           'Headers',
           {'name': header.name, 'order_index': header.orderIndex},
@@ -573,11 +592,9 @@ class DatabaseHelper {
 
       final int dbTaskHeaderId = maps.first['header_id'];
       final int dbTaskOrderIndex = maps.first['order_index'];
-      if (dbTaskHeaderId != task.headerId ||
-          dbTaskOrderIndex != task.orderIndex) {
+      if (dbTaskHeaderId != task.headerId || dbTaskOrderIndex != task.orderIndex) {
         print('Task [${task.name}] Head: $dbTaskHeaderId | ${task.headerId}');
-        print(
-            'Task [${task.name}] O_I.: $dbTaskOrderIndex | ${task.orderIndex}');
+        print('Task [${task.name}] O_I.: $dbTaskOrderIndex | ${task.orderIndex}');
         changes += await db.update(
           'Tasks',
           {
@@ -681,13 +698,11 @@ class DatabaseHelper {
     headers.remove(header);
     boards[findBoardIndexByID(header.boardId)].headers.remove(header);
     final Database db = await DatabaseHelper.instance.database;
-    await db.delete('Headers',
-        where: 'header_id = ?', whereArgs: [header.headerId]);
+    await db.delete('Headers', where: 'header_id = ?', whereArgs: [header.headerId]);
 
     for (var i = 0; i < taskRemovalList.length; i++) {
       tasks.remove(taskRemovalList[i]);
-      await db.delete('Tasks',
-          where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
+      await db.delete('Tasks', where: 'header_id = ?', whereArgs: [taskRemovalList[i].headerId]);
     }
   }
 
@@ -699,40 +714,30 @@ class DatabaseHelper {
     await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
   }
 
-  void insertReorderTask(Task oldTask, int oldTaskIndex, int newTaskIndex,
-      int boardIndex, int oldHeaderIndex, int newHeaderIndex) {
+  void insertReorderTask(Task oldTask, int oldTaskIndex, int newTaskIndex, int boardIndex, int oldHeaderIndex, int newHeaderIndex) {
     // copy oldHeaderIndex.oldTaskIndex into a buffer
     Task oldTaskBuffer = oldTask;
     // delete oldHeaderIndex.oldTaskIndex from old position
     boards[boardIndex].headers[oldHeaderIndex].tasks.remove(oldTask);
     // iterate through the remaining positions after old position
-    for (int i = 0;
-        i < boards[boardIndex].headers[oldHeaderIndex].tasks.length;
-        i++) {
+    for (int i = 0; i < boards[boardIndex].headers[oldHeaderIndex].tasks.length; i++) {
       // decrement orderIndex of remaining positions
       if (i >= oldTaskIndex) {
         boards[boardIndex].headers[oldHeaderIndex].tasks[i].orderIndex = i;
       }
     }
     // change the task's headerId if it's different
-    if (oldTaskBuffer.headerId !=
-        boards[boardIndex].headers[newHeaderIndex].headerId) {
-      oldTaskBuffer.headerId =
-          boards[boardIndex].headers[newHeaderIndex].headerId;
+    if (oldTaskBuffer.headerId != boards[boardIndex].headers[newHeaderIndex].headerId) {
+      oldTaskBuffer.headerId = boards[boardIndex].headers[newHeaderIndex].headerId;
     }
     if (boards[boardIndex].headers[newHeaderIndex].tasks.isEmpty) {
       // insert oldHeaderIndex.oldTaskIndex into new position
       boards[boardIndex].headers[newHeaderIndex].tasks.add(oldTaskBuffer);
     } else {
       // insert oldHeaderIndex.oldTaskIndex into new position
-      boards[boardIndex]
-          .headers[newHeaderIndex]
-          .tasks
-          .insert(newTaskIndex, oldTaskBuffer);
+      boards[boardIndex].headers[newHeaderIndex].tasks.insert(newTaskIndex, oldTaskBuffer);
       // loop through the whole array adjusting the orderIndex
-      for (int i = 0;
-          i < boards[boardIndex].headers[newHeaderIndex].tasks.length;
-          i++) {
+      for (int i = 0; i < boards[boardIndex].headers[newHeaderIndex].tasks.length; i++) {
         // increment orderIndex of remaining positions
         boards[boardIndex].headers[newHeaderIndex].tasks[i].orderIndex = i;
       }

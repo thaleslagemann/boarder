@@ -51,8 +51,7 @@ class AppBodyState extends State<AppBody> {
             child: CircleAvatar(
               radius: 100,
               backgroundColor: Colors.transparent,
-              backgroundImage:
-                  NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+              backgroundImage: NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
             ),
           ),
         ],
@@ -83,7 +82,7 @@ class AppBodyState extends State<AppBody> {
         page = SettingsPage();
         break;
       default:
-        throw UnimplementedError('no widget for $selectedIndex');
+        throw UnimplementedError('No widget for index $selectedIndex');
     }
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -95,13 +94,10 @@ class AppBodyState extends State<AppBody> {
             padding: EdgeInsets.zero,
             children: [
               UserAccountsDrawerHeader(
-                decoration:
-                    BoxDecoration(color: Theme.of(context).colorScheme.primary),
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
                 accountName: Text(
                   "${FirebaseAuth.instance.currentUser?.displayName}",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primaryContainer),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primaryContainer),
                 ),
                 accountEmail: Text(
                   "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
