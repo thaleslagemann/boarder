@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:boarder/firebase_options.dart';
+import 'package:boarder/app_settings/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/auth_gate.dart';
+import 'package:boarder/app_settings/auth_gate.dart';
 import 'package:provider/provider.dart';
-import 'package:boarder/config.dart';
+import 'package:boarder/app_settings/config.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,14 +36,8 @@ class AppState extends State<MyApp> {
       create: (context) => ConfigState(),
       child: MaterialApp(
         title: 'Boarder',
-        theme: ThemeData(
-            brightness: Brightness.light,
-            colorSchemeSeed: Colors.deepPurple,
-            cardColor: Color.fromARGB(255, 255, 255, 255)),
-        darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            colorSchemeSeed: Colors.deepPurple,
-            cardColor: Color.fromARGB(255, 30, 30, 30)),
+        theme: ThemeData(brightness: Brightness.light, colorSchemeSeed: Colors.deepPurple, cardColor: Color.fromARGB(255, 255, 255, 255)),
+        darkTheme: ThemeData(brightness: Brightness.dark, colorSchemeSeed: Colors.deepPurple, cardColor: Color.fromARGB(255, 30, 30, 30)),
         themeMode: globalAppTheme.currentTheme(),
         home: const AuthGate(),
       ),

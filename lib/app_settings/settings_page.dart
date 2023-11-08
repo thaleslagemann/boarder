@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:boarder/config.dart';
+import 'package:boarder/app_settings/config.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -64,18 +64,14 @@ class SettingsPageState extends State<SettingsPage> {
                         Navigator.of(context).pop();
                       });
                     }),
-                    child: Text('ok',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary)))
+                    child: Text('ok', style: TextStyle(color: Theme.of(context).colorScheme.primary)))
               ],
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Project by:'),
-                  Text('Thales Lagemann',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary)),
+                  Text('Thales Lagemann', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                   SizedBox(height: 20),
                   Row(
                     children: [
@@ -151,35 +147,28 @@ class SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               items: _themeOptions
-                                  .map(
-                                      (String item) => DropdownMenuItem<String>(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                              ),
-                                            ),
-                                          ))
+                                  .map((String item) => DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
+                                        ),
+                                      ))
                                   .toList(),
                               value: selectedTheme,
                               onChanged: (String? value) {
                                 setState(() {
                                   selectedTheme = value;
-                                  print(
-                                      'Attempting to switch theme to $selectedTheme');
-                                  globalAppTheme.switchTheme(
-                                      _themeOptions.indexOf(selectedTheme!));
+                                  print('Attempting to switch theme to $selectedTheme');
+                                  globalAppTheme.switchTheme(_themeOptions.indexOf(selectedTheme!));
                                   print(globalAppTheme.currentTheme());
                                 });
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Theme changed')),
+                                  const SnackBar(content: Text('Theme changed')),
                                 );
                               },
                               buttonStyleData: const ButtonStyleData(
@@ -217,9 +206,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         item,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
                                     ))
@@ -228,16 +215,13 @@ class SettingsPageState extends State<SettingsPage> {
                             onChanged: (String? value) {
                               setState(() {
                                 selectedReorder = value;
-                                print(
-                                    'Attempting to switch reorder type to $selectedReorder');
+                                print('Attempting to switch reorder type to $selectedReorder');
                                 reorderType.switchReorder();
                                 print(selectedReorder);
                               });
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Reorder type changed')),
+                                const SnackBar(content: Text('Reorder type changed')),
                               );
                             },
                             buttonStyleData: const ButtonStyleData(
@@ -257,8 +241,7 @@ class SettingsPageState extends State<SettingsPage> {
                       title: Text('Security'),
                       tiles: [
                         SettingsTile.switchTile(
-                          activeSwitchColor:
-                              Theme.of(context).colorScheme.primary,
+                          activeSwitchColor: Theme.of(context).colorScheme.primary,
                           initialValue: _encryptionSwitch,
                           title: Text('Encrypt data'),
                           leading: encryptionIconSwitch(),

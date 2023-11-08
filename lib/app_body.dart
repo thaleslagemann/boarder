@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/boards_page.dart';
-import 'package:boarder/config.dart';
-import 'package:boarder/settings_page.dart';
+import 'package:boarder/app_settings/config.dart';
+import 'package:boarder/app_settings/settings_page.dart';
 import 'package:boarder/home_page.dart';
 import 'package:provider/provider.dart';
 

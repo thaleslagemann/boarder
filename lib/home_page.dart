@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/config.dart';
+import 'package:boarder/app_settings/config.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -92,12 +92,7 @@ class HomePageState extends State<HomePage> {
                         TextSpan(
                           text: 'Welcome to Boarder, ',
                           children: [
-                            TextSpan(
-                                text:
-                                    '${FirebaseAuth.instance.currentUser?.displayName}',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary)),
+                            TextSpan(text: '${FirebaseAuth.instance.currentUser?.displayName}', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                             TextSpan(text: '!'),
                           ],
                         ),

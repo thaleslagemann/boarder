@@ -1,13 +1,10 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_unnecessary_containers, unnecessary_string_interpolations
-
 library config.globals;
 
-// ignore_for_file: unused_field
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:boarder/app_settings/config.dart';
+import 'package:boarder/app_settings/db_handler.dart';
 import 'package:get/get.dart';
-import 'package:boarder/config.dart';
-import 'package:boarder/db_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
