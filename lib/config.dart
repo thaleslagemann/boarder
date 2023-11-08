@@ -361,4 +361,29 @@ class ConfigState extends ChangeNotifier {
     print('At getSequentialTaskID: New task ID is $id');
     return id;
   }
+
+  void addKanbanPresetHeadersToBoard(Board board) {
+    databaseHelper.addKanbanPresetHeadersToBoard(board);
+    notifyListeners();
+  }
+
+  void addBoard(Board board) {
+    databaseHelper.addBoard(board);
+    notifyListeners();
+  }
+
+  void addBookmark(Bookmark bookmark) {
+    databaseHelper.addBookmark(bookmark);
+    notifyListeners();
+  }
+
+  void addHeader(Header header) {
+    databaseHelper.addHeader(header);
+    notifyListeners();
+  }
+
+  void addTask(Task task) {
+    databaseHelper.addTask(task);
+    notifyListeners();
+  }
 }

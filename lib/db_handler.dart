@@ -282,9 +282,12 @@ class DatabaseHelper {
     await db.delete('Boards', where: 'board_id = ?', whereArgs: [board.boardId]);
   }
 
+  void addBookmark(Bookmark bookmark) {
+    bookmarks.add(bookmark);
+  }
+
   // Create a bookmark
   void createBookmark(Bookmark bookmark) async {
-    bookmarks.add(bookmark);
     final db = await database;
     await db.insert('Bookmarks', bookmark.toMap());
     print('Added bookmark ${bookmark.bookmarkId}');
@@ -473,8 +476,14 @@ class DatabaseHelper {
   }
 
   Future<void> createTask(Task task) async {
-    tasks.add(task);
-    headers[findHeaderIndexByID(task.headerId)].tasks.add(task);
+    int headerIndex = findHeaderIndexByID(task.headerId);
+    if (headerIndex != -1) {
+      headers[headerIndex].tasks.add(task);
+      print("header's tasks:");
+      for (var task in headers[findHeaderIndexByID(task.headerId)].tasks) {
+        print('${task.taskId}, ${task.name}, ${task.orderIndex}');
+      }
+    }
     final Database db = await DatabaseHelper.instance.database;
     await db.insert(
       'Tasks',

@@ -76,7 +76,7 @@ class BoardsPageState extends State<BoardsPage> {
           builder: (context) {
             return StatefulBuilder(builder: (context, setState) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
@@ -95,7 +95,7 @@ class BoardsPageState extends State<BoardsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Preset"),
+                      Text("Preset", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                       DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
@@ -121,10 +121,6 @@ class BoardsPageState extends State<BoardsPage> {
                           value: selectedPreset,
                           onChanged: (String? value) {
                             setState(() => selectedPreset = value);
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Preset changed to "$selectedPreset"')),
-                            );
                           },
                           buttonStyleData: const ButtonStyleData(
                             padding: EdgeInsets.symmetric(horizontal: 5),
@@ -151,27 +147,28 @@ class BoardsPageState extends State<BoardsPage> {
                     style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
                     child: const Text('ok'),
                     onPressed: () {
-                      var newBoard = Board(
-                          boardId: configState.databaseHelper.boards.length,
-                          name: _boardNameInputController.text,
-                          description: _boardDescInputController.text,
-                          creationDate: DateTime.now(),
-                          lastUpdate: DateTime.now(),
-                          headers: []);
-                      _boardNameInputController.clear();
-                      _boardDescInputController.clear();
-                      setState(() {
-                        configState.databaseHelper.boards.add(newBoard);
-                        configState.databaseHelper.insertBoard(newBoard);
-
-                        if (selectedPreset == 'Kanban') {
-                          configState.databaseHelper
-                              .addKanbanPresetHeadersToBoard(configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
-                        }
-
-                        boards = configState.databaseHelper.boards;
+                      if (_boardNameInputController.text.isNotEmpty) {
+                        var newBoard = Board(
+                            boardId: configState.databaseHelper.boards.length,
+                            name: _boardNameInputController.text,
+                            description: _boardDescInputController.text,
+                            creationDate: DateTime.now(),
+                            lastUpdate: DateTime.now(),
+                            headers: []);
+                        _boardNameInputController.clear();
+                        _boardDescInputController.clear();
+                        setState(() {
+                          configState.addBoard(newBoard);
+                          configState.databaseHelper.insertBoard(newBoard);
+                          if (selectedPreset == 'Kanban') {
+                            configState.addKanbanPresetHeadersToBoard(configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
+                          }
+                          boards = configState.databaseHelper.boards;
+                          Navigator.pop(context);
+                        });
+                      } else {
                         Navigator.pop(context);
-                      });
+                      }
                     },
                   ),
                 ],

@@ -38,9 +38,6 @@ class BoardScreenState extends State<BoardScreen> {
   Widget build(BuildContext context) {
     String boardNewName = '';
     String boardNewDesc = '';
-    String newHeaderName = '';
-    String newTaskName = '';
-    String newTaskDesc = '';
     String renameHeaderNewName = '';
     String renameTaskNewName = '';
 
@@ -241,11 +238,6 @@ class BoardScreenState extends State<BoardScreen> {
               ),
               title: const Text('Create a new header'),
               content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    newHeaderName = value;
-                  });
-                },
                 autofocus: true,
                 controller: _headerFieldController,
                 decoration: const InputDecoration(hintText: "Header name"),
@@ -264,18 +256,15 @@ class BoardScreenState extends State<BoardScreen> {
                   style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('ok'),
                   onPressed: () {
+                    final newHeader = Header(
+                        headerId: configState.databaseHelper.headers.length,
+                        boardId: widget.board.boardId,
+                        name: _headerFieldController.text,
+                        orderIndex: widget.board.headers.length,
+                        tasks: []);
                     setState(() {
-                      newHeaderName = _headerFieldController.text;
-                      print(newHeaderName);
-                      final newHeader = Header(
-                          headerId: configState.getSequentialHeaderID(0),
-                          boardId: widget.board.boardId,
-                          name: newHeaderName,
-                          orderIndex: widget.board.headers.length,
-                          tasks: []);
-                      configState.databaseHelper.addHeader(newHeader);
+                      configState.addHeader(newHeader);
                       configState.databaseHelper.insertHeader(newHeader);
-                      newHeaderName = '';
                       _headerFieldController.clear();
                       Navigator.pop(context);
                     });
@@ -333,21 +322,11 @@ class BoardScreenState extends State<BoardScreen> {
               title: const Text('Create a new task'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
                 TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      newTaskName = value;
-                    });
-                  },
                   autofocus: true,
                   controller: _taskNameFieldController,
                   decoration: const InputDecoration(hintText: "Name"),
                 ),
                 TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      newTaskName = value;
-                    });
-                  },
                   autofocus: true,
                   controller: _taskDescFieldController,
                   decoration: const InputDecoration(hintText: "Description"),
@@ -367,22 +346,17 @@ class BoardScreenState extends State<BoardScreen> {
                   style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
                   child: const Text('ok'),
                   onPressed: () {
+                    var newTask = Task(
+                      taskId: configState.databaseHelper.tasks.length,
+                      headerId: headerID,
+                      name: _taskNameFieldController.text,
+                      description: _taskDescFieldController.text,
+                      assignedUserId: 0,
+                      orderIndex: configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].tasks.length,
+                    );
                     setState(() {
-                      newTaskName = _taskNameFieldController.text;
-                      newTaskDesc = _taskDescFieldController.text;
-                      print("Creating new task: [$newTaskName]");
-                      var taskID = configState.getSequentialTaskID(configState.databaseHelper.tasks, 0);
-                      var newTask = Task(
-                        taskId: taskID,
-                        headerId: headerID,
-                        name: newTaskName,
-                        description: newTaskDesc,
-                        assignedUserId: 0,
-                        orderIndex: configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].tasks.length,
-                      );
+                      configState.addTask(newTask);
                       configState.databaseHelper.createTask(newTask);
-                      newTaskName = '';
-                      newTaskDesc = '';
                       _taskNameFieldController.clear();
                       _taskDescFieldController.clear();
                       Navigator.pop(context);
