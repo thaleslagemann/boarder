@@ -33,17 +33,19 @@ class BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var configState = context.watch<ConfigState>();
     String boardNewName = '';
     String boardNewDesc = '';
     String renameHeaderNewName = '';
     String renameTaskNewName = '';
 
+    taskShape.setPrimaryBorderColor(context);
+    print("Task shape: ${taskShape.getCurrentShapeInt()}");
+    BoxDecoration currentTaskShape = taskShape.getCurrentTaskShape(context);
     int currentReorderOption = reorderType.currentReorderInt();
     bool _isEditing = false;
     bool _isEditingTitle = false;
     FocusNode myFocusNode = FocusNode();
-
-    var configState = context.watch<ConfigState>();
 
     _displayBoardDeletionAlert(BuildContext context, boardID) {
       showDialog(
@@ -254,7 +256,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('ok'),
                   onPressed: () {
                     final newHeader = Header(
-                        headerId: configState.databaseHelper.headers.length,
+                        headerId: configState.getSequentialHeaderID(0),
                         boardId: widget.board.boardId,
                         name: _headerFieldController.text,
                         orderIndex: widget.board.headers.length,
@@ -344,7 +346,7 @@ class BoardScreenState extends State<BoardScreen> {
                   child: const Text('ok'),
                   onPressed: () {
                     var newTask = Task(
-                      taskId: configState.databaseHelper.tasks.length,
+                      taskId: configState.getSequentialTaskID(0),
                       headerId: headerID,
                       name: _taskNameFieldController.text,
                       description: _taskDescFieldController.text,
@@ -994,9 +996,7 @@ class BoardScreenState extends State<BoardScreen> {
                                           Container(
                                             margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                             alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                                border: Border.all(width: 1.5, color: Theme.of(context).colorScheme.primary)),
+                                            decoration: taskShape.getCurrentTaskShape(context),
                                             child: TextButton(
                                               onPressed: () {
                                                 setState(() {
@@ -1012,7 +1012,7 @@ class BoardScreenState extends State<BoardScreen> {
                                                     child: Padding(
                                                       padding: const EdgeInsets.all(10.0),
                                                       child: Text(
-                                                        "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
+                                                        configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name,
                                                         softWrap: true,
                                                         maxLines: 3,
                                                         overflow: TextOverflow.ellipsis,

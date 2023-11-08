@@ -28,6 +28,10 @@ class AppState extends State<MyApp> {
       print('And the theme changes!');
       setState(() {});
     });
+    taskShape.addListener(() {
+      print('And the task shape changes!');
+      setState(() {});
+    });
   }
 
   @override

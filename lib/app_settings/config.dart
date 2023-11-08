@@ -1,5 +1,6 @@
 library config.globals;
 
+import 'package:boarder/app_settings/task_display_shape.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/db_handler.dart';
@@ -7,6 +8,7 @@ import 'package:boarder/app_settings/reorder_settings.dart';
 import 'package:boarder/app_settings/themes.dart';
 
 MyTheme globalAppTheme = MyTheme();
+TaskDisplayShape taskShape = TaskDisplayShape();
 ReorderSettings reorderType = ReorderSettings();
 
 class Constants {
@@ -103,6 +105,7 @@ class ConfigState extends ChangeNotifier {
           print("[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
         }
       }
+
       printHeaders();
       printTasks();
       print('DB loaded');
@@ -352,10 +355,11 @@ class ConfigState extends ChangeNotifier {
     return id;
   }
 
-  int getSequentialTaskID(List<dynamic> list, int id) {
+  int getSequentialTaskID(int id) {
+    List<dynamic> list = databaseHelper.tasks;
     if (containsTask(list, id)) {
       id = id + 1;
-      return getSequentialTaskID(list, id);
+      return getSequentialTaskID(id);
     }
 
     print('At getSequentialTaskID: New task ID is $id');

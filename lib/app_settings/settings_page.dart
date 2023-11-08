@@ -27,6 +27,8 @@ class SettingsPageState extends State<SettingsPage> {
 
   String? selectedTheme = globalAppTheme.currentThemeString();
   String? selectedReorder = reorderType.currentReorderString();
+  int selectedRadio = taskShape.getCurrentShapeInt();
+  Color _currentBorderColor = taskShape.getCurrentColor();
 
   var _encryptionSwitch = true;
 
@@ -186,6 +188,89 @@ class SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     SettingsSection(title: Text('Boards'), tiles: [
+                      SettingsTile(
+                        title: Text('Task shape'),
+                        leading: Icon(Icons.format_shapes_sharp),
+                        trailing: ButtonBar(
+                          alignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Radio(
+                                      value: 0,
+                                      groupValue: selectedRadio,
+                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          taskShape.switchTaskShape(val!);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                        });
+                                        print("Radio $val");
+                                      },
+                                    ),
+                                    Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                                          border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Radio(
+                                      value: 1,
+                                      groupValue: selectedRadio,
+                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          taskShape.switchTaskShape(val!);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                        });
+                                        print("Radio $val");
+                                      },
+                                    ),
+                                    Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(10)), border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Radio(
+                                      value: 2,
+                                      groupValue: selectedRadio,
+                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          taskShape.switchTaskShape(val!);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                        });
+                                        print("Radio $val");
+                                      },
+                                    ),
+                                    Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(0)), border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       SettingsTile(
                         title: Text('Reorder type'),
                         leading: Icon(Icons.swap_vert_rounded),

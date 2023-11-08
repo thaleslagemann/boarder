@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/boards_page.dart';
+import 'package:boarder/board/boards_page.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:boarder/app_settings/settings_page.dart';
 import 'package:boarder/home_page.dart';
@@ -88,6 +88,7 @@ class AppBodyState extends State<AppBody> {
     return LayoutBuilder(builder: (context, constraints) {
       var configState = context.watch<ConfigState>();
       configState.loadDB();
+      taskShape.setPrimaryBorderColor(context);
       return Scaffold(
         drawer: Drawer(
           child: ListView(
