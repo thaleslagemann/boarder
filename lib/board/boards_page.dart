@@ -2,7 +2,7 @@
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/board_screen.dart';
+import 'package:boarder/board/board_screen.dart';
 import 'package:boarder/app_settings/db_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
