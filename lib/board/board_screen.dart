@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_unnecessary_containers
+
 library config.globals;
 
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
@@ -474,7 +476,7 @@ class BoardScreenState extends State<BoardScreen> {
                       children: [
                         Text.rich(
                           TextSpan(text: 'Name: ', children: [
-                            TextSpan(text: '${configState.databaseHelper.boards[index].name}', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                            TextSpan(text: configState.databaseHelper.boards[index].name, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                           ]),
                         ),
                       ],
@@ -485,8 +487,7 @@ class BoardScreenState extends State<BoardScreen> {
                           child: Text.rich(
                             TextSpan(text: 'Description: ', children: [
                               TextSpan(
-                                  text: '${configState.databaseHelper.boards[index].description}',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                                  text: configState.databaseHelper.boards[index].description, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                             ]),
                           ),
                         ),
@@ -497,7 +498,7 @@ class BoardScreenState extends State<BoardScreen> {
                         Text.rich(
                           TextSpan(text: 'Creation date: ', children: [
                             TextSpan(
-                                text: '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate)}',
+                                text: DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate),
                                 style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                           ]),
                         ),
@@ -508,7 +509,7 @@ class BoardScreenState extends State<BoardScreen> {
                         Text.rich(
                           TextSpan(text: 'Last update: ', children: [
                             TextSpan(
-                                text: '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate)}',
+                                text: DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate),
                                 style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                           ]),
                         ),
