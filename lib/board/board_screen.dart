@@ -40,7 +40,6 @@ class BoardScreenState extends State<BoardScreen> {
     String renameTaskNewName = '';
 
     taskShape.setPrimaryBorderColor(context);
-    print("Task shape: ${taskShape.getCurrentShapeInt()}");
     BoxDecoration currentTaskShape = taskShape.getCurrentTaskShape(context);
     int currentReorderOption = reorderType.currentReorderInt();
     bool _isEditing = false;
@@ -996,7 +995,7 @@ class BoardScreenState extends State<BoardScreen> {
                                           Container(
                                             margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                             alignment: Alignment.center,
-                                            decoration: taskShape.getCurrentTaskShape(context),
+                                            decoration: currentTaskShape,
                                             child: TextButton(
                                               onPressed: () {
                                                 setState(() {

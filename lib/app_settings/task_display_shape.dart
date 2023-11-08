@@ -6,7 +6,6 @@ class TaskDisplayShape with ChangeNotifier {
 
   void setPrimaryBorderColor(BuildContext context) {
     _borderColor = Theme.of(context).colorScheme.primary;
-    print(_borderColor);
   }
 
   void switchBorderColor(Color color) {
