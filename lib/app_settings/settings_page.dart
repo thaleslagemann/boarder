@@ -1,5 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'package:boarder/app_settings/preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:boarder/app_settings/config.dart';
@@ -24,6 +25,8 @@ class SettingsPageState extends State<SettingsPage> {
     'Insert',
     'Swap',
   ];
+
+  Preferences prefs = Preferences();
 
   String? selectedTheme = globalAppTheme.currentThemeString();
   String? selectedReorder = reorderType.currentReorderString();
@@ -207,6 +210,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
                                           selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(val);
                                         });
                                         print("Radio $val");
                                       },
@@ -231,6 +235,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
                                           selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(val);
                                         });
                                         print("Radio $val");
                                       },
@@ -254,6 +259,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
                                           selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(val);
                                         });
                                         print("Radio $val");
                                       },

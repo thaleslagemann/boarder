@@ -1,8 +1,18 @@
+import 'package:boarder/app_settings/preferences.dart';
 import 'package:flutter/material.dart';
 
 class TaskDisplayShape with ChangeNotifier {
-  int _currentShape = 0;
+  TaskDisplayShape() {
+    getCurrentShapePreferences();
+  }
   late Color _borderColor;
+
+  Preferences prefs = Preferences();
+
+  late int _currentShape;
+  Future<void> getCurrentShapePreferences() async {
+    _currentShape = await prefs.getTaskShapePreferences();
+  }
 
   void setPrimaryBorderColor(BuildContext context) {
     _borderColor = Theme.of(context).colorScheme.primary;

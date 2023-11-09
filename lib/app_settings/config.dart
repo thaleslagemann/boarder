@@ -8,6 +8,7 @@ import 'package:boarder/app_settings/reorder_settings.dart';
 import 'package:boarder/app_settings/themes.dart';
 
 MyTheme globalAppTheme = MyTheme();
+
 TaskDisplayShape taskShape = TaskDisplayShape();
 ReorderSettings reorderType = ReorderSettings();
 

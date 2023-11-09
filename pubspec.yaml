@@ -32,6 +32,7 @@ dependencies:
   google_sign_in: ^6.1.5
   firebase_ui_oauth_google: ^1.2.13
   intl: ^0.18.1
+  shared_preferences: 2.2.2
 
 dev_dependencies:
   flutter_test:
