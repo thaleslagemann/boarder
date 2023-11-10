@@ -1,9 +1,12 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:boarder/app_settings/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/app_settings/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,9 +25,33 @@ class MyApp extends StatefulWidget {
 }
 
 class AppState extends State<MyApp> {
+  late SharedPreferences prefs;
+  late int? _initialTheme;
+  late int? _initialMainColor;
+  final String _kThemePrefs = "Theme Preferences";
+  final String _kMainColorPrefs = "Main Color Preferences";
+
   @override
   void initState() {
     super.initState();
+    SharedPreferences.getInstance().then((SharedPreferences sp) {
+      prefs = sp;
+      _initialTheme = prefs.getInt(_kThemePrefs);
+      _initialMainColor = prefs.getInt(_kMainColorPrefs);
+      if (_initialTheme == null) {
+        _initialTheme = 0;
+        globalAppTheme.loadInitialTheme(_initialTheme!);
+      } else {
+        globalAppTheme.loadInitialTheme(_initialTheme!);
+      }
+      if (_initialMainColor == null) {
+        _initialMainColor = 0;
+        globalAppTheme.loadInitialMainColor(_initialMainColor!);
+      } else {
+        globalAppTheme.loadInitialMainColor(_initialMainColor!);
+      }
+      setState(() {});
+    });
     globalAppTheme.addListener(() {
       print('And the theme changes!');
       setState(() {});
@@ -41,8 +68,8 @@ class AppState extends State<MyApp> {
       create: (context) => ConfigState(),
       child: MaterialApp(
         title: 'Boarder',
-        theme: ThemeData(brightness: Brightness.light, colorSchemeSeed: Colors.deepPurple, cardColor: Color.fromARGB(255, 255, 255, 255)),
-        darkTheme: ThemeData(brightness: Brightness.dark, colorSchemeSeed: Colors.deepPurple, cardColor: Color.fromARGB(255, 30, 30, 30)),
+        theme: globalAppTheme.lightTheme,
+        darkTheme: globalAppTheme.darkTheme,
         themeMode: globalAppTheme.currentTheme(),
         home: const AuthGate(),
       ),

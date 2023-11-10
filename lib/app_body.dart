@@ -88,23 +88,22 @@ class AppBodyState extends State<AppBody> {
     return LayoutBuilder(builder: (context, constraints) {
       var configState = context.watch<ConfigState>();
       configState.loadDB();
-      taskShape.setPrimaryBorderColor(context);
       return Scaffold(
         drawer: Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
               UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
+                decoration: BoxDecoration(color: globalAppTheme.mainColorOption()),
                 accountName: Text(
                   "${FirebaseAuth.instance.currentUser?.displayName}",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primaryContainer),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 accountEmail: Text(
                   "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 currentAccountPicture: _currentUserPicture(),
@@ -143,7 +142,7 @@ class AppBodyState extends State<AppBody> {
               selectedIndex = index;
             });
           },
-          indicatorColor: Theme.of(context).colorScheme.primary,
+          indicatorColor: globalAppTheme.mainColorOption(),
           selectedIndex: selectedIndex,
           destinations: <Widget>[
             if (selectedIndex == 0)
@@ -158,7 +157,7 @@ class AppBodyState extends State<AppBody> {
               NavigationDestination(
                 icon: Icon(
                   Icons.home_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: globalAppTheme.mainColorOption(),
                 ),
                 label: 'Home',
               ),
@@ -174,7 +173,7 @@ class AppBodyState extends State<AppBody> {
               NavigationDestination(
                 icon: Icon(
                   Icons.space_dashboard_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: globalAppTheme.mainColorOption(),
                 ),
                 label: 'Boards',
               ),
@@ -190,7 +189,7 @@ class AppBodyState extends State<AppBody> {
               NavigationDestination(
                 icon: Icon(
                   Icons.settings_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: globalAppTheme.mainColorOption(),
                 ),
                 label: 'Settings',
               ),

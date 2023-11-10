@@ -2,6 +2,7 @@
 
 import 'package:boarder/app_settings/preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -31,7 +32,7 @@ class SettingsPageState extends State<SettingsPage> {
   String? selectedTheme = globalAppTheme.currentThemeString();
   String? selectedReorder = reorderType.currentReorderString();
   int selectedRadio = taskShape.getCurrentShapeInt();
-  Color _currentBorderColor = taskShape.getCurrentColor();
+  int selectedColorRadio = globalAppTheme.getCurrentMainColor();
 
   var _encryptionSwitch = true;
 
@@ -69,14 +70,14 @@ class SettingsPageState extends State<SettingsPage> {
                         Navigator.of(context).pop();
                       });
                     }),
-                    child: Text('ok', style: TextStyle(color: Theme.of(context).colorScheme.primary)))
+                    child: Text('ok', style: TextStyle(color: globalAppTheme.mainColorOption())))
               ],
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Project by:'),
-                  Text('Thales Lagemann', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                  Text('Thales Lagemann', style: TextStyle(color: globalAppTheme.mainColorOption())),
                   SizedBox(height: 20),
                   Row(
                     children: [
@@ -108,6 +109,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var configState = context.watch<ConfigState>();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -148,7 +150,7 @@ class SettingsPageState extends State<SettingsPage> {
                                 selectedTheme!,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color: globalAppTheme.mainColorOption(),
                                 ),
                               ),
                               items: _themeOptions
@@ -158,7 +160,7 @@ class SettingsPageState extends State<SettingsPage> {
                                           item,
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: Theme.of(context).colorScheme.primary,
+                                            color: globalAppTheme.mainColorOption(),
                                           ),
                                         ),
                                       ))
@@ -169,6 +171,7 @@ class SettingsPageState extends State<SettingsPage> {
                                   selectedTheme = value;
                                   print('Attempting to switch theme to $selectedTheme');
                                   globalAppTheme.switchTheme(_themeOptions.indexOf(selectedTheme!));
+                                  prefs.setThemePreferences(_themeOptions.indexOf(selectedTheme!));
                                   print(globalAppTheme.currentTheme());
                                 });
                                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -188,6 +191,91 @@ class SettingsPageState extends State<SettingsPage> {
                           ),
                           onPressed: (value) {},
                         ),
+                        SettingsTile(
+                          title: Text('Main Color'),
+                          leading: Icon(Icons.format_paint_outlined),
+                          trailing: ButtonBar(
+                            alignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Radio(
+                                        value: 0,
+                                        groupValue: selectedColorRadio,
+                                        activeColor: globalAppTheme.mainColorOption(),
+                                        onChanged: (val) {
+                                          setState(() {
+                                            configState.switchMainColor(val!);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(val);
+                                          });
+                                          print("Color Radio $val");
+                                        },
+                                      ),
+                                      Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration:
+                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.primary),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Radio(
+                                        value: 1,
+                                        groupValue: selectedColorRadio,
+                                        activeColor: globalAppTheme.mainColorOption(),
+                                        onChanged: (val) {
+                                          setState(() {
+                                            configState.switchMainColor(val!);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(val);
+                                          });
+                                          print("Color Radio $val");
+                                        },
+                                      ),
+                                      Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration:
+                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.secondary),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Radio(
+                                        value: 2,
+                                        groupValue: selectedColorRadio,
+                                        activeColor: globalAppTheme.mainColorOption(),
+                                        onChanged: (val) {
+                                          setState(() {
+                                            configState.switchMainColor(val!);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(val);
+                                          });
+                                          print("Color Radio $val");
+                                        },
+                                      ),
+                                      Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration:
+                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.tertiary),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                     SettingsSection(title: Text('Boards'), tiles: [
@@ -205,7 +293,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     Radio(
                                       value: 0,
                                       groupValue: selectedRadio,
-                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      activeColor: globalAppTheme.mainColorOption(),
                                       onChanged: (val) {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
@@ -220,7 +308,7 @@ class SettingsPageState extends State<SettingsPage> {
                                       width: 30,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                          border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
                                     )
                                   ],
                                 ),
@@ -230,7 +318,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     Radio(
                                       value: 1,
                                       groupValue: selectedRadio,
-                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      activeColor: globalAppTheme.mainColorOption(),
                                       onChanged: (val) {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
@@ -244,7 +332,8 @@ class SettingsPageState extends State<SettingsPage> {
                                       height: 30,
                                       width: 30,
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(Radius.circular(10)), border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
                                     )
                                   ],
                                 ),
@@ -254,7 +343,7 @@ class SettingsPageState extends State<SettingsPage> {
                                     Radio(
                                       value: 2,
                                       groupValue: selectedRadio,
-                                      activeColor: Theme.of(context).colorScheme.primary,
+                                      activeColor: globalAppTheme.mainColorOption(),
                                       onChanged: (val) {
                                         setState(() {
                                           taskShape.switchTaskShape(val!);
@@ -268,7 +357,8 @@ class SettingsPageState extends State<SettingsPage> {
                                       height: 30,
                                       width: 30,
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(Radius.circular(0)), border: Border.all(width: 1.5, color: _currentBorderColor)),
+                                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
                                     ),
                                   ],
                                 ),
@@ -287,7 +377,7 @@ class SettingsPageState extends State<SettingsPage> {
                               selectedReorder!,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: globalAppTheme.mainColorOption(),
                               ),
                             ),
                             items: _reorderOptions
@@ -297,7 +387,7 @@ class SettingsPageState extends State<SettingsPage> {
                                         item,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: globalAppTheme.mainColorOption(),
                                         ),
                                       ),
                                     ))
@@ -332,7 +422,7 @@ class SettingsPageState extends State<SettingsPage> {
                       title: Text('Security'),
                       tiles: [
                         SettingsTile.switchTile(
-                          activeSwitchColor: Theme.of(context).colorScheme.primary,
+                          activeSwitchColor: globalAppTheme.mainColorOption(),
                           initialValue: _encryptionSwitch,
                           title: Text('Encrypt data'),
                           leading: encryptionIconSwitch(),

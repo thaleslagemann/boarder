@@ -8,7 +8,6 @@ import 'package:boarder/app_settings/reorder_settings.dart';
 import 'package:boarder/app_settings/themes.dart';
 
 MyTheme globalAppTheme = MyTheme();
-
 TaskDisplayShape taskShape = TaskDisplayShape();
 ReorderSettings reorderType = ReorderSettings();
 
@@ -389,6 +388,11 @@ class ConfigState extends ChangeNotifier {
 
   void addTask(Task task) {
     databaseHelper.addTask(task);
+    notifyListeners();
+  }
+
+  void switchMainColor(int value) {
+    globalAppTheme.switchMainColor(value);
     notifyListeners();
   }
 }

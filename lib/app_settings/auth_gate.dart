@@ -1,3 +1,4 @@
+import 'package:boarder/app_settings/config.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
@@ -16,9 +17,7 @@ class AuthGate extends StatelessWidget {
           return SignInScreen(
             providers: [
               EmailAuthProvider(),
-              GoogleProvider(
-                  clientId:
-                      "279286220681-cfsf341ikp9t1gkgucl8qk3dbc7l8tdm.apps.googleusercontent.com"),
+              GoogleProvider(clientId: "279286220681-cfsf341ikp9t1gkgucl8qk3dbc7l8tdm.apps.googleusercontent.com"),
             ],
             headerBuilder: (context, constraints, shrinkOffset) {
               return Padding(
@@ -31,8 +30,7 @@ class AuthGate extends StatelessWidget {
                     children: [
                       Text(
                         'Boarder',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 40),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40, color: globalAppTheme.mainColorOption()),
                         textAlign: TextAlign.center,
                       )
                     ],
@@ -51,8 +49,7 @@ class AuthGate extends StatelessWidget {
                     children: [
                       Text(
                         'Boarder',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 40),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
                         textAlign: TextAlign.center,
                       )
                     ],

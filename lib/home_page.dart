@@ -24,7 +24,7 @@ class HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LoadingAnimationWidget.threeArchedCircle(
-                color: Theme.of(context).colorScheme.primary,
+                color: globalAppTheme.mainColorOption()!,
                 size: 50,
               ),
               SizedBox(
@@ -32,7 +32,7 @@ class HomePageState extends State<HomePage> {
               ),
               Text(
                 'Loading',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                style: TextStyle(color: globalAppTheme.mainColorOption()),
               )
             ],
           ),
@@ -92,7 +92,7 @@ class HomePageState extends State<HomePage> {
                         TextSpan(
                           text: 'Welcome to Boarder, ',
                           children: [
-                            TextSpan(text: '${FirebaseAuth.instance.currentUser?.displayName}', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                            TextSpan(text: '${FirebaseAuth.instance.currentUser?.displayName}', style: TextStyle(color: globalAppTheme.mainColorOption())),
                             TextSpan(text: '!'),
                           ],
                         ),

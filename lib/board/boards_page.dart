@@ -40,14 +40,14 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete board?'),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -95,7 +95,7 @@ class BoardsPageState extends State<BoardsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Preset", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                      Text("Preset", style: TextStyle(color: globalAppTheme.mainColorOption())),
                       DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
@@ -137,14 +137,14 @@ class BoardsPageState extends State<BoardsPage> {
                 ]),
                 actions: <Widget>[
                   TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                    style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
                     child: const Text('cancel'),
                     onPressed: () {
                       setState(() => Navigator.pop(context));
                     },
                   ),
                   TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                    style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
                     child: const Text('ok'),
                     onPressed: () {
                       if (_boardNameInputController.text.isNotEmpty) {
@@ -184,7 +184,7 @@ class BoardsPageState extends State<BoardsPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
@@ -216,7 +216,7 @@ class BoardsPageState extends State<BoardsPage> {
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -225,7 +225,7 @@ class BoardsPageState extends State<BoardsPage> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
@@ -322,7 +322,7 @@ class BoardsPageState extends State<BoardsPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               LoadingAnimationWidget.threeArchedCircle(
-                color: Theme.of(context).colorScheme.primary,
+                color: globalAppTheme.mainColorOption()!,
                 size: 50,
               ),
               SizedBox(
@@ -330,7 +330,7 @@ class BoardsPageState extends State<BoardsPage> {
               ),
               Text(
                 'Loading',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                style: TextStyle(color: globalAppTheme.mainColorOption()),
               )
             ],
           ),
@@ -352,8 +352,8 @@ class BoardsPageState extends State<BoardsPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('Try adding a new board by pressing the ['),
-                        Icon(Icons.add_circle_outline_sharp, size: 14, color: Theme.of(context).colorScheme.primary),
-                        Text.rich(TextSpan(text: ' add button', style: TextStyle(color: Theme.of(context).colorScheme.primary), children: [
+                        Icon(Icons.add_circle_outline_sharp, size: 14, color: globalAppTheme.mainColorOption()),
+                        Text.rich(TextSpan(text: ' add button', style: TextStyle(color: globalAppTheme.mainColorOption()), children: [
                           TextSpan(
                             text: '].',
                             style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
@@ -410,7 +410,7 @@ class BoardsPageState extends State<BoardsPage> {
                     child: ListTile(
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: Theme.of(context).colorScheme.primary), borderRadius: BorderRadius.circular(10)),
+                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.circular(10)),
                       onTap: () => setState(() {
                         Navigator.push(
                           context,
@@ -465,7 +465,7 @@ class BoardsPageState extends State<BoardsPage> {
                     child: ListTile(
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: Theme.of(context).colorScheme.primary), borderRadius: BorderRadius.circular(10)),
+                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.circular(10)),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -506,7 +506,7 @@ class BoardsPageState extends State<BoardsPage> {
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
         foregroundColor: Theme.of(context).colorScheme.surface,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: globalAppTheme.mainColorOption(),
         onPressed: () {
           _displayBoardInputDialog(context);
         },
