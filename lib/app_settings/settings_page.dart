@@ -116,27 +116,34 @@ class SettingsPageState extends State<SettingsPage> {
         child: Stack(children: [
           Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.settings_sharp,
-                      size: 24,
-                    ),
-                    Text(
-                      ' Settings',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ],
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     crossAxisAlignment: CrossAxisAlignment.center,
+              //     children: [
+              //       Icon(
+              //         Icons.settings_sharp,
+              //         size: 24,
+              //       ),
+              //       Text(
+              //         ' Settings',
+              //         style: TextStyle(fontSize: 24),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               Expanded(
                 child: SettingsList(
-                  contentPadding: EdgeInsets.only(top: 20.0),
                   sections: [
+                    SettingsSection(
+                        title: Center(
+                          child: Text(
+                            'Settings',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ),
+                        tiles: []),
                     SettingsSection(
                       title: Text('System'),
                       tiles: [

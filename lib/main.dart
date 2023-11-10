@@ -36,19 +36,19 @@ class AppState extends State<MyApp> {
     super.initState();
     SharedPreferences.getInstance().then((SharedPreferences sp) {
       prefs = sp;
-      _initialTheme = prefs.getInt(_kThemePrefs);
       _initialMainColor = prefs.getInt(_kMainColorPrefs);
-      if (_initialTheme == null) {
-        _initialTheme = 0;
-        globalAppTheme.loadInitialTheme(_initialTheme!);
-      } else {
-        globalAppTheme.loadInitialTheme(_initialTheme!);
-      }
+      _initialTheme = prefs.getInt(_kThemePrefs);
       if (_initialMainColor == null) {
         _initialMainColor = 0;
         globalAppTheme.loadInitialMainColor(_initialMainColor!);
       } else {
         globalAppTheme.loadInitialMainColor(_initialMainColor!);
+      }
+      if (_initialTheme == null) {
+        _initialTheme = 0;
+        globalAppTheme.loadInitialTheme(_initialTheme!);
+      } else {
+        globalAppTheme.loadInitialTheme(_initialTheme!);
       }
       setState(() {});
     });

@@ -378,35 +378,68 @@ class BoardScreenState extends State<BoardScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
+              contentPadding: EdgeInsets.only(top: 5, bottom: 10, left: 15, right: 15),
               title: const Text('Edit board'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewName = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardNameEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board name"),
+                  Divider(thickness: 1, color: globalAppTheme.mainColorOption()),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewName = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardNameEditFieldController,
+                          decoration: InputDecoration(
+                            hintText: "Board name",
+                            border: InputBorder.none,
+                          ),
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewDesc = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardDescEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board description"),
+                  SizedBox(height: 5),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewDesc = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardDescEditFieldController,
+                          decoration: InputDecoration(
+                              hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
+                          maxLines: 8,
+                          minLines: 1,
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -415,7 +448,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
@@ -461,55 +494,54 @@ class BoardScreenState extends State<BoardScreen> {
                         color: globalAppTheme.mainColorOption(),
                       ),
                     ),
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('ID:')]),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Text('#${configState.databaseHelper.boards[index].boardId}', style: TextStyle(fontWeight: FontWeight.bold))],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('Name:')]),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [Text(configState.databaseHelper.boards[index].name, style: TextStyle(fontWeight: FontWeight.bold))]),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('Creation date:')]),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text.rich(
-                          TextSpan(text: 'ID: ', children: [
-                            TextSpan(text: '${configState.databaseHelper.boards[index].boardId}', style: TextStyle(color: globalAppTheme.mainColorOption())),
-                          ]),
-                        ),
+                        Text(DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate),
+                            style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(text: 'Name: ', children: [
-                            TextSpan(text: configState.databaseHelper.boards[index].name, style: TextStyle(color: globalAppTheme.mainColorOption())),
-                          ]),
-                        ),
-                      ],
+                    SizedBox(
+                      height: 5,
                     ),
                     Row(
-                      children: [
-                        Flexible(
-                          child: Text.rich(
-                            TextSpan(text: 'Description: ', children: [
-                              TextSpan(text: configState.databaseHelper.boards[index].description, style: TextStyle(color: globalAppTheme.mainColorOption())),
-                            ]),
-                          ),
-                        ),
-                      ],
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Text('Last modified:')],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text.rich(
-                          TextSpan(text: 'Creation date: ', children: [
-                            TextSpan(
-                                text: DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate),
-                                style: TextStyle(color: globalAppTheme.mainColorOption())),
-                          ]),
-                        ),
+                        Text(DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate),
+                            style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Text('Description:')],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text.rich(
-                          TextSpan(text: 'Last update: ', children: [
-                            TextSpan(
-                                text: DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate),
-                                style: TextStyle(color: globalAppTheme.mainColorOption())),
-                          ]),
-                        ),
+                        Flexible(child: Text(configState.databaseHelper.boards[index].description, style: TextStyle(fontWeight: FontWeight.bold))),
                       ],
                     ),
                   ],

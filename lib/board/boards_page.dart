@@ -76,21 +76,62 @@ class BoardsPageState extends State<BoardsPage> {
           builder: (context) {
             return StatefulBuilder(builder: (context, setState) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).colorScheme.surface,
+                backgroundColor: globalAppTheme.mainColorContainerOption(),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 title: const Text('Create a new board'),
                 content: Column(mainAxisSize: MainAxisSize.min, children: [
-                  TextField(
-                    autofocus: true,
-                    controller: _boardNameInputController,
-                    decoration: const InputDecoration(hintText: "Name"),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewName = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardNameInputController,
+                          decoration: InputDecoration(
+                            hintText: "Board name",
+                            border: InputBorder.none,
+                          ),
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
-                  TextField(
-                    autofocus: true,
-                    controller: _boardDescInputController,
-                    decoration: const InputDecoration(hintText: "Description"),
+                  SizedBox(height: 5),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewDesc = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardDescInputController,
+                          decoration: InputDecoration(
+                              hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
+                          maxLines: 8,
+                          minLines: 1,
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,7 +154,7 @@ class BoardsPageState extends State<BoardsPage> {
                                       item,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Theme.of(context).colorScheme.primary,
+                                        color: globalAppTheme.mainColorOption(),
                                       ),
                                     ),
                                   ))
@@ -188,35 +229,68 @@ class BoardsPageState extends State<BoardsPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
+              contentPadding: EdgeInsets.only(top: 5, bottom: 10, left: 15, right: 15),
               title: const Text('Edit board'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewName = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardNameEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board name"),
+                  Divider(thickness: 1, color: globalAppTheme.mainColorOption()),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewName = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardNameEditFieldController,
+                          decoration: InputDecoration(
+                            hintText: "Board name",
+                            border: InputBorder.none,
+                          ),
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewDesc = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardDescEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board description"),
+                  SizedBox(height: 5),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration:
+                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewDesc = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardDescEditFieldController,
+                          decoration: InputDecoration(
+                              hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
+                          maxLines: 8,
+                          minLines: 1,
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -225,7 +299,7 @@ class BoardsPageState extends State<BoardsPage> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
