@@ -100,6 +100,7 @@ class BoardsPageState extends State<BoardsPage> {
                           controller: _boardNameInputController,
                           decoration: InputDecoration(
                             hintText: "Board name",
+                            hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
                             border: InputBorder.none,
                           ),
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -136,7 +137,7 @@ class BoardsPageState extends State<BoardsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Preset", style: TextStyle(color: globalAppTheme.mainColorOption())),
+                      Text("Preset", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
@@ -144,7 +145,7 @@ class BoardsPageState extends State<BoardsPage> {
                             selectedPreset!,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: globalAppTheme.mainColorOption(),
                             ),
                           ),
                           items: _boardPresets
@@ -154,7 +155,7 @@ class BoardsPageState extends State<BoardsPage> {
                                       item,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: globalAppTheme.mainColorOption(),
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                   ))
@@ -338,7 +339,7 @@ class BoardsPageState extends State<BoardsPage> {
         configState.databaseHelper.deleteBookmark(boardID);
       } else {
         print('Adding bookmark $boardID');
-        configState.databaseHelper.createBookmark(Bookmark(bookmarkId: boardID, boardId: boardID));
+        configState.databaseHelper.createBookmark(Bookmark(bookmarkId: configState.getSequentialBookmarkID(0), boardId: boardID));
       }
     }
 

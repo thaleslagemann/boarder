@@ -490,6 +490,7 @@ class DatabaseHelper {
       task.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('Task created ${task.name}');
   }
 
   Future<void> updateOrderInDatabase() async {

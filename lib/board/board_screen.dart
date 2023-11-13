@@ -26,7 +26,6 @@ class BoardScreenState extends State<BoardScreen> {
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskNameFieldController = TextEditingController();
   final TextEditingController _taskDescFieldController = TextEditingController();
-  final TextEditingController _taskRenameFieldController = TextEditingController();
   final TextEditingController _headerRenameFieldController = TextEditingController();
   final TextEditingController _boardNameEditFieldController = TextEditingController();
   final TextEditingController _boardDescEditFieldController = TextEditingController();
@@ -39,7 +38,6 @@ class BoardScreenState extends State<BoardScreen> {
     String boardNewName = '';
     String boardNewDesc = '';
     String renameHeaderNewName = '';
-    String renameTaskNewName = '';
 
     BoxDecoration currentTaskShape = taskShape.getCurrentTaskShape(context);
     int currentReorderOption = reorderType.currentReorderInt();
@@ -52,7 +50,7 @@ class BoardScreenState extends State<BoardScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            backgroundColor: globalAppTheme.mainColorContainerOption(),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
@@ -62,7 +60,7 @@ class BoardScreenState extends State<BoardScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                 child: Text('cancel'),
               ),
               TextButton(
@@ -97,24 +95,33 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Rename header'),
-              content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    renameHeaderNewName = value;
-                  });
-                },
-                autofocus: true,
-                controller: _headerRenameFieldController,
-                decoration: const InputDecoration(hintText: "New header name"),
+              content: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      renameHeaderNewName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _headerRenameFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Header name",
+                    hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                    border: InputBorder.none,
+                  ),
+                  cursorColor: globalAppTheme.mainColorOption(),
+                ),
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -123,7 +130,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
@@ -133,56 +140,6 @@ class BoardScreenState extends State<BoardScreen> {
                       Navigator.pop(context);
                       renameHeaderNewName = '';
                       _headerRenameFieldController.clear();
-                    });
-                  },
-                ),
-              ],
-            );
-          });
-    }
-
-    Future<void> _displayTaskRenameDialog(BuildContext context, Task task) async {
-      _taskRenameFieldController.text = task.name;
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              title: const Text('Rename task'),
-              content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    renameTaskNewName = value;
-                  });
-                },
-                autofocus: true,
-                controller: _taskRenameFieldController,
-                decoration: const InputDecoration(hintText: "New task name"),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
-                  child: const Text('cancel'),
-                  onPressed: () {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
-                  },
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
-                  child: const Text('ok'),
-                  onPressed: () {
-                    setState(() {
-                      renameTaskNewName = _taskRenameFieldController.text;
-                      print(renameTaskNewName);
-                      configState.databaseHelper.updateTaskName(task.taskId, renameTaskNewName);
-                      Navigator.pop(context);
-                      renameTaskNewName = '';
-                      _taskRenameFieldController.clear();
                     });
                   },
                 ),
@@ -203,7 +160,7 @@ class BoardScreenState extends State<BoardScreen> {
               title: const Text('Delete header?'),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -236,14 +193,23 @@ class BoardScreenState extends State<BoardScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new header'),
-              content: TextField(
-                autofocus: true,
-                controller: _headerFieldController,
-                decoration: const InputDecoration(hintText: "Header name"),
+              content: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: TextField(
+                  autofocus: true,
+                  controller: _headerFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Header name",
+                    hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                    border: InputBorder.none,
+                  ),
+                  cursorColor: globalAppTheme.mainColorOption(),
+                ),
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -252,7 +218,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     final newHeader = Header(
@@ -286,7 +252,7 @@ class BoardScreenState extends State<BoardScreen> {
               title: const Text('Delete task?'),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -320,20 +286,39 @@ class BoardScreenState extends State<BoardScreen> {
               ),
               title: const Text('Create a new task'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(
-                  autofocus: true,
-                  controller: _taskNameFieldController,
-                  decoration: const InputDecoration(hintText: "Name"),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: TextField(
+                    autofocus: true,
+                    controller: _taskNameFieldController,
+                    decoration: InputDecoration(
+                      hintText: "Task name",
+                      hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                      border: InputBorder.none,
+                    ),
+                    cursorColor: globalAppTheme.mainColorOption(),
+                  ),
                 ),
-                TextField(
-                  autofocus: true,
-                  controller: _taskDescFieldController,
-                  decoration: const InputDecoration(hintText: "Description"),
+                SizedBox(height: 10),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: TextField(
+                    autofocus: true,
+                    controller: _taskDescFieldController,
+                    decoration: InputDecoration(
+                      hintText: "Task description",
+                      hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                      border: InputBorder.none,
+                    ),
+                    cursorColor: globalAppTheme.mainColorOption(),
+                  ),
                 ),
               ]),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -342,7 +327,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     var newTask = Task(
@@ -402,6 +387,7 @@ class BoardScreenState extends State<BoardScreen> {
                           controller: _boardNameEditFieldController,
                           decoration: InputDecoration(
                             hintText: "Board name",
+                            hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
                             border: InputBorder.none,
                           ),
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -865,8 +851,6 @@ class BoardScreenState extends State<BoardScreen> {
       if (choice == Constants.delete) {
         print('Removing task ${task.name}');
         _displayTaskDeletionConfirmationDialog(context, task);
-      } else if (choice == Constants.rename) {
-        _displayTaskRenameDialog(context, task);
       }
     }
 

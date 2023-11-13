@@ -25,7 +25,6 @@ class Constants {
     delete,
   ];
   static const List<String> taskChoices = <String>[
-    rename,
     delete,
   ];
   static const List<String> boardChoices = <String>[
@@ -344,6 +343,17 @@ class ConfigState extends ChangeNotifier {
     return id;
   }
 
+  int getSequentialBookmarkID(int id) {
+    List<dynamic> list = databaseHelper.bookmarks;
+    if (containsTask(list, id)) {
+      id = id + 1;
+      return getSequentialBookmarkID(id);
+    }
+
+    print('At getSequentialTaskID: New task ID is $id');
+    return id;
+  }
+
   int getSequentialHeaderID(int id) {
     List<dynamic> list = databaseHelper.headers;
     if (containsHeader(list, id)) {
@@ -388,6 +398,7 @@ class ConfigState extends ChangeNotifier {
 
   void addTask(Task task) {
     databaseHelper.addTask(task);
+    print('Task added ${task.name}');
     notifyListeners();
   }
 
