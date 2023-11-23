@@ -140,7 +140,10 @@ class SettingsPageState extends State<SettingsPage> {
                         title: Center(
                           child: Text(
                             'Settings',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                         ),
                         tiles: []),
@@ -222,11 +225,21 @@ class SettingsPageState extends State<SettingsPage> {
                                           print("Color Radio $val");
                                         },
                                       ),
-                                      Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration:
-                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.primary),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            configState.switchMainColor(0);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(0);
+                                          });
+                                        },
+                                        child: Container(
+                                          height: 30,
+                                          width: 30,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                                              color: Theme.of(context).colorScheme.primary),
+                                        ),
                                       )
                                     ],
                                   ),
@@ -246,11 +259,21 @@ class SettingsPageState extends State<SettingsPage> {
                                           print("Color Radio $val");
                                         },
                                       ),
-                                      Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration:
-                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.secondary),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            configState.switchMainColor(1);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(1);
+                                          });
+                                        },
+                                        child: Container(
+                                          height: 30,
+                                          width: 30,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                                              color: Theme.of(context).colorScheme.secondary),
+                                        ),
                                       )
                                     ],
                                   ),
@@ -270,11 +293,21 @@ class SettingsPageState extends State<SettingsPage> {
                                           print("Color Radio $val");
                                         },
                                       ),
-                                      Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration:
-                                            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Theme.of(context).colorScheme.tertiary),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            configState.switchMainColor(2);
+                                            selectedColorRadio = globalAppTheme.getCurrentMainColor();
+                                            prefs.setMainColorPreferences(2);
+                                          });
+                                        },
+                                        child: Container(
+                                          height: 30,
+                                          width: 30,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                                              color: Theme.of(context).colorScheme.tertiary),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -288,7 +321,7 @@ class SettingsPageState extends State<SettingsPage> {
                     SettingsSection(title: Text('Boards'), tiles: [
                       SettingsTile(
                         title: Text('Task shape'),
-                        leading: Icon(Icons.format_shapes_sharp),
+                        leading: Icon(Icons.crop_7_5_rounded),
                         trailing: ButtonBar(
                           alignment: MainAxisAlignment.start,
                           children: <Widget>[
@@ -310,12 +343,22 @@ class SettingsPageState extends State<SettingsPage> {
                                         print("Radio $val");
                                       },
                                     ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          taskShape.switchTaskShape(0);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(0);
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -335,12 +378,21 @@ class SettingsPageState extends State<SettingsPage> {
                                         print("Radio $val");
                                       },
                                     ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          taskShape.switchTaskShape(1);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(1);
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -360,12 +412,21 @@ class SettingsPageState extends State<SettingsPage> {
                                         print("Radio $val");
                                       },
                                     ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                                          border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          taskShape.switchTaskShape(2);
+                                          selectedRadio = taskShape.getCurrentShapeInt();
+                                          prefs.setTaskShapePreferences(2);
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(Radius.circular(0)),
+                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -40,7 +40,7 @@ class AppBodyState extends State<AppBody> {
   }
 
   _currentUserPicture() {
-    if (FirebaseAuth.instance.currentUser?.photoURL! != null) {
+    if (FirebaseAuth.instance.currentUser?.photoURL != null) {
       return Stack(
         children: [
           Container(
@@ -95,10 +95,15 @@ class AppBodyState extends State<AppBody> {
             children: [
               UserAccountsDrawerHeader(
                 decoration: BoxDecoration(color: globalAppTheme.mainColorOption()),
-                accountName: Text(
-                  "${FirebaseAuth.instance.currentUser?.displayName}",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                ),
+                accountName: FirebaseAuth.instance.currentUser?.displayName != null
+                    ? Text(
+                        "${FirebaseAuth.instance.currentUser?.displayName}",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                      )
+                    : Text(
+                        "Guest",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                      ),
                 accountEmail: Text(
                   "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
                   style: TextStyle(

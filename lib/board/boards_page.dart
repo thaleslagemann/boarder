@@ -88,8 +88,9 @@ class BoardsPageState extends State<BoardsPage> {
                       Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration:
-                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -112,11 +113,13 @@ class BoardsPageState extends State<BoardsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Text('Description',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration:
-                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -126,7 +129,9 @@ class BoardsPageState extends State<BoardsPage> {
                           autofocus: true,
                           controller: _boardDescInputController,
                           decoration: InputDecoration(
-                              hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
+                              hintText: "Board description",
+                              hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                              border: InputBorder.none),
                           maxLines: 8,
                           minLines: 1,
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -179,14 +184,14 @@ class BoardsPageState extends State<BoardsPage> {
                 ]),
                 actions: <Widget>[
                   TextButton(
-                    style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                     child: const Text('cancel'),
                     onPressed: () {
                       setState(() => Navigator.pop(context));
                     },
                   ),
                   TextButton(
-                    style: TextButton.styleFrom(foregroundColor: globalAppTheme.mainColorOption()),
+                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                     child: const Text('ok'),
                     onPressed: () {
                       if (_boardNameInputController.text.isNotEmpty) {
@@ -203,7 +208,8 @@ class BoardsPageState extends State<BoardsPage> {
                           configState.addBoard(newBoard);
                           configState.databaseHelper.insertBoard(newBoard);
                           if (selectedPreset == 'Kanban') {
-                            configState.addKanbanPresetHeadersToBoard(configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
+                            configState.addKanbanPresetHeadersToBoard(
+                                configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
                           }
                           boards = configState.databaseHelper.boards;
                           Navigator.pop(context);
@@ -242,8 +248,9 @@ class BoardsPageState extends State<BoardsPage> {
                       Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration:
-                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -265,11 +272,13 @@ class BoardsPageState extends State<BoardsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Text('Description',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration:
-                            BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -279,7 +288,9 @@ class BoardsPageState extends State<BoardsPage> {
                           autofocus: true,
                           controller: _boardDescEditFieldController,
                           decoration: InputDecoration(
-                              hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
+                              hintText: "Board description",
+                              hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                              border: InputBorder.none),
                           maxLines: 8,
                           minLines: 1,
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -309,7 +320,11 @@ class BoardsPageState extends State<BoardsPage> {
                       print(boardNewName);
                       print(boardNewDesc);
                       configState.databaseHelper.updateBoard(Board(
-                          boardId: board.boardId, name: boardNewName, description: boardNewDesc, creationDate: board.creationDate, lastUpdate: DateTime.now()));
+                          boardId: board.boardId,
+                          name: boardNewName,
+                          description: boardNewDesc,
+                          creationDate: board.creationDate,
+                          lastUpdate: DateTime.now()));
                       Navigator.pop(context);
                       boardNewName = '';
                       boardNewDesc = '';
@@ -339,7 +354,8 @@ class BoardsPageState extends State<BoardsPage> {
         configState.databaseHelper.deleteBookmark(boardID);
       } else {
         print('Adding bookmark $boardID');
-        configState.databaseHelper.createBookmark(Bookmark(bookmarkId: configState.getSequentialBookmarkID(0), boardId: boardID));
+        configState.databaseHelper
+            .createBookmark(Bookmark(bookmarkId: configState.getSequentialBookmarkID(0), boardId: boardID));
       }
     }
 
@@ -428,12 +444,15 @@ class BoardsPageState extends State<BoardsPage> {
                       children: [
                         Text('Try adding a new board by pressing the ['),
                         Icon(Icons.add_circle_outline_sharp, size: 14, color: globalAppTheme.mainColorOption()),
-                        Text.rich(TextSpan(text: ' add button', style: TextStyle(color: globalAppTheme.mainColorOption()), children: [
-                          TextSpan(
-                            text: '].',
-                            style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
-                          )
-                        ])),
+                        Text.rich(TextSpan(
+                            text: ' add button',
+                            style: TextStyle(color: globalAppTheme.mainColorOption()),
+                            children: [
+                              TextSpan(
+                                text: '].',
+                                style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                              )
+                            ])),
                       ],
                     )
                   ],
@@ -485,7 +504,8 @@ class BoardsPageState extends State<BoardsPage> {
                     child: ListTile(
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.circular(10)),
+                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
+                          borderRadius: BorderRadius.circular(10)),
                       onTap: () => setState(() {
                         Navigator.push(
                           context,
@@ -540,7 +560,8 @@ class BoardsPageState extends State<BoardsPage> {
                     child: ListTile(
                       tileColor: Theme.of(context).colorScheme.surface,
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.circular(10)),
+                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
+                          borderRadius: BorderRadius.circular(10)),
                       onTap: () {
                         Navigator.push(
                           context,

@@ -92,7 +92,12 @@ class HomePageState extends State<HomePage> {
                         TextSpan(
                           text: 'Welcome to Boarder, ',
                           children: [
-                            TextSpan(text: '${FirebaseAuth.instance.currentUser?.displayName}', style: TextStyle(color: globalAppTheme.mainColorOption())),
+                            if (FirebaseAuth.instance.currentUser?.displayName != null)
+                              TextSpan(
+                                  text: '${FirebaseAuth.instance.currentUser?.displayName}',
+                                  style: TextStyle(color: globalAppTheme.mainColorOption())),
+                            if (FirebaseAuth.instance.currentUser?.displayName == null)
+                              TextSpan(text: 'Guest', style: TextStyle(color: globalAppTheme.mainColorOption())),
                             TextSpan(text: '!'),
                           ],
                         ),
