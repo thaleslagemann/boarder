@@ -1,6 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers, unused_element
 
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/board/board_screen.dart';
 import 'package:boarder/app_settings/db_handler.dart';
@@ -196,12 +197,13 @@ class BoardsPageState extends State<BoardsPage> {
                     onPressed: () {
                       if (_boardNameInputController.text.isNotEmpty) {
                         var newBoard = Board(
-                            boardId: configState.databaseHelper.boards.length,
-                            name: _boardNameInputController.text,
-                            description: _boardDescInputController.text,
-                            creationDate: DateTime.now(),
-                            lastUpdate: DateTime.now(),
-                            headers: []);
+                          boardId: configState.databaseHelper.boards.length,
+                          userUid: FirebaseAuth.instance.currentUser!.uid,
+                          name: _boardNameInputController.text,
+                          description: _boardDescInputController.text,
+                          creationDate: DateTime.now(),
+                          lastUpdate: DateTime.now(),
+                        );
                         _boardNameInputController.clear();
                         _boardDescInputController.clear();
                         setState(() {
@@ -321,6 +323,7 @@ class BoardsPageState extends State<BoardsPage> {
                       print(boardNewDesc);
                       configState.databaseHelper.updateBoard(Board(
                           boardId: board.boardId,
+                          userUid: board.userUid,
                           name: boardNewName,
                           description: boardNewDesc,
                           creationDate: board.creationDate,
@@ -338,29 +341,20 @@ class BoardsPageState extends State<BoardsPage> {
           });
     }
 
-    int findBookmarkIndex(int boardID) {
-      int index = -1;
-      for (var i = 0; i < configState.databaseHelper.bookmarks.length; i++) {
-        if (configState.databaseHelper.bookmarks[i].boardId == boardID) {
-          index = i;
-        }
-      }
-      return index;
-    }
-
     toggleBookmark(int boardID) {
-      if (configState.containsBookmark(configState.databaseHelper.bookmarks, boardID)) {
+      int boardIndex = configState.findBoardIndexByID(boardID);
+      if (configState.databaseHelper.boards[boardIndex].bookmark == true) {
         print('Removing bookmark $boardID');
-        configState.databaseHelper.deleteBookmark(boardID);
+        configState.databaseHelper.boards[boardIndex].bookmark = false;
       } else {
         print('Adding bookmark $boardID');
-        configState.databaseHelper
-            .createBookmark(Bookmark(bookmarkId: configState.getSequentialBookmarkID(0), boardId: boardID));
+        configState.databaseHelper.boards[boardIndex].bookmark = true;
       }
     }
 
-    IconData bookmarkIconSwitch(bookmarkId) {
-      switch (configState.containsBookmark(configState.databaseHelper.bookmarks, bookmarkId)) {
+    IconData bookmarkIconSwitch(boardId) {
+      int boardIndex = configState.findBoardIndexByID(boardId);
+      switch (configState.databaseHelper.boards[boardIndex].bookmark) {
         case true:
           return Icons.bookmark_remove_rounded;
         case false:
@@ -393,7 +387,7 @@ class BoardsPageState extends State<BoardsPage> {
         print('Toggle bookmark was activated');
         toggleBookmark(board.boardId);
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        if (!configState.containsBookmark(configState.databaseHelper.bookmarks, board.boardId)) {
+        if (board.bookmark) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Added bookmark')),
           );
@@ -484,7 +478,7 @@ class BoardsPageState extends State<BoardsPage> {
             shrinkWrap: true,
             children: [
               SizedBox(height: 20),
-              if (configState.databaseHelper.bookmarks.isNotEmpty)
+              if (configState.containsAnyBookmark())
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
                   child: Row(
@@ -498,7 +492,7 @@ class BoardsPageState extends State<BoardsPage> {
                   ),
                 ),
               for (var board in configState.databaseHelper.boards)
-                if (configState.containsBookmark(configState.databaseHelper.bookmarks, board.boardId))
+                if (board.bookmark == true)
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: ListTile(
@@ -537,7 +531,7 @@ class BoardsPageState extends State<BoardsPage> {
                       selectedColor: Theme.of(context).colorScheme.surfaceVariant,
                     ),
                   ),
-              if (configState.databaseHelper.bookmarks.isNotEmpty)
+              if (configState.containsAnyBookmark())
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
                 ),
@@ -554,7 +548,7 @@ class BoardsPageState extends State<BoardsPage> {
                 ),
               ),
               for (var board in boards)
-                if (!configState.containsBookmark(configState.databaseHelper.bookmarks, board.boardId))
+                if (!board.bookmark)
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: ListTile(

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/db_handler.dart';
 import 'package:boarder/app_settings/reorder_settings.dart';
 import 'package:boarder/app_settings/themes.dart';
+import 'package:intl/intl.dart';
 
 MyTheme globalAppTheme = MyTheme();
 TaskDisplayShape taskShape = TaskDisplayShape();
@@ -51,7 +52,8 @@ class ConfigState extends ChangeNotifier {
       databaseHelper.boards = await databaseHelper.getAllBoards();
       for (var board in databaseHelper.boards) {
         print("Searching headers for board [${board.name}]...");
-        databaseHelper.boards[findBoardIndexByID(board.boardId)].headers = await databaseHelper.getHeadersForBoard(board.boardId);
+        databaseHelper.boards[findBoardIndexByID(board.boardId)].headers =
+            await databaseHelper.getHeadersForBoard(board.boardId);
         for (var header in board.headers) {
           print("Header found: [${header.headerId}, ${header.name}]");
           databaseHelper.addHeader(header);
@@ -78,16 +80,6 @@ class ConfigState extends ChangeNotifier {
         }
       }
       databaseHelper.sortHeadersAndTasks();
-      databaseHelper.bookmarks = await databaseHelper.getAllBookmarks();
-      List<Bookmark> badBookmarks = [];
-      for (var bookmark in databaseHelper.bookmarks) {
-        if (!containsBoardId(bookmark.boardId)) {
-          badBookmarks.add(bookmark);
-        }
-      }
-      for (var b in badBookmarks) {
-        databaseHelper.bookmarks.remove(b);
-      }
       print("Boards:");
       if (databaseHelper.boards.isEmpty) {
         print("No boards found!");
@@ -96,17 +88,10 @@ class ConfigState extends ChangeNotifier {
           print("[ID: ${board.boardId}, NAME: ${board.name}]");
         }
       }
-      print("Bookmarks:");
-      if (databaseHelper.bookmarks.isEmpty) {
-        print("No bookmarks found!");
-      } else {
-        for (var bookmark in databaseHelper.bookmarks) {
-          print("[BookmarkID: ${bookmark.bookmarkId}, BoardID: ${bookmark.boardId}]");
-        }
-      }
 
-      printHeaders();
-      printTasks();
+      printTitle();
+      printDataTable();
+
       print('DB loaded');
       loadingDB = false;
       print('Loading DB: $loadingDB');
@@ -114,26 +99,74 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
+  void printTitle() {
+    print("                _,-\"\"\"\"-..__");
+    print("           |`,-'_. `  ` ``  `--'\"\"\".");
+    print("           ;  ,'  | ``  ` `  ` ```  `.");
+    print("         ,-'   ..-' ` ` `` `  `` `  ` |==.");
+    print("       ,'    ^    `  `    `` `  ` `.  ;   \\ ");
+    print("      `}_,-^-   _ .  ` \\ `  ` __ `   ;    #");
+    print("         `\"---\"' `-`. ` \\---\"\"`.`.  `;");
+    print("                    \\\\` ;       ; `. `,");
+    print("                     ||`;      / / | |");
+    print("                    //_;`    ,_;' ,_;\"");
+    print("  ____                               __                  ");
+    print(" /\\  _`\\                            /\\ \\                 ");
+    print(" \\ \\ \\_\\ \\    ___      __     _ __  \\_\\ \\     __   _ __  ");
+    print("  \\ \\  _ <'  / __`\\  /'__`\\  /\\`'__\\/'_` \\  /'__`\\/\\`'__\\");
+    print("   \\ \\ \\_\\ \\/\\ \\_\\ \\/\\ \\_\\.\\_\\ \\ \\//\\ \\_\\ \\/\\  __/\\ \\ \\/ ");
+    print("    \\ \\____/\\ \\____/\\ \\__/.\\_\\\\ \\_\\\\ \\___,_\\ \\____\\\\ \\_\\ ");
+    print("     \\/___/  \\/___/  \\/__/\\/_/ \\/_/ \\/__,_ /\\/____/ \\/_/ ");
+    print("");
+  }
+
+  void printDataTable() {
+    printBoards();
+    printHeaders();
+    printTasks();
+  }
+
+  void printBoards() {
+    if (databaseHelper.boards.isEmpty) {
+      print("No boards found!");
+    } else {
+      print('┌──────────────────────────────────────────────────────┐');
+      print('│ BOARDS:\t\t\t\t\t\t  │');
+      print('├──────────────────────────────────────────────────────┤');
+      print('│ BOARD_ID \tNAME    \tCREATE_DATE\tLAST_UPDT │');
+      for (var board in databaseHelper.boards) {
+        if (board.name.length > 15) {
+          print(
+              "│ ${board.boardId.toString().padRight(8)} \t${board.name.substring(0, 12)}...\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}  │");
+        } else {
+          print(
+              "│ ${board.boardId.toString().padRight(8)} \t${board.name.padRight(15)}\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}  │");
+        }
+      }
+      print('│ \t\t\t\t\t\t\t  │');
+    }
+  }
+
   void printHeaders() {
     if (databaseHelper.headers.isEmpty) {
       print("No headers found!");
     } else {
-      print('|======================================================|');
-      print('| HEADERS:\t\t\t\t\t\t  |');
-      print('|======================================================|');
-      print('| HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID |');
+      print('├──────────────────────────────────────────────────────┤');
+      print('│ HEADERS:\t\t\t\t\t\t  │');
+      print('├──────────────────────────────────────────────────────┤');
+      print('│ HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID │');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           if (header.name.length > 15) {
             print(
-                "| ${header.headerId.toString().padRight(8)} \t${header.name.substring(0, 12)}...\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+                "│ ${header.headerId.toString().padRight(8)} \t${header.name.substring(0, 12)}...\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} │");
           } else {
             print(
-                "| ${header.headerId.toString().padRight(8)} \t${header.name.padRight(15)}\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} |");
+                "│ ${header.headerId.toString().padRight(8)} \t${header.name.padRight(15)}\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} │");
           }
         }
       }
-      print('|======================================================|');
+      print('│ \t\t\t\t\t\t\t  │');
     }
   }
 
@@ -141,24 +174,24 @@ class ConfigState extends ChangeNotifier {
     if (databaseHelper.tasks.isEmpty) {
       print("No tasks found!");
     } else {
-      print('|======================================================|');
-      print('| TASKS:\t\t\t\t\t\t  |');
-      print('|======================================================|');
-      print('| TASK_ID  \tTASK_NAME    \tHEADER_ID\t ORDER_ID |');
+      print('├──────────────────────────────────────────────────────┤');
+      print('│ TASKS:\t\t\t\t\t\t  │');
+      print('├──────────────────────────────────────────────────────┤');
+      print('│ TASK_ID  \tTASK_NAME    \tHEADER_ID\t ORDER_ID │');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           for (var task in header.tasks) {
             if (task.name.length > 15) {
               print(
-                  "| ${task.taskId.toString().padRight(8)} \t${task.name.substring(0, 12)}...\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
+                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.substring(0, 12)}...\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} │");
             } else {
               print(
-                  "| ${task.taskId.toString().padRight(8)} \t${task.name.padRight(15)}\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} |");
+                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.padRight(15)}\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} │");
             }
           }
         }
       }
-      print('|======================================================|');
+      print('└──────────────────────────────────────────────────────┘');
     }
   }
 
@@ -265,6 +298,15 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
+  bool containsAnyBookmark() {
+    List<Board> boards = databaseHelper.boards;
+
+    for (var board in boards) {
+      if (board.bookmark) return true;
+    }
+    return false;
+  }
+
   bool containsBoard(List<dynamic> list, elementToCheck) {
     for (var board in list) {
       if (board.boardId == elementToCheck || board.name == elementToCheck || board.description == elementToCheck) {
@@ -278,15 +320,6 @@ class ConfigState extends ChangeNotifier {
     List<Board> list = databaseHelper.boards;
     for (var board in list) {
       if (board.boardId == elementToCheck) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool containsBookmark(List<Bookmark> list, elementToCheck) {
-    for (var bookmark in list) {
-      if (bookmark.boardId == elementToCheck || bookmark.bookmarkId == elementToCheck) {
         return true;
       }
     }
@@ -343,17 +376,6 @@ class ConfigState extends ChangeNotifier {
     return id;
   }
 
-  int getSequentialBookmarkID(int id) {
-    List<dynamic> list = databaseHelper.bookmarks;
-    if (containsTask(list, id)) {
-      id = id + 1;
-      return getSequentialBookmarkID(id);
-    }
-
-    print('At getSequentialTaskID: New task ID is $id');
-    return id;
-  }
-
   int getSequentialHeaderID(int id) {
     List<dynamic> list = databaseHelper.headers;
     if (containsHeader(list, id)) {
@@ -383,11 +405,6 @@ class ConfigState extends ChangeNotifier {
 
   void addBoard(Board board) {
     databaseHelper.addBoard(board);
-    notifyListeners();
-  }
-
-  void addBookmark(Bookmark bookmark) {
-    databaseHelper.addBookmark(bookmark);
     notifyListeners();
   }
 
