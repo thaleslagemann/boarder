@@ -18,6 +18,7 @@ class Board {
     required this.userUid,
     required this.name,
     required this.description,
+    this.bookmark = false,
     required this.creationDate,
     required this.lastUpdate,
   });
@@ -28,7 +29,7 @@ class Board {
       'user_uid': userUid,
       'name': name,
       'description': description,
-      'bookmark': bookmark,
+      'bookmark': convertBookmark(bookmark),
       'creation_date': creationDate.toIso8601String(),
       'last_update': lastUpdate.toIso8601String(),
     };
@@ -40,9 +41,35 @@ class Board {
       userUid: map['user_uid'],
       name: map['name'],
       description: map['description'],
+      bookmark: convertBookmark(map['bookmark']),
       creationDate: DateTime.parse(map['creation_date']),
       lastUpdate: DateTime.parse(map['last_update']),
     );
+  }
+}
+
+convertBookmark(var bookmark) {
+  if (bookmark is int) {
+    switch (bookmark) {
+      case 0:
+        return true;
+      case 1:
+        return false;
+      default:
+        print('defaulted to false');
+        return false;
+    }
+  }
+  if (bookmark is bool) {
+    switch (bookmark) {
+      case true:
+        return 0;
+      case false:
+        return 1;
+      default:
+        print('defaulted to false');
+        return 0;
+    }
   }
 }
 
@@ -156,7 +183,7 @@ class DatabaseHelper {
         'user_uid TEXT,'
         'name TEXT,'
         'description TEXT,'
-        'bookmark BOOLEAN,'
+        'bookmark BOOLEAN NOT NULL CHECK (bookmark IN (0, 1)),'
         'creation_date DATETIME,'
         'last_update DATETIME);');
     await db.execute('CREATE TABLE Headers ('
@@ -174,6 +201,16 @@ class DatabaseHelper {
         'order_index INTEGER,'
         'FOREIGN KEY (header_id) REFERENCES Headers(header_id),'
         'FOREIGN KEY (assigned_user_id) REFERENCES Users(user_id));');
+  }
+
+  void updateBoardBookmark(int boardId, bool bookmark) async {
+    final Database db = await DatabaseHelper.instance.database;
+    await db.update(
+      'Boards',
+      {'bookmark': convertBookmark(bookmark)},
+      where: 'board_id = ?',
+      whereArgs: [boardId],
+    );
   }
 
   void addBoard(Board board) {
@@ -635,11 +672,11 @@ class DatabaseHelper {
   }
 
   // Delete a task
-  void deleteTask(Task task) async {
-    tasks.remove(task);
-    headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
+  Future<void> deleteTask(Task task) async {
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
+    tasks.removeAt(tasks.indexWhere((element) => element.taskId == task.taskId));
+    headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
   }
 
   void insertReorderTask(

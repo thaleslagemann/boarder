@@ -42,10 +42,11 @@ class Constants {
 
 class ConfigState extends ChangeNotifier {
   bool loadingDB = true;
+  bool loadedDB = false;
 
   final databaseHelper = DatabaseHelper.instance;
 
-  void loadDB() async {
+  Future<void> loadDB() async {
     if (loadingDB) {
       print('Loading DB: $loadingDB');
       await databaseHelper.initializeDatabase();
@@ -94,6 +95,7 @@ class ConfigState extends ChangeNotifier {
 
       print('DB loaded');
       loadingDB = false;
+      loadedDB = true;
       print('Loading DB: $loadingDB');
       notifyListeners();
     }
@@ -121,29 +123,39 @@ class ConfigState extends ChangeNotifier {
   }
 
   void printDataTable() {
-    printBoards();
-    printHeaders();
-    printTasks();
+    if (databaseHelper.boards.isNotEmpty) {
+      printBoards();
+    }
+    if (databaseHelper.headers.isNotEmpty) {
+      printHeaders();
+    } else {
+      print('└────────────────────────────────────────────────────────────────────┘');
+    }
+    if (databaseHelper.tasks.isNotEmpty) {
+      printTasks();
+    } else {
+      print('└────────────────────────────────────────────────────────────────────┘');
+    }
   }
 
   void printBoards() {
     if (databaseHelper.boards.isEmpty) {
       print("No boards found!");
     } else {
-      print('┌──────────────────────────────────────────────────────┐');
-      print('│ BOARDS:\t\t\t\t\t\t  │');
-      print('├──────────────────────────────────────────────────────┤');
-      print('│ BOARD_ID \tNAME    \tCREATE_DATE\tLAST_UPDT │');
+      print('┌────────────────────────────────────────────────────────────────────┐');
+      print('│ BOARDS:                                                            │');
+      print('├────────────────────────────────────────────────────────────────────┤');
+      print('│ BOARD_ID \tNAME    \tCREATE_DATE\tLAST_UPDT\tBOOKMARK│');
       for (var board in databaseHelper.boards) {
         if (board.name.length > 15) {
           print(
-              "│ ${board.boardId.toString().padRight(8)} \t${board.name.substring(0, 12)}...\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}  │");
+              "│ ${board.boardId.toString().padRight(8)} \t${board.name.substring(0, 12)}...\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}\t${board.bookmark}\t│");
         } else {
           print(
-              "│ ${board.boardId.toString().padRight(8)} \t${board.name.padRight(15)}\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}  │");
+              "│ ${board.boardId.toString().padRight(8)} \t${board.name.padRight(15)}\t${DateFormat('dd/MM/yy').format(board.creationDate).padRight(12)}\t${DateFormat('dd/MM/yy').format(board.lastUpdate).padRight(8)}\t${board.bookmark}\t│");
         }
       }
-      print('│ \t\t\t\t\t\t\t  │');
+      print('│                                                                    │');
     }
   }
 
@@ -151,22 +163,22 @@ class ConfigState extends ChangeNotifier {
     if (databaseHelper.headers.isEmpty) {
       print("No headers found!");
     } else {
-      print('├──────────────────────────────────────────────────────┤');
-      print('│ HEADERS:\t\t\t\t\t\t  │');
-      print('├──────────────────────────────────────────────────────┤');
-      print('│ HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID │');
+      print('├────────────────────────────────────────────────────────────────────┤');
+      print('│ HEADERS:                                                           │');
+      print('├────────────────────────────────────────────────────────────────────┤');
+      print('│ HEADER_ID \tNAME    \tBOARD_ID\t ORDER_ID\t        │');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           if (header.name.length > 15) {
             print(
-                "│ ${header.headerId.toString().padRight(8)} \t${header.name.substring(0, 12)}...\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} │");
+                "│ ${header.headerId.toString().padRight(8)} \t${header.name.substring(0, 12)}...\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)}\t        │");
           } else {
             print(
-                "│ ${header.headerId.toString().padRight(8)} \t${header.name.padRight(15)}\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)} │");
+                "│ ${header.headerId.toString().padRight(8)} \t${header.name.padRight(15)}\t${header.boardId.toString().padRight(12)}\t ${header.orderIndex.toString().padRight(8)}\t        │");
           }
         }
       }
-      print('│ \t\t\t\t\t\t\t  │');
+      print('│                                                                    │');
     }
   }
 
@@ -174,24 +186,24 @@ class ConfigState extends ChangeNotifier {
     if (databaseHelper.tasks.isEmpty) {
       print("No tasks found!");
     } else {
-      print('├──────────────────────────────────────────────────────┤');
-      print('│ TASKS:\t\t\t\t\t\t  │');
-      print('├──────────────────────────────────────────────────────┤');
-      print('│ TASK_ID  \tTASK_NAME    \tHEADER_ID\t ORDER_ID │');
+      print('├────────────────────────────────────────────────────────────────────┤');
+      print('│ TASKS:                                                             │');
+      print('├────────────────────────────────────────────────────────────────────┤');
+      print('│ TASK_ID  \tTASK_NAME    \tHEADER_ID\t ORDER_ID\t        │');
       for (var board in databaseHelper.boards) {
         for (var header in board.headers) {
           for (var task in header.tasks) {
             if (task.name.length > 15) {
               print(
-                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.substring(0, 12)}...\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} │");
+                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.substring(0, 12)}...\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)}\t        │");
             } else {
               print(
-                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.padRight(15)}\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)} │");
+                  "│ ${task.taskId.toString().padRight(8)} \t${task.name.padRight(15)}\t${task.headerId.toString().padRight(10)} \t ${task.orderIndex.toString().padRight(8)}\t        │");
             }
           }
         }
       }
-      print('└──────────────────────────────────────────────────────┘');
+      print('└────────────────────────────────────────────────────────────────────┘');
     }
   }
 
@@ -416,6 +428,12 @@ class ConfigState extends ChangeNotifier {
   void addTask(Task task) {
     databaseHelper.addTask(task);
     print('Task added ${task.name}');
+    notifyListeners();
+  }
+
+  void deleteTask(Task task) {
+    databaseHelper.deleteTask(task);
+    print('Task deleted ${task.name}');
     notifyListeners();
   }
 

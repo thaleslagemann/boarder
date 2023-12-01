@@ -70,6 +70,7 @@ class AppBodyState extends State<AppBody> {
 
   @override
   Widget build(BuildContext context) {
+    bool _loading = false;
     Widget page;
     switch (selectedIndex) {
       case 0:
@@ -87,7 +88,9 @@ class AppBodyState extends State<AppBody> {
 
     return LayoutBuilder(builder: (context, constraints) {
       var configState = context.watch<ConfigState>();
+
       configState.loadDB();
+
       return Scaffold(
         drawer: Drawer(
           child: ListView(

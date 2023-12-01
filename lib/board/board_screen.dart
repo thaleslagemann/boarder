@@ -246,7 +246,7 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
-    Future<void> _displayTaskDeletionConfirmationDialog(BuildContext context, Task task) async {
+    void _displayTaskDeletionConfirmationDialog(BuildContext context, Task task) async {
       return showDialog(
           context: context,
           builder: (context) {
@@ -270,10 +270,8 @@ class BoardScreenState extends State<BoardScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('delete'),
                   onPressed: () {
-                    setState(() {
-                      configState.databaseHelper.deleteTask(task);
-                      Navigator.pop(context);
-                    });
+                    setState(() => configState.deleteTask(task));
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -354,8 +352,8 @@ class BoardScreenState extends State<BoardScreen> {
                       configState.databaseHelper.createTask(newTask);
                       _taskNameFieldController.clear();
                       _taskDescFieldController.clear();
-                      Navigator.pop(context);
                     });
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -1085,18 +1083,14 @@ class BoardScreenState extends State<BoardScreen> {
                                                     shape: RoundedRectangleBorder(
                                                       borderRadius: BorderRadius.all(Radius.circular(5)),
                                                     ),
-                                                    icon: Icon(Icons.arrow_drop_down_sharp,
-                                                        color: globalAppTheme.mainColorOption()),
+                                                    icon:
+                                                        Icon(Icons.more_vert, color: globalAppTheme.mainColorOption()),
                                                     itemBuilder: (BuildContext context) {
                                                       return Constants.taskChoices.map((String choice) {
                                                         return PopupMenuItem<String>(
                                                             value: choice,
                                                             child: Text(choice),
-                                                            onTap: () => {
-                                                                  setState(() {
-                                                                    taskChoiceAction(choice, task);
-                                                                  })
-                                                                });
+                                                            onTap: () => taskChoiceAction(choice, task));
                                                       }).toList();
                                                     },
                                                   ),

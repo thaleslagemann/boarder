@@ -346,9 +346,11 @@ class BoardsPageState extends State<BoardsPage> {
       if (configState.databaseHelper.boards[boardIndex].bookmark == true) {
         print('Removing bookmark $boardID');
         configState.databaseHelper.boards[boardIndex].bookmark = false;
+        configState.databaseHelper.updateBoardBookmark(boardID, false);
       } else {
         print('Adding bookmark $boardID');
         configState.databaseHelper.boards[boardIndex].bookmark = true;
+        configState.databaseHelper.updateBoardBookmark(boardID, true);
       }
     }
 

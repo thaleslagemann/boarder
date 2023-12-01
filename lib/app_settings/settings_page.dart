@@ -148,7 +148,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                         tiles: []),
                     SettingsSection(
-                      title: Text('System'),
+                      title: Text('System', style: TextStyle(color: globalAppTheme.mainColorOption())),
                       tiles: [
                         SettingsTile(
                           title: Text('Theme'),
@@ -318,176 +318,181 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                       ],
                     ),
-                    SettingsSection(title: Text('Boards'), tiles: [
-                      SettingsTile(
-                        title: Text('Task shape'),
-                        leading: Icon(Icons.crop_7_5_rounded),
-                        trailing: ButtonBar(
-                          alignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    SettingsSection(
+                        title: Text('Boards', style: TextStyle(color: globalAppTheme.mainColorOption())),
+                        tiles: [
+                          SettingsTile(
+                            title: Text('Task shape'),
+                            leading: Icon(Icons.crop_7_5_rounded),
+                            trailing: ButtonBar(
+                              alignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Column(
                                   children: [
-                                    Radio(
-                                      value: 0,
-                                      groupValue: selectedRadio,
-                                      activeColor: globalAppTheme.mainColorOption(),
-                                      onChanged: (val) {
-                                        setState(() {
-                                          taskShape.switchTaskShape(val!);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(val);
-                                        });
-                                        print("Radio $val");
-                                      },
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Radio(
+                                          value: 0,
+                                          groupValue: selectedRadio,
+                                          activeColor: globalAppTheme.mainColorOption(),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              taskShape.switchTaskShape(val!);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(val);
+                                            });
+                                            print("Radio $val");
+                                          },
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              taskShape.switchTaskShape(0);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(0);
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                                                border:
+                                                    Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          taskShape.switchTaskShape(0);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(0);
-                                        });
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Radio(
-                                      value: 1,
-                                      groupValue: selectedRadio,
-                                      activeColor: globalAppTheme.mainColorOption(),
-                                      onChanged: (val) {
-                                        setState(() {
-                                          taskShape.switchTaskShape(val!);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(val);
-                                        });
-                                        print("Radio $val");
-                                      },
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Radio(
+                                          value: 1,
+                                          groupValue: selectedRadio,
+                                          activeColor: globalAppTheme.mainColorOption(),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              taskShape.switchTaskShape(val!);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(val);
+                                            });
+                                            print("Radio $val");
+                                          },
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              taskShape.switchTaskShape(1);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(1);
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                border:
+                                                    Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          taskShape.switchTaskShape(1);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(1);
-                                        });
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Radio(
-                                      value: 2,
-                                      groupValue: selectedRadio,
-                                      activeColor: globalAppTheme.mainColorOption(),
-                                      onChanged: (val) {
-                                        setState(() {
-                                          taskShape.switchTaskShape(val!);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(val);
-                                        });
-                                        print("Radio $val");
-                                      },
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          taskShape.switchTaskShape(2);
-                                          selectedRadio = taskShape.getCurrentShapeInt();
-                                          prefs.setTaskShapePreferences(2);
-                                        });
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(Radius.circular(0)),
-                                            border: Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
-                                      ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Radio(
+                                          value: 2,
+                                          groupValue: selectedRadio,
+                                          activeColor: globalAppTheme.mainColorOption(),
+                                          onChanged: (val) {
+                                            setState(() {
+                                              taskShape.switchTaskShape(val!);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(val);
+                                            });
+                                            print("Radio $val");
+                                          },
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              taskShape.switchTaskShape(2);
+                                              selectedRadio = taskShape.getCurrentShapeInt();
+                                              prefs.setTaskShapePreferences(2);
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(Radius.circular(0)),
+                                                border:
+                                                    Border.all(width: 1.5, color: globalAppTheme.mainColorOption()!)),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                      SettingsTile(
-                        title: Text('Reorder type'),
-                        leading: Icon(Icons.swap_vert_rounded),
-                        trailing: DropdownButtonHideUnderline(
-                          child: DropdownButton2<String>(
-                            isExpanded: true,
-                            hint: Text(
-                              selectedReorder!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: globalAppTheme.mainColorOption(),
+                          ),
+                          SettingsTile(
+                            title: Text('Reorder type'),
+                            leading: Icon(Icons.swap_vert_rounded),
+                            trailing: DropdownButtonHideUnderline(
+                              child: DropdownButton2<String>(
+                                isExpanded: true,
+                                hint: Text(
+                                  selectedReorder!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: globalAppTheme.mainColorOption(),
+                                  ),
+                                ),
+                                items: _reorderOptions
+                                    .map((String item) => DropdownMenuItem<String>(
+                                          value: item,
+                                          child: Text(
+                                            item,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: globalAppTheme.mainColorOption(),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                value: selectedReorder,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedReorder = value;
+                                    print('Attempting to switch reorder type to $selectedReorder');
+                                    reorderType.switchReorder();
+                                    print(selectedReorder);
+                                  });
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Reorder type changed')),
+                                  );
+                                },
+                                buttonStyleData: const ButtonStyleData(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  height: 40,
+                                  width: 120,
+                                ),
+                                menuItemStyleData: const MenuItemStyleData(
+                                  height: 40,
+                                ),
                               ),
                             ),
-                            items: _reorderOptions
-                                .map((String item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(
-                                        item,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: globalAppTheme.mainColorOption(),
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                            value: selectedReorder,
-                            onChanged: (String? value) {
-                              setState(() {
-                                selectedReorder = value;
-                                print('Attempting to switch reorder type to $selectedReorder');
-                                reorderType.switchReorder();
-                                print(selectedReorder);
-                              });
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Reorder type changed')),
-                              );
-                            },
-                            buttonStyleData: const ButtonStyleData(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              height: 40,
-                              width: 120,
-                            ),
-                            menuItemStyleData: const MenuItemStyleData(
-                              height: 40,
-                            ),
+                            onPressed: (value) {},
                           ),
-                        ),
-                        onPressed: (value) {},
-                      ),
-                    ]),
+                        ]),
                     SettingsSection(
-                      title: Text('Security'),
+                      title: Text('Security', style: TextStyle(color: globalAppTheme.mainColorOption())),
                       tiles: [
                         SettingsTile.switchTile(
                           activeSwitchColor: globalAppTheme.mainColorOption(),
@@ -508,7 +513,7 @@ class SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     SettingsSection(
-                      title: Text('Other'),
+                      title: Text('Other', style: TextStyle(color: globalAppTheme.mainColorOption())),
                       tiles: [
                         SettingsTile(
                             leading: Icon(Icons.people_sharp),
