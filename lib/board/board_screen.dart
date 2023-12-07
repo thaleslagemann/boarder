@@ -499,31 +499,32 @@ class BoardScreenState extends State<BoardScreen> {
                         color: globalAppTheme.mainColorOption(),
                       ),
                     ),
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('ID:')]),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('#${configState.databaseHelper.boards[index].boardId}',
+                        Text('ID:'),
+                        Text(
+                            configState.databaseHelper.boards[index].boardId
+                                .toString()
+                                .padLeft(10 - configState.databaseHelper.boards[index].boardId.toString().length, '0'),
                             style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
                     SizedBox(
                       height: 5,
                     ),
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('Name:')]),
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                      Text('Name:'),
                       Text(configState.databaseHelper.boards[index].name, style: TextStyle(fontWeight: FontWeight.bold))
                     ]),
                     SizedBox(
                       height: 5,
                     ),
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [Text('Creation date:')]),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                            DateFormat('dd-MM-yyyy kk:mm')
-                                .format(configState.databaseHelper.boards[index].creationDate),
+                        Text('Creation date:'),
+                        Text(DateFormat('dd/MM/yyyy').format(configState.databaseHelper.boards[index].creationDate),
                             style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
@@ -531,13 +532,10 @@ class BoardScreenState extends State<BoardScreen> {
                       height: 5,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [Text('Last modified:')],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate),
+                        Text('Last modified:'),
+                        Text(DateFormat('dd/MM/yyyy').format(configState.databaseHelper.boards[index].lastUpdate),
                             style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
