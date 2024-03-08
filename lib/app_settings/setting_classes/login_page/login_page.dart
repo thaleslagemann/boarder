@@ -16,7 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  User? user;
+  User? _user;
   bool loading = false;
 
   FocusNode emailFocusNode = FocusNode();
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     await Future.delayed(
       const Duration(seconds: 4),
     );
-    user = await loginController.callSignIn(
+    _user = await loginController.callSignIn(
       _emailController.text,
       _passwordController.text,
     );
@@ -372,6 +372,16 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 onPressed: () async {
                                   await loginController.callSignInWithGoogle();
+                                  if (await loginController.user
+                                          ?.getIdToken() !=
+                                      null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomePage(),
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ),

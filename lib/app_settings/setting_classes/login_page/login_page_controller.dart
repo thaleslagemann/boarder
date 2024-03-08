@@ -1,10 +1,16 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobx/mobx.dart';
 
 class LoginPageController {
+  @observable
+  User? user;
+
+  @observable
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  @action
   bool isUserLoggedIn() {
     if (_auth.currentUser != null) {
       return true;
@@ -42,12 +48,13 @@ class LoginPageController {
         );
         final UserCredential authResult =
             await _auth.signInWithCredential(credential);
-        final User? user = authResult.user;
-        return user;
+        final User? authenticatedUser = authResult.user;
+        return authenticatedUser;
       }
     } catch (error) {
       print('Error signing in with Google: $error');
     }
+    return null;
   }
 
   Future<User?> _signInAnonymously() async {
