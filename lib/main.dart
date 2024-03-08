@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'package:boarder/app_settings/setting_classes/login_page/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:boarder/app_settings/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ Future main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -71,7 +71,7 @@ class AppState extends State<MyApp> {
         theme: globalAppTheme.lightTheme,
         darkTheme: globalAppTheme.darkTheme,
         themeMode: globalAppTheme.currentTheme(),
-        home: const AuthGate(),
+        home: const LoginPage(),
       ),
     );
   }

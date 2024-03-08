@@ -51,7 +51,8 @@ class AppBodyState extends State<AppBody> {
             child: CircleAvatar(
               radius: 100,
               backgroundColor: Colors.transparent,
-              backgroundImage: NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+              backgroundImage:
+                  NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
             ),
           ),
         ],
@@ -64,7 +65,7 @@ class AppBodyState extends State<AppBody> {
             border: Border.all(color: Colors.black, width: 2),
             color: _randomColorPicker(),
           ),
-          child: Image(image: AssetImage('lib/assets/boar.png')));
+          child: Image(image: AssetImage('assets/images/boar.png')));
     }
   }
 
@@ -97,16 +98,22 @@ class AppBodyState extends State<AppBody> {
             padding: EdgeInsets.zero,
             children: [
               UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: globalAppTheme.mainColorOption()),
-                accountName: FirebaseAuth.instance.currentUser?.displayName != null
-                    ? Text(
-                        "${FirebaseAuth.instance.currentUser?.displayName}",
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                      )
-                    : Text(
-                        "Guest",
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                      ),
+                decoration:
+                    BoxDecoration(color: globalAppTheme.mainColorOption()),
+                accountName:
+                    FirebaseAuth.instance.currentUser?.displayName != null
+                        ? Text(
+                            "${FirebaseAuth.instance.currentUser?.displayName}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface),
+                          )
+                        : Text(
+                            "Guest",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface),
+                          ),
                 accountEmail: Text(
                   "${FirebaseAuth.instance.currentUser?.email?.replaceRange(2, (FirebaseAuth.instance.currentUser?.email?.length)! - 4, '*****@*****')}",
                   style: TextStyle(
