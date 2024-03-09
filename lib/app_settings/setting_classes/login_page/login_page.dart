@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:boarder/app_settings/config.dart';
 import 'package:boarder/core/widgets/ui/shared/boarder_text_field.dart';
 import 'package:boarder/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -95,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: globalAppTheme.mainColorContainerOption(),
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: <Widget>[
@@ -218,8 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Icon(
                                   Icons.lock_outline,
                                   color: loginError ? Colors.red : Colors.black,
@@ -236,27 +236,21 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               IconButton(
-                                onPressed: () =>
-                                    setState(() => hidePass = !hidePass),
-                                icon: hidePass
-                                    ? Icon(Icons.remove_red_eye_outlined)
-                                    : Icon(Icons.remove_red_eye),
+                                onPressed: () => setState(() => hidePass = !hidePass),
+                                icon: hidePass ? Icon(Icons.remove_red_eye_outlined) : Icon(Icons.remove_red_eye),
                               ),
                             ],
                           ),
                         ),
                       ),
                       AnimatedOpacity(
-                        opacity: MediaQuery.of(context).viewInsets.bottom > 90
-                            ? 1.0
-                            : 0.0,
+                        opacity: MediaQuery.of(context).viewInsets.bottom > 90 ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 100),
                         child: SizedBox(
                           width: 45,
                           height: 45,
                           child: Visibility(
-                            visible:
-                                MediaQuery.of(context).viewInsets.bottom != 0,
+                            visible: MediaQuery.of(context).viewInsets.bottom != 0,
                             child: IconButton(
                               icon: Icon(
                                 Icons.arrow_circle_right_rounded,
@@ -272,9 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   Text(
-                    loginError
-                        ? "Something went wrong, check email/password."
-                        : "",
+                    loginError ? "Something went wrong, check email/password." : "",
                     style: TextStyle(
                       color: Colors.red,
                     ),
@@ -372,9 +364,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 onPressed: () async {
                                   await loginController.callSignInWithGoogle();
-                                  if (await loginController.user
-                                          ?.getIdToken() !=
-                                      null) {
+                                  if (await loginController.user?.getIdToken() != null) {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(

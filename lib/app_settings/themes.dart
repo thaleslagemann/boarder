@@ -117,6 +117,34 @@ class MyTheme with ChangeNotifier {
     }
   }
 
+  Color? mainColorBackgroundOption() {
+    if (_theme == 0 || (_theme == 2 && _isDarkMode)) {
+      print('is dark mode');
+      switch (_mainColor) {
+        case 0:
+          return darkTheme.colorScheme.background;
+        case 1:
+          return darkTheme.colorScheme.secondaryContainer;
+        case 2:
+          return darkTheme.colorScheme.tertiaryContainer;
+        default:
+          return darkTheme.colorScheme.primaryContainer;
+      }
+    } else {
+      print('is light mode');
+      switch (_mainColor) {
+        case 0:
+          return lightTheme.colorScheme.primaryContainer;
+        case 1:
+          return lightTheme.colorScheme.secondaryContainer;
+        case 2:
+          return lightTheme.colorScheme.tertiaryContainer;
+        default:
+          return lightTheme.colorScheme.primaryContainer;
+      }
+    }
+  }
+
   int getCurrentMainColor() {
     return _mainColor;
   }
