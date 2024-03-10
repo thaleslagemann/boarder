@@ -1,9 +1,11 @@
 import 'package:boarder/app_settings/setting_classes/login_page/login_page_controller.dart';
+import 'package:boarder/core/themes/theme_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:provider/provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:boarder/main.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -13,6 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  final themeController = ThemeController();
+
   @override
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
@@ -21,19 +25,66 @@ class HomePageState extends State<HomePage> {
         ? Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
                 children: [
-                  CircularProgressIndicator(
-                    color: globalAppTheme.mainColorOption(),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: themeController.getCurrentTheme().onBackground,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Loading home',
+                        style: TextStyle(
+                            color:
+                                themeController.getCurrentTheme().onBackground),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 10,
+                  Positioned(
+                    bottom: 40,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Taking too long?',
+                          style: TextStyle(
+                              color: themeController
+                                  .getCurrentTheme()
+                                  .onBackground),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        OutlinedButton(
+                            onPressed: () {
+                              FirebaseAuth.instance.signOut();
+                              navigatorKey.currentState?.pushNamed('/login');
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                width: 2.0,
+                                color: themeController
+                                    .getCurrentTheme()
+                                    .onBackground,
+                              ),
+                              backgroundColor:
+                                  themeController.getCurrentTheme().surface,
+                            ),
+                            child: Text(
+                              'Log out',
+                              style: TextStyle(
+                                  color: themeController
+                                      .getCurrentTheme()
+                                      .onBackground),
+                            )),
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Loading',
-                    style: TextStyle(color: globalAppTheme.mainColorOption()),
-                  )
                 ],
               ),
             ),

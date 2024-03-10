@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:boarder/app_settings/config.dart';
+import 'package:boarder/main.dart';
+import 'package:boarder/core/themes/theme_controller.dart';
 import 'package:boarder/core/widgets/ui/shared/boarder_text_field.dart';
 import 'package:boarder/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +17,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final themeController = ThemeController();
   User? _user;
   bool loading = false;
 
@@ -38,6 +39,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    print(themeController.getCurrentTheme().brightness);
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
@@ -53,14 +55,6 @@ class _LoginPageState extends State<LoginPage> {
       loading = true;
     });
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_passwordController.text == "p@ssW0Rd#...") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('smartass >:B'),
-          duration: Duration(seconds: 1),
-        ),
-      );
-    }
     await Future.delayed(
       const Duration(seconds: 4),
     );
@@ -68,13 +62,8 @@ class _LoginPageState extends State<LoginPage> {
       _emailController.text,
       _passwordController.text,
     );
-    if (await FirebaseAuth.instance.currentUser?.getIdToken() != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
-      );
+    if (loginController.isUserLoggedIn()) {
+      navigatorKey.currentState?.pushNamed('/home');
     } else {
       setState(() {
         loading = false;
@@ -96,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: globalAppTheme.mainColorContainerOption(),
+        backgroundColor: themeController.getCurrentTheme().background,
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: <Widget>[
@@ -108,90 +97,97 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Align(
                     alignment: Alignment.center,
+                    child: Container(
+                        height: 200,
+                        width: 240,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                              "assets/images/boar.png",
+                            ),
+                            fit: BoxFit.contain,
+                            colorFilter: ColorFilter.mode(
+                                themeController.getCurrentTheme().onBackground,
+                                BlendMode.srcATop),
+                          ),
+                        )),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
                     child: SizedBox(
-                      height: 200,
-                      width: 240,
-                      child: Image.asset(
-                        "assets/images/logo.png",
-                        fit: BoxFit.contain,
+                      height: 50,
+                      width: 150,
+                      child: Text(
+                        "BOARDER",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: themeController.getCurrentTheme().onBackground,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
-                  // Align(
-                  //   alignment: Alignment.center,
-                  //   child: SizedBox(
-                  //     height: 50,
-                  //     width: 150,
-                  //     child: Text(
-                  //       "BOARDER",
-                  //       textAlign: TextAlign.center,
-                  //       style: TextStyle(
-                  //         fontSize: 30,
-                  //         fontWeight: FontWeight.w600,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  SizedBox(
-                    height: 55,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: GestureDetector(
-                        onTap: emailFocusNode.requestFocus,
-                        child: AnimatedContainer(
-                          duration: Duration(milliseconds: 75),
-                          height: 50,
-                          width: 300,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(5),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color.fromARGB(0, 0, 0, 0),
-                                blurRadius: 0,
-                                spreadRadius: 0,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              AnimatedContainer(
-                                duration: Duration(milliseconds: 100),
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Icon(
-                                  Icons.person_outline,
-                                  color: loginError ? Colors.red : Colors.black,
-                                  size: 26,
-                                ),
-                              ),
-                              Flexible(
-                                fit: FlexFit.tight,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: BoarderTextField(
-                                    "Email",
-                                    focusNode: emailFocusNode,
-                                    controller: _emailController,
-                                    undoController: _emailUndoController,
-                                    textStyle: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                    hintText: "email",
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      height: 50,
+                      width: 300,
+                      decoration: BoxDecoration(
+                        color: themeController.getCurrentTheme().surface,
+                        border: Border.all(
+                          color: themeController.getCurrentTheme().onBackground,
+                          width: 2,
                         ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Icon(
+                              Icons.person_outline,
+                              color: loginError
+                                  ? themeController.getCurrentTheme().error
+                                  : themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
+                              size: 26,
+                            ),
+                          ),
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: BoarderTextField(
+                                "Email",
+                                color: themeController
+                                    .getCurrentTheme()
+                                    .onBackground,
+                                focusNode: emailFocusNode,
+                                controller: _emailController,
+                                undoController: _emailUndoController,
+                                textStyle: TextStyle(
+                                  color: themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
+                                  fontSize: 16,
+                                ),
+                                cursorColor: themeController
+                                    .getCurrentTheme()
+                                    .onBackground,
+                                hintText: "email",
+                                onChange: (value) => {
+                                  setState(() => loginError = false),
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -201,63 +197,111 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      GestureDetector(
-                        onTap: passwordFocusNode.requestFocus,
-                        child: Container(
-                          height: 50,
-                          width: 300,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(5),
-                            ),
+                      Container(
+                        height: 50,
+                        width: 300,
+                        decoration: BoxDecoration(
+                          color: themeController.getCurrentTheme().surface,
+                          border: Border.all(
+                            color:
+                                themeController.getCurrentTheme().onBackground,
+                            width: 2,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Icon(
-                                  Icons.lock_outline,
-                                  color: loginError ? Colors.red : Colors.black,
-                                ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(5),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Icon(
+                                Icons.lock_outline,
+                                color: loginError
+                                    ? themeController.getCurrentTheme().error
+                                    : themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
+                                size: 26,
                               ),
-                              Flexible(
-                                fit: FlexFit.tight,
+                            ),
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
                                 child: BoarderTextField(
                                   "Password",
+                                  obscureText: hidePass,
+                                  color: themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
                                   focusNode: passwordFocusNode,
                                   controller: _passwordController,
-                                  obscureText: hidePass,
+                                  undoController: _passwordUndoController,
+                                  textStyle: TextStyle(
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
+                                    fontSize: 16,
+                                  ),
+                                  cursorColor: themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
                                   hintText: "password",
+                                  onChange: (value) => {
+                                    setState(() => loginError = false),
+                                  },
+                                  onEditingComplete: () {
+                                    buttonPress(context);
+                                  },
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () => setState(() => hidePass = !hidePass),
-                                icon: hidePass ? Icon(Icons.remove_red_eye_outlined) : Icon(Icons.remove_red_eye),
-                              ),
-                            ],
-                          ),
+                            ),
+                            IconButton(
+                              onPressed: () =>
+                                  setState(() => hidePass = !hidePass),
+                              icon: hidePass
+                                  ? Icon(
+                                      Icons.remove_red_eye_outlined,
+                                      color: themeController
+                                          .getCurrentTheme()
+                                          .onBackground,
+                                    )
+                                  : Icon(
+                                      Icons.remove_red_eye,
+                                      color: themeController
+                                          .getCurrentTheme()
+                                          .onBackground,
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
                       AnimatedOpacity(
-                        opacity: MediaQuery.of(context).viewInsets.bottom > 90 ? 1.0 : 0.0,
+                        opacity: MediaQuery.of(context).viewInsets.bottom > 90
+                            ? 1.0
+                            : 0.0,
                         duration: const Duration(milliseconds: 100),
                         child: SizedBox(
-                          width: 45,
+                          width: 55,
                           height: 45,
                           child: Visibility(
-                            visible: MediaQuery.of(context).viewInsets.bottom != 0,
+                            visible:
+                                MediaQuery.of(context).viewInsets.bottom != 0,
                             child: IconButton(
                               icon: Icon(
                                 Icons.arrow_circle_right_rounded,
-                                color: Colors.black,
+                                color: themeController
+                                    .getCurrentTheme()
+                                    .onBackground,
                               ),
                               onPressed: () async {
                                 buttonPress(context);
+                                if (loginController.isUserLoggedIn()) {
+                                  navigatorKey.currentState?.pushNamed('/home');
+                                }
                               },
                             ),
                           ),
@@ -265,47 +309,49 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                  Text(
-                    loginError ? "Something went wrong, check email/password." : "",
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
                   Align(
                     alignment: Alignment.center,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: loading
                           ? SizedBox(
-                              height: 35,
+                              height: 40,
                               child: CircularProgressIndicator(
-                                color: Colors.black,
+                                color: themeController
+                                    .getCurrentTheme()
+                                    .onBackground,
                               ),
                             )
                           : SizedBox(
-                              height: 35,
+                              height: 40,
                               width: 200,
-                              child: ElevatedButton.icon(
+                              child: OutlinedButton.icon(
                                 label: Text(
                                   "Sign in with Email",
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
                                   ),
                                 ),
                                 icon: Icon(
                                   Icons.arrow_circle_right_rounded,
-                                  color: Colors.black,
+                                  color: themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    width: 2.0,
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
+                                  ),
+                                  backgroundColor:
+                                      themeController.getCurrentTheme().surface,
                                 ),
                                 onPressed: () async {
                                   buttonPress(context);
-                                  if (loginController.isUserLoggedIn()) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomePage(),
-                                      ),
-                                    );
-                                  }
                                 },
                               ),
                             ),
@@ -316,18 +362,14 @@ class _LoginPageState extends State<LoginPage> {
                     child: Container(
                       child: TextButton(
                         child: Text(
-                          'New Account',
+                          'Or Create a New Account',
                           style: TextStyle(
-                            color: Colors.black,
+                            color:
+                                themeController.getCurrentTheme().onBackground,
                           ),
                         ),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RegisterPage(),
-                            ),
-                          );
+                          navigatorKey.currentState?.pushNamed('/register');
                         },
                       ),
                     ),
@@ -337,7 +379,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Divider(
                       height: 1,
                       thickness: 2,
-                      color: Colors.black,
+                      color: themeController.getCurrentTheme().onBackground,
                     ),
                   ),
                   Align(
@@ -346,25 +388,41 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.only(top: 20.0),
                       child: loading
                           ? SizedBox(
-                              height: 35,
+                              height: 40,
                             )
                           : SizedBox(
-                              height: 35,
+                              height: 40,
                               width: 200,
-                              child: ElevatedButton.icon(
+                              child: OutlinedButton.icon(
                                 label: Text(
                                   "Sign in with Google",
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
                                   ),
                                 ),
                                 icon: Icon(
                                   Icons.g_mobiledata_sharp,
-                                  color: Colors.black,
+                                  color: themeController
+                                      .getCurrentTheme()
+                                      .onBackground,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    width: 2.0,
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
+                                  ),
+                                  backgroundColor:
+                                      themeController.getCurrentTheme().surface,
                                 ),
                                 onPressed: () async {
                                   await loginController.callSignInWithGoogle();
-                                  if (await loginController.user?.getIdToken() != null) {
+                                  if (await loginController.user
+                                          ?.getIdToken() !=
+                                      null) {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -392,18 +450,16 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text(
                                   "Or enter Anonymously",
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: themeController
+                                        .getCurrentTheme()
+                                        .onBackground,
                                   ),
                                 ),
                                 onPressed: () async {
                                   await loginController.callLoginAnnymous();
                                   if (loginController.isUserLoggedIn()) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomePage(),
-                                      ),
-                                    );
+                                    navigatorKey.currentState
+                                        ?.pushNamed('/home');
                                   }
                                 },
                               ),

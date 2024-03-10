@@ -23,6 +23,10 @@ class BoarderTextField extends StatefulWidget {
     this.cursorColor = Colors.black,
     this.showCursor = true,
     this.hintText,
+    this.hintColor,
+    this.onChange,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
   });
 
   final String text;
@@ -43,7 +47,11 @@ class BoarderTextField extends StatefulWidget {
   Color cursorColor;
   bool showCursor;
   String? hintText;
+  Color? hintColor;
   bool textFieldFocused = false;
+  Function(String)? onChange;
+  Function()? onEditingComplete;
+  Function(String)? onFieldSubmitted;
 
   RegExp pattern = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
@@ -67,7 +75,7 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
               strokeAlign: widget.strokeAlign ?? BorderSide.strokeAlignInside,
             ),
         borderRadius: BorderRadius.circular(widget.borderRadius ?? 15.0),
-        color: widget.backgroundColor ?? Colors.white,
+        color: widget.backgroundColor,
       ),
       child: TextFormField(
         focusNode: widget.focusNode,
@@ -78,6 +86,7 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
         decoration: widget.inputDecoration ??
             InputDecoration(
               hintText: widget.hintText,
+              hintStyle: TextStyle(color: widget.hintColor ?? Colors.grey),
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               errorBorder: InputBorder.none,
@@ -91,6 +100,9 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
         maxLines: widget.maxLines,
         showCursor: widget.showCursor,
         cursorColor: widget.cursorColor,
+        onChanged: (value) => widget.onChange,
+        onEditingComplete: () => widget.onEditingComplete,
+        onFieldSubmitted: (value) => widget.onFieldSubmitted,
       ),
     );
   }
