@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+enum Pattern { primary, secondary, outline, text, login }
+
 class BoarderTextField extends StatefulWidget {
   BoarderTextField(
     this.text, {
@@ -27,6 +29,9 @@ class BoarderTextField extends StatefulWidget {
     this.onChange,
     this.onEditingComplete,
     this.onFieldSubmitted,
+    this.enabled = true,
+    this.selectionColor,
+    this.selectionHandleColor,
   });
 
   final String text;
@@ -49,6 +54,9 @@ class BoarderTextField extends StatefulWidget {
   String? hintText;
   Color? hintColor;
   bool textFieldFocused = false;
+  bool enabled;
+  Color? selectionColor;
+  Color? selectionHandleColor;
   Function(String)? onChange;
   Function()? onEditingComplete;
   Function(String)? onFieldSubmitted;
@@ -77,32 +85,41 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
         borderRadius: BorderRadius.circular(widget.borderRadius ?? 15.0),
         color: widget.backgroundColor,
       ),
-      child: TextFormField(
-        focusNode: widget.focusNode,
-        controller: widget.controller,
-        undoController: widget.undoController,
-        obscureText: widget.obscureText,
-        obscuringCharacter: widget.obscuringCharacter,
-        decoration: widget.inputDecoration ??
-            InputDecoration(
-              hintText: widget.hintText,
-              hintStyle: TextStyle(color: widget.hintColor ?? Colors.grey),
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              border: InputBorder.none,
-            ),
-        enableInteractiveSelection: true,
-        magnifierConfiguration: TextMagnifierConfiguration(
-          shouldDisplayHandlesInMagnifier: false,
+      child: Theme(
+        data: ThemeData(
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: widget.cursorColor,
+            selectionColor: widget.selectionColor,
+            selectionHandleColor: widget.selectionHandleColor,
+          ),
         ),
-        style: widget.textStyle ?? TextStyle(color: Colors.black),
-        maxLines: widget.maxLines,
-        showCursor: widget.showCursor,
-        cursorColor: widget.cursorColor,
-        onChanged: (value) => widget.onChange,
-        onEditingComplete: () => widget.onEditingComplete,
-        onFieldSubmitted: (value) => widget.onFieldSubmitted,
+        child: TextFormField(
+          focusNode: widget.focusNode,
+          controller: widget.controller,
+          undoController: widget.undoController,
+          obscureText: widget.obscureText,
+          obscuringCharacter: widget.obscuringCharacter,
+          enabled: widget.enabled,
+          decoration: widget.inputDecoration ??
+              InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: TextStyle(color: widget.hintColor ?? Colors.grey),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                border: InputBorder.none,
+              ),
+          enableInteractiveSelection: true,
+          magnifierConfiguration: TextMagnifierConfiguration(
+            shouldDisplayHandlesInMagnifier: false,
+          ),
+          style: widget.textStyle ?? TextStyle(color: Colors.black),
+          maxLines: widget.maxLines,
+          showCursor: widget.showCursor,
+          onChanged: (value) => widget.onChange,
+          onEditingComplete: () => widget.onEditingComplete,
+          onFieldSubmitted: (value) => widget.onFieldSubmitted,
+        ),
       ),
     );
   }

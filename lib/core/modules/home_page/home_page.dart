@@ -1,11 +1,13 @@
-import 'package:boarder/app_settings/setting_classes/login_page/login_page_controller.dart';
 import 'package:boarder/core/themes/theme_controller.dart';
+import 'package:boarder/core/widgets/ui/shared/boarder_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:provider/provider.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:boarder/main.dart';
+
+import '../user/user_controller.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -16,12 +18,23 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final themeController = ThemeController();
+  final userController = UserController();
+
+  bool loading = false;
+
+  @override
+  void initState() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        navigatorKey.currentState?.pushNamed('/');
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    var configState = context.watch<ConfigState>();
-
-    return configState.loadingDB
+    return loading
         ? Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
             body: Center(
@@ -33,16 +46,14 @@ class HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
-                        color: themeController.getCurrentTheme().onBackground,
+                        color: themeController.getCurrentTheme().colorScheme.onBackground,
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       Text(
                         'Loading home',
-                        style: TextStyle(
-                            color:
-                                themeController.getCurrentTheme().onBackground),
+                        style: TextStyle(color: themeController.getCurrentTheme().colorScheme.onBackground),
                       ),
                     ],
                   ),
@@ -52,10 +63,7 @@ class HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           'Taking too long?',
-                          style: TextStyle(
-                              color: themeController
-                                  .getCurrentTheme()
-                                  .onBackground),
+                          style: TextStyle(color: themeController.getCurrentTheme().colorScheme.onBackground),
                         ),
                         SizedBox(
                           height: 10,
@@ -68,19 +76,13 @@ class HomePageState extends State<HomePage> {
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
                                 width: 2.0,
-                                color: themeController
-                                    .getCurrentTheme()
-                                    .onBackground,
+                                color: themeController.getCurrentTheme().colorScheme.onBackground,
                               ),
-                              backgroundColor:
-                                  themeController.getCurrentTheme().surface,
+                              backgroundColor: themeController.getCurrentTheme().colorScheme.surface,
                             ),
                             child: Text(
                               'Log out',
-                              style: TextStyle(
-                                  color: themeController
-                                      .getCurrentTheme()
-                                      .onBackground),
+                              style: TextStyle(color: themeController.getCurrentTheme().colorScheme.onBackground),
                             )),
                       ],
                     ),
@@ -90,7 +92,8 @@ class HomePageState extends State<HomePage> {
             ),
           )
         : Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            drawer: BoarderDrawer(),
+            backgroundColor: themeController.getCurrentTheme().colorScheme.background,
             body: SafeArea(
                 child: Stack(children: [
               Row(
@@ -108,7 +111,7 @@ class HomePageState extends State<HomePage> {
                             size: 24,
                           ),
                           Text(
-                            ' Home Page',
+                            ' Home',
                             style: TextStyle(fontSize: 24),
                             softWrap: true,
                             textAlign: TextAlign.center,
@@ -135,30 +138,18 @@ class HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                           child: Center(
                             child: Text.rich(
                               TextSpan(
                                 text: 'Welcome to Boarder, ',
                                 children: [
-                                  if (FirebaseAuth
-                                          .instance.currentUser?.displayName !=
-                                      null)
+                                  if (FirebaseAuth.instance.currentUser?.displayName != null)
                                     TextSpan(
-                                        text:
-                                            '${FirebaseAuth.instance.currentUser?.displayName}',
-                                        style: TextStyle(
-                                            color: globalAppTheme
-                                                .mainColorOption())),
-                                  if (FirebaseAuth
-                                          .instance.currentUser?.displayName ==
-                                      null)
-                                    TextSpan(
-                                        text: 'Guest',
-                                        style: TextStyle(
-                                            color: globalAppTheme
-                                                .mainColorOption())),
+                                        text: '${FirebaseAuth.instance.currentUser?.displayName}',
+                                        style: TextStyle(color: themeController.getCurrentTheme().colorScheme.primary)),
+                                  if (FirebaseAuth.instance.currentUser?.displayName == null)
+                                    TextSpan(text: 'Guest', style: TextStyle(color: globalAppTheme.mainColorOption())),
                                   TextSpan(text: '!'),
                                 ],
                               ),
@@ -174,8 +165,7 @@ class HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                           child: Text(
                             'We are very happy to have you here!',
                             textAlign: TextAlign.center,
@@ -190,8 +180,7 @@ class HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                           child: Text(
                             'The app is currently under development, so we appreciate the patience.',
                             maxLines: 8,

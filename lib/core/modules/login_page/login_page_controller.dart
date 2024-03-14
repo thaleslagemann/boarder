@@ -2,13 +2,24 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobx/mobx.dart';
 
-class LoginPageController {
+part 'login_page_controller.g.dart';
+
+class LoginPageController = LoginPageControllerBase with _$LoginPageController;
+
+abstract class LoginPageControllerBase with Store {
+  LoginPageControllerBase({
+    this.user,
+  });
+
   @observable
   User? user;
 
   @observable
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  bool loading = false;
+
+  @observable
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @action
   bool isUserLoggedIn() {

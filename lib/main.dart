@@ -1,7 +1,10 @@
-import 'package:boarder/app_settings/setting_classes/login_page/login_page.dart';
-import 'package:boarder/app_settings/setting_classes/register_page/register_page.dart';
+import 'package:boarder/app_settings/settings_page.dart';
+import 'package:boarder/core/modules/board/boards_page.dart';
+import 'package:boarder/core/modules/login_page/login_page.dart';
+import 'package:boarder/core/modules/register_page/register_page.dart';
 import 'package:boarder/core/themes/theme_controller.dart';
-import 'package:boarder/home_page.dart';
+import 'package:boarder/core/modules/home_page/home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:boarder/app_settings/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +12,9 @@ import 'package:boarder/app_settings/auth_gate.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'core/modules/profile/profile_page.dart';
+import 'core/modules/team/teams_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final themeController = ThemeController();
@@ -35,6 +41,8 @@ class AppState extends State<MyApp> {
   final String _kThemePrefs = "Theme Preferences";
   final String _kMainColorPrefs = "Main Color Preferences";
 
+  bool userLoggedIn = false;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +61,14 @@ class AppState extends State<MyApp> {
         themeController.setThemeMode(_initialTheme!);
       } else {
         themeController.setThemeMode(_initialTheme!);
+      }
+      User? _user = FirebaseAuth.instance.currentUser;
+      if (_user == null) {
+        print('User is currently signed out!');
+        userLoggedIn = false;
+      } else {
+        print('User is signed in!');
+        userLoggedIn = true;
       }
       setState(() {});
     });
@@ -75,10 +91,9 @@ class AppState extends State<MyApp> {
         initialRoute: '/',
         navigatorKey: navigatorKey,
         title: 'Boarder',
-        theme: globalAppTheme.lightTheme,
-        darkTheme: globalAppTheme.darkTheme,
-        themeMode: globalAppTheme.currentTheme(),
-        home: const LoginPage(),
+        theme: themeController.getCurrentTheme(),
+        themeMode: themeController.getThemeMode(),
+        home: userLoggedIn ? HomePage() : LoginPage(),
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case '/':
@@ -87,8 +102,16 @@ class AppState extends State<MyApp> {
               return MaterialPageRoute(builder: (_) => LoginPage());
             case '/register':
               return MaterialPageRoute(builder: (_) => RegisterPage());
+            case '/boards':
+              return MaterialPageRoute(builder: (_) => BoardsPage());
             case '/home':
               return MaterialPageRoute(builder: (_) => HomePage());
+            case '/profile':
+              return MaterialPageRoute(builder: (_) => ProfilePage());
+            case '/teams':
+              return MaterialPageRoute(builder: (_) => TeamsPage());
+            case '/settings':
+              return MaterialPageRoute(builder: (_) => SettingsPage());
             default:
               return MaterialPageRoute(builder: (_) => HomePage());
           }

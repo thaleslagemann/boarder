@@ -1,9 +1,9 @@
 import 'package:boarder/app_settings/config.dart';
+import 'package:boarder/core/modules/home_page/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/app_body.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -30,7 +30,8 @@ class AuthGate extends StatelessWidget {
                     children: [
                       Text(
                         'Boarder',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40, color: globalAppTheme.mainColorOption()),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 40, color: globalAppTheme.mainColorOption()),
                         textAlign: TextAlign.center,
                       )
                     ],
@@ -59,7 +60,7 @@ class AuthGate extends StatelessWidget {
             },
           );
         }
-        return AppBody();
+        return HomePage();
       },
     );
   }

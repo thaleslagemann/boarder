@@ -1,6 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'package:boarder/app_settings/preferences.dart';
+import 'package:boarder/core/widgets/ui/shared/boarder_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -111,6 +112,7 @@ class SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     var configState = context.watch<ConfigState>();
     return Scaffold(
+      drawer: BoarderDrawer(),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Stack(children: [

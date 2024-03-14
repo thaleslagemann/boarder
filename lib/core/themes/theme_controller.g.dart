@@ -41,6 +41,22 @@ mixin _$ThemeController on ThemeControllerBase, Store {
     });
   }
 
+  late final _$themeBrightnessAtom =
+      Atom(name: 'ThemeControllerBase.themeBrightness', context: context);
+
+  @override
+  Brightness get themeBrightness {
+    _$themeBrightnessAtom.reportRead();
+    return super.themeBrightness;
+  }
+
+  @override
+  set themeBrightness(Brightness value) {
+    _$themeBrightnessAtom.reportWrite(value, super.themeBrightness, () {
+      super.themeBrightness = value;
+    });
+  }
+
   late final _$ThemeControllerBaseActionController =
       ActionController(name: 'ThemeControllerBase', context: context);
 
@@ -67,10 +83,33 @@ mixin _$ThemeController on ThemeControllerBase, Store {
   }
 
   @override
+  ThemeData getCurrentTheme() {
+    final _$actionInfo = _$ThemeControllerBaseActionController.startAction(
+        name: 'ThemeControllerBase.getCurrentTheme');
+    try {
+      return super.getCurrentTheme();
+    } finally {
+      _$ThemeControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  ThemeMode getThemeMode() {
+    final _$actionInfo = _$ThemeControllerBaseActionController.startAction(
+        name: 'ThemeControllerBase.getThemeMode');
+    try {
+      return super.getThemeMode();
+    } finally {
+      _$ThemeControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 themeMode: ${themeMode},
-themeColor: ${themeColor}
+themeColor: ${themeColor},
+themeBrightness: ${themeBrightness}
     ''';
   }
 }

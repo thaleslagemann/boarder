@@ -3,11 +3,13 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:boarder/board/board_screen.dart';
+import 'package:boarder/core/modules/board/board_screen.dart';
 import 'package:boarder/app_settings/db_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/app_settings/config.dart';
+
+import '../../widgets/ui/shared/boarder_drawer.dart';
 
 class BoardsPage extends StatefulWidget {
   BoardsPage({super.key});
@@ -440,7 +442,8 @@ class BoardsPageState extends State<BoardsPage> {
                       children: [
                         Text('Try adding a new board by pressing the ['),
                         Icon(Icons.add_circle_outline_sharp, size: 14, color: globalAppTheme.mainColorOption()),
-                        Text.rich(TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: ' add button',
                             style: TextStyle(color: globalAppTheme.mainColorOption()),
                             children: [
@@ -448,7 +451,9 @@ class BoardsPageState extends State<BoardsPage> {
                                 text: '].',
                                 style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                               )
-                            ])),
+                            ],
+                          ),
+                        ),
                       ],
                     )
                   ],
@@ -472,6 +477,7 @@ class BoardsPageState extends State<BoardsPage> {
     }
 
     return Scaffold(
+      drawer: BoarderDrawer(),
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
