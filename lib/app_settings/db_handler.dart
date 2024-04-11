@@ -5,26 +5,31 @@ import 'package:sqflite/sqflite.dart';
 
 class Board {
   int boardId;
+  String userUid;
   String name;
   String description;
   DateTime creationDate;
   DateTime lastUpdate;
-  List<Header> headers;
+  bool bookmark = false;
+  List<Header> headers = [];
 
   Board({
     required this.boardId,
+    required this.userUid,
     required this.name,
     required this.description,
+    this.bookmark = false,
     required this.creationDate,
     required this.lastUpdate,
-    this.headers = const [],
   });
 
   Map<String, dynamic> toMap() {
     return {
       'board_id': boardId,
+      'user_uid': userUid,
       'name': name,
       'description': description,
+      'bookmark': convertBookmark(bookmark),
       'creation_date': creationDate.toIso8601String(),
       'last_update': lastUpdate.toIso8601String(),
     };
@@ -33,35 +38,38 @@ class Board {
   factory Board.fromMap(Map<String, dynamic> map) {
     return Board(
       boardId: map['board_id'],
+      userUid: map['user_uid'],
       name: map['name'],
       description: map['description'],
+      bookmark: convertBookmark(map['bookmark']),
       creationDate: DateTime.parse(map['creation_date']),
       lastUpdate: DateTime.parse(map['last_update']),
     );
   }
 }
 
-class Bookmark {
-  int bookmarkId;
-  int boardId;
-
-  Bookmark({
-    required this.bookmarkId,
-    required this.boardId,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'bookmark_id': bookmarkId,
-      'board_id': boardId,
-    };
+convertBookmark(var bookmark) {
+  if (bookmark is int) {
+    switch (bookmark) {
+      case 0:
+        return true;
+      case 1:
+        return false;
+      default:
+        print('defaulted to false');
+        return false;
+    }
   }
-
-  factory Bookmark.fromMap(Map<String, dynamic> map) {
-    return Bookmark(
-      bookmarkId: map['bookmark_id'],
-      boardId: map['board_id'],
-    );
+  if (bookmark is bool) {
+    switch (bookmark) {
+      case true:
+        return 0;
+      case false:
+        return 1;
+      default:
+        print('defaulted to false');
+        return 0;
+    }
   }
 }
 
@@ -70,14 +78,13 @@ class Header {
   int boardId;
   String name;
   int orderIndex;
-  List<Task> tasks;
+  List<Task> tasks = [];
 
   Header({
     required this.headerId,
     required this.boardId,
     required this.name,
     required this.orderIndex,
-    this.tasks = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -144,7 +151,6 @@ class DatabaseHelper {
   static Database? _database;
 
   List<Board> boards = [];
-  List<Bookmark> bookmarks = [];
   List<Header> headers = [];
   List<Task> tasks = [];
 
@@ -174,13 +180,12 @@ class DatabaseHelper {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('CREATE TABLE Boards('
         'board_id INTEGER PRIMARY KEY,'
+        'user_uid TEXT,'
         'name TEXT,'
         'description TEXT,'
+        'bookmark BOOLEAN NOT NULL CHECK (bookmark IN (0, 1)),'
         'creation_date DATETIME,'
         'last_update DATETIME);');
-    await db.execute('CREATE TABLE Bookmarks('
-        'bookmark_id INTEGER PRIMARY KEY,'
-        'board_id INTEGER);');
     await db.execute('CREATE TABLE Headers ('
         'header_id INTEGER PRIMARY KEY,'
         'board_id INTEGER,'
@@ -196,6 +201,16 @@ class DatabaseHelper {
         'order_index INTEGER,'
         'FOREIGN KEY (header_id) REFERENCES Headers(header_id),'
         'FOREIGN KEY (assigned_user_id) REFERENCES Users(user_id));');
+  }
+
+  void updateBoardBookmark(int boardId, bool bookmark) async {
+    final Database db = await DatabaseHelper.instance.database;
+    await db.update(
+      'Boards',
+      {'bookmark': convertBookmark(bookmark)},
+      where: 'board_id = ?',
+      whereArgs: [boardId],
+    );
   }
 
   void addBoard(Board board) {
@@ -238,19 +253,6 @@ class DatabaseHelper {
 
     final Database db = await DatabaseHelper.instance.database;
     // Search and delete the bookmark if it exists
-    int bookmarkIndex = findBookmarkIndex(board.boardId);
-    print(bookmarkIndex);
-    if (bookmarkIndex != -1) {
-      Bookmark bookmark = bookmarks[bookmarkIndex];
-      bookmarks.remove(bookmark);
-      print("Bookmarks:");
-      for (var bookmark in bookmarks) {
-        print("[${bookmark.boardId}]");
-      }
-
-      print('removed bookmark $bookmarkIndex');
-    }
-
     List<Header> headerRemovalList = [];
     List<Task> taskRemovalList = [];
 
@@ -275,57 +277,8 @@ class DatabaseHelper {
       await db.delete('Headers', where: 'header_id = ?', whereArgs: [headerRemovalList[i].headerId]);
     }
 
-    if (bookmarkIndex != -1) {
-      await db.query('Bookmarks', where: 'bookmark_id = ?', whereArgs: [board.boardId]);
-    }
     print('removed board ${board.boardId} from list');
     await db.delete('Boards', where: 'board_id = ?', whereArgs: [board.boardId]);
-  }
-
-  void addBookmark(Bookmark bookmark) {
-    bookmarks.add(bookmark);
-  }
-
-  // Create a bookmark
-  void createBookmark(Bookmark bookmark) async {
-    final db = await database;
-    await db.insert('Bookmarks', bookmark.toMap());
-    print('Added bookmark ${bookmark.bookmarkId}');
-    for (var bookmark in bookmarks) {
-      print('[${bookmark.boardId}]');
-    }
-  }
-
-  // Delete a bookmark
-  Future<void> deleteBookmark(int bookmarkId) async {
-    bookmarks.removeAt(findBookmarkIndex(bookmarkId));
-    final db = await database;
-    int rows = await db.delete('Bookmarks', where: 'bookmark_id = ?', whereArgs: [bookmarkId]);
-    print('Deleted bookmark $bookmarkId, rows affected: $rows');
-    for (var bookmark in bookmarks) {
-      print('[${bookmark.boardId}]');
-    }
-  }
-
-  // Get all bookmarked boards
-  Future<List<Bookmark>> getAllBookmarks() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('Bookmarks');
-    return List.generate(maps.length, (i) {
-      return Bookmark(
-        bookmarkId: maps[i]['bookmark_id'],
-        boardId: maps[i]['board_id'],
-      );
-    });
-  }
-
-  int findBookmarkIndex(bookmarkId) {
-    for (var i = 0; i < bookmarks.length; i++) {
-      if (bookmarks[i].bookmarkId == bookmarkId) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   int findBoardIndexByID(int id) {
@@ -405,7 +358,8 @@ class DatabaseHelper {
     Header presetHeader2 = Header(headerId: headersLength + 1, boardId: board.boardId, name: 'To do', orderIndex: 1);
     presetHeaders.add(presetHeader2);
 
-    Header presetHeader3 = Header(headerId: headersLength + 2, boardId: board.boardId, name: 'In progress', orderIndex: 2);
+    Header presetHeader3 =
+        Header(headerId: headersLength + 2, boardId: board.boardId, name: 'In progress', orderIndex: 2);
     presetHeaders.add(presetHeader3);
 
     Header presetHeader4 = Header(headerId: headersLength + 3, boardId: board.boardId, name: 'Testing', orderIndex: 3);
@@ -490,6 +444,7 @@ class DatabaseHelper {
       task.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('Task created ${task.name}');
   }
 
   Future<void> updateOrderInDatabase() async {
@@ -517,7 +472,8 @@ class DatabaseHelper {
   }
 
   // Update the order_index of tasks in the database for a specific header
-  Future<void> updateTaskOrderInDatabase(Task task, Header oldHeader, Header newHeader, int oldTaskIndex, int newTaskIndex) async {
+  Future<void> updateTaskOrderInDatabase(
+      Task task, Header oldHeader, Header newHeader, int oldTaskIndex, int newTaskIndex) async {
     final Database db = await DatabaseHelper.instance.database;
 
     var updatedTask = task;
@@ -716,14 +672,15 @@ class DatabaseHelper {
   }
 
   // Delete a task
-  void deleteTask(Task task) async {
-    tasks.remove(task);
-    headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
+  Future<void> deleteTask(Task task) async {
     final Database db = await DatabaseHelper.instance.database;
     await db.delete('Tasks', where: 'task_id = ?', whereArgs: [task.taskId]);
+    tasks.removeAt(tasks.indexWhere((element) => element.taskId == task.taskId));
+    headers[findHeaderIndexByID(task.headerId)].tasks.remove(task);
   }
 
-  void insertReorderTask(Task oldTask, int oldTaskIndex, int newTaskIndex, int boardIndex, int oldHeaderIndex, int newHeaderIndex) {
+  void insertReorderTask(
+      Task oldTask, int oldTaskIndex, int newTaskIndex, int boardIndex, int oldHeaderIndex, int newHeaderIndex) {
     // copy oldHeaderIndex.oldTaskIndex into a buffer
     Task oldTaskBuffer = oldTask;
     // delete oldHeaderIndex.oldTaskIndex from old position

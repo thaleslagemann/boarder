@@ -1,13 +1,12 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_unnecessary_containers, unnecessary_string_interpolations
+// ignore_for_file: no_leading_underscores_for_local_identifiers, avoid_unnecessary_containers
 
 library config.globals;
 
-// ignore_for_file: unused_field
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:boarder/app_settings/config.dart';
+import 'package:boarder/app_settings/db_handler.dart';
 import 'package:get/get.dart';
-import 'package:boarder/config.dart';
-import 'package:boarder/db_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -27,7 +26,6 @@ class BoardScreenState extends State<BoardScreen> {
   final TextEditingController _headerFieldController = TextEditingController();
   final TextEditingController _taskNameFieldController = TextEditingController();
   final TextEditingController _taskDescFieldController = TextEditingController();
-  final TextEditingController _taskRenameFieldController = TextEditingController();
   final TextEditingController _headerRenameFieldController = TextEditingController();
   final TextEditingController _boardNameEditFieldController = TextEditingController();
   final TextEditingController _boardDescEditFieldController = TextEditingController();
@@ -36,24 +34,23 @@ class BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var configState = context.watch<ConfigState>();
     String boardNewName = '';
     String boardNewDesc = '';
     String renameHeaderNewName = '';
-    String renameTaskNewName = '';
 
+    BoxDecoration currentTaskShape = taskShape.getCurrentTaskShape(context);
     int currentReorderOption = reorderType.currentReorderInt();
     bool _isEditing = false;
     bool _isEditingTitle = false;
     FocusNode myFocusNode = FocusNode();
-
-    var configState = context.watch<ConfigState>();
 
     _displayBoardDeletionAlert(BuildContext context, boardID) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            backgroundColor: globalAppTheme.mainColorContainerOption(),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
@@ -63,13 +60,14 @@ class BoardScreenState extends State<BoardScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                 child: Text('cancel'),
               ),
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  configState.databaseHelper.deleteBoard(configState.databaseHelper.boards[configState.findBoardIndexByID(boardID)]);
+                  configState.databaseHelper
+                      .deleteBoard(configState.databaseHelper.boards[configState.findBoardIndexByID(boardID)]);
                   if (!configState.containsBoard(configState.databaseHelper.boards, boardID)) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -93,29 +91,41 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     Future<void> _displayHeaderRenameDialog(BuildContext context, int headerID) async {
-      _headerRenameFieldController.text = configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].name;
+      _headerRenameFieldController.text =
+          configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].name;
       return showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Rename header'),
-              content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    renameHeaderNewName = value;
-                  });
-                },
-                autofocus: true,
-                controller: _headerRenameFieldController,
-                decoration: const InputDecoration(hintText: "New header name"),
+              content: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(color: globalAppTheme.mainColorOption()!),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      renameHeaderNewName = value;
+                    });
+                  },
+                  autofocus: true,
+                  controller: _headerRenameFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Header name",
+                    hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                    border: InputBorder.none,
+                  ),
+                  cursorColor: globalAppTheme.mainColorOption(),
+                ),
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -124,7 +134,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
@@ -142,69 +152,19 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
-    Future<void> _displayTaskRenameDialog(BuildContext context, Task task) async {
-      _taskRenameFieldController.text = task.name;
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              title: const Text('Rename task'),
-              content: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    renameTaskNewName = value;
-                  });
-                },
-                autofocus: true,
-                controller: _taskRenameFieldController,
-                decoration: const InputDecoration(hintText: "New task name"),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
-                  child: const Text('cancel'),
-                  onPressed: () {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
-                  },
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
-                  child: const Text('ok'),
-                  onPressed: () {
-                    setState(() {
-                      renameTaskNewName = _taskRenameFieldController.text;
-                      print(renameTaskNewName);
-                      configState.databaseHelper.updateTaskName(task.taskId, renameTaskNewName);
-                      Navigator.pop(context);
-                      renameTaskNewName = '';
-                      _taskRenameFieldController.clear();
-                    });
-                  },
-                ),
-              ],
-            );
-          });
-    }
-
     Future<void> _displayHeaderDeletionConfirmationDialog(BuildContext context, Header header) async {
       return showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete header?'),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -232,19 +192,30 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new header'),
-              content: TextField(
-                autofocus: true,
-                controller: _headerFieldController,
-                decoration: const InputDecoration(hintText: "Header name"),
+              content: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(color: globalAppTheme.mainColorOption()!),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: TextField(
+                  autofocus: true,
+                  controller: _headerFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Header name",
+                    hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                    border: InputBorder.none,
+                  ),
+                  cursorColor: globalAppTheme.mainColorOption(),
+                ),
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -253,15 +224,15 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     final newHeader = Header(
-                        headerId: configState.databaseHelper.headers.length,
-                        boardId: widget.board.boardId,
-                        name: _headerFieldController.text,
-                        orderIndex: widget.board.headers.length,
-                        tasks: []);
+                      headerId: configState.getSequentialHeaderID(0),
+                      boardId: widget.board.boardId,
+                      name: _headerFieldController.text,
+                      orderIndex: widget.board.headers.length,
+                    );
                     setState(() {
                       configState.addHeader(newHeader);
                       configState.databaseHelper.insertHeader(newHeader);
@@ -275,19 +246,19 @@ class BoardScreenState extends State<BoardScreen> {
           });
     }
 
-    Future<void> _displayTaskDeletionConfirmationDialog(BuildContext context, Task task) async {
+    void _displayTaskDeletionConfirmationDialog(BuildContext context, Task task) async {
       return showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Delete task?'),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -299,10 +270,8 @@ class BoardScreenState extends State<BoardScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('delete'),
                   onPressed: () {
-                    setState(() {
-                      configState.databaseHelper.deleteTask(task);
-                      Navigator.pop(context);
-                    });
+                    setState(() => configState.deleteTask(task));
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -315,26 +284,49 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               title: const Text('Create a new task'),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(
-                  autofocus: true,
-                  controller: _taskNameFieldController,
-                  decoration: const InputDecoration(hintText: "Name"),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: globalAppTheme.mainColorOption()!),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: TextField(
+                    autofocus: true,
+                    controller: _taskNameFieldController,
+                    decoration: InputDecoration(
+                      hintText: "Task name",
+                      hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                      border: InputBorder.none,
+                    ),
+                    cursorColor: globalAppTheme.mainColorOption(),
+                  ),
                 ),
-                TextField(
-                  autofocus: true,
-                  controller: _taskDescFieldController,
-                  decoration: const InputDecoration(hintText: "Description"),
+                SizedBox(height: 10),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: globalAppTheme.mainColorOption()!),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: TextField(
+                    autofocus: true,
+                    controller: _taskDescFieldController,
+                    decoration: InputDecoration(
+                      hintText: "Task description",
+                      hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                      border: InputBorder.none,
+                    ),
+                    cursorColor: globalAppTheme.mainColorOption(),
+                  ),
                 ),
               ]),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -343,24 +335,25 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     var newTask = Task(
-                      taskId: configState.databaseHelper.tasks.length,
+                      taskId: configState.getSequentialTaskID(0),
                       headerId: headerID,
                       name: _taskNameFieldController.text,
                       description: _taskDescFieldController.text,
                       assignedUserId: 0,
-                      orderIndex: configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].tasks.length,
+                      orderIndex:
+                          configState.databaseHelper.headers[configState.findHeaderIndexByID(headerID)].tasks.length,
                     );
                     setState(() {
                       configState.addTask(newTask);
                       configState.databaseHelper.createTask(newTask);
                       _taskNameFieldController.clear();
                       _taskDescFieldController.clear();
-                      Navigator.pop(context);
                     });
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -375,39 +368,78 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
+              contentPadding: EdgeInsets.only(top: 5, bottom: 10, left: 15, right: 15),
               title: const Text('Edit board'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewName = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardNameEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board name"),
+                  Divider(thickness: 1, color: globalAppTheme.mainColorOption()),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewName = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardNameEditFieldController,
+                          decoration: InputDecoration(
+                            hintText: "Board name",
+                            hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                            border: InputBorder.none,
+                          ),
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        boardNewDesc = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: _boardDescEditFieldController,
-                    decoration: const InputDecoration(hintText: "Board description"),
+                  SizedBox(height: 5),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Description',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: globalAppTheme.mainColorOption()!),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              boardNewDesc = value;
+                            });
+                          },
+                          autofocus: true,
+                          controller: _boardDescEditFieldController,
+                          decoration: InputDecoration(
+                              hintText: "Board description",
+                              hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
+                              border: InputBorder.none),
+                          maxLines: 8,
+                          minLines: 1,
+                          cursorColor: globalAppTheme.mainColorOption(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('cancel'),
                   onPressed: () {
                     setState(() {
@@ -416,7 +448,7 @@ class BoardScreenState extends State<BoardScreen> {
                   },
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                   child: const Text('ok'),
                   onPressed: () {
                     setState(() {
@@ -425,7 +457,12 @@ class BoardScreenState extends State<BoardScreen> {
                       print(boardNewName);
                       print(boardNewDesc);
                       configState.databaseHelper.updateBoard(Board(
-                          boardId: board.boardId, name: boardNewName, description: boardNewDesc, creationDate: board.creationDate, lastUpdate: DateTime.now()));
+                          boardId: board.boardId,
+                          userUid: board.userUid,
+                          name: boardNewName,
+                          description: boardNewDesc,
+                          creationDate: board.creationDate,
+                          lastUpdate: DateTime.now()));
                       Navigator.pop(context);
                       boardNewName = '';
                       boardNewDesc = '';
@@ -445,7 +482,7 @@ class BoardScreenState extends State<BoardScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: globalAppTheme.mainColorContainerOption(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
@@ -459,61 +496,62 @@ class BoardScreenState extends State<BoardScreen> {
                       child: Divider(
                         height: 5,
                         thickness: 1.5,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: globalAppTheme.mainColorOption(),
                       ),
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text.rich(
-                          TextSpan(text: 'ID: ', children: [
-                            TextSpan(
-                                text: '${configState.databaseHelper.boards[index].boardId}', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ]),
-                        ),
+                        Text('ID:'),
+                        Text(
+                            configState.databaseHelper.boards[index].boardId
+                                .toString()
+                                .padLeft(10 - configState.databaseHelper.boards[index].boardId.toString().length, '0'),
+                            style: TextStyle(fontWeight: FontWeight.bold))
                       ],
                     ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(text: 'Name: ', children: [
-                            TextSpan(text: '${configState.databaseHelper.boards[index].name}', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ]),
-                        ),
-                      ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                      Text('Name:'),
+                      Text(configState.databaseHelper.boards[index].name, style: TextStyle(fontWeight: FontWeight.bold))
+                    ]),
+                    SizedBox(
+                      height: 5,
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Creation date:'),
+                        Text(DateFormat('dd/MM/yyyy').format(configState.databaseHelper.boards[index].creationDate),
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Last modified:'),
+                        Text(DateFormat('dd/MM/yyyy').format(configState.databaseHelper.boards[index].lastUpdate),
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Text('Description:')],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Flexible(
-                          child: Text.rich(
-                            TextSpan(text: 'Description: ', children: [
-                              TextSpan(
-                                  text: '${configState.databaseHelper.boards[index].description}',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                            ]),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(text: 'Creation date: ', children: [
-                            TextSpan(
-                                text: '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].creationDate)}',
-                                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ]),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(text: 'Last update: ', children: [
-                            TextSpan(
-                                text: '${DateFormat('dd-MM-yyyy kk:mm').format(configState.databaseHelper.boards[index].lastUpdate)}',
-                                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ]),
-                        ),
+                            child: Text(configState.databaseHelper.boards[index].description,
+                                style: TextStyle(fontWeight: FontWeight.bold))),
                       ],
                     ),
                   ],
@@ -554,7 +592,7 @@ class BoardScreenState extends State<BoardScreen> {
                   titlePadding: EdgeInsets.only(top: 5, left: 20, right: 5),
                   contentPadding: EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 0),
                   insetPadding: EdgeInsets.symmetric(horizontal: 10),
-                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                  backgroundColor: globalAppTheme.mainColorContainerOption(),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
@@ -652,7 +690,7 @@ class BoardScreenState extends State<BoardScreen> {
                           Divider(
                             height: 5,
                             thickness: 1.5,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: globalAppTheme.mainColorOption(),
                           ),
                           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                             Text('Description:'),
@@ -693,7 +731,8 @@ class BoardScreenState extends State<BoardScreen> {
                                             _toggleEdit();
                                             var _newDescription = _taskDescriptionEditController.text;
                                             task.description = _newDescription;
-                                            configState.databaseHelper.updateTaskDescription(task.taskId, _newDescription);
+                                            configState.databaseHelper
+                                                .updateTaskDescription(task.taskId, _newDescription);
                                           });
                                         }),
                                         icon: Icon(Icons.check)),
@@ -704,10 +743,11 @@ class BoardScreenState extends State<BoardScreen> {
                             padding: EdgeInsets.all(7),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: globalAppTheme.mainColorOption()!,
                                 width: 1,
                               ),
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                              borderRadius:
+                                  BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
                             ),
                             child: TextField(
                               textCapitalization: TextCapitalization.sentences,
@@ -722,14 +762,15 @@ class BoardScreenState extends State<BoardScreen> {
                               readOnly: !_isEditing,
                               textAlign: TextAlign.justify,
                               controller: _taskDescriptionEditController, //'${task.description.capitalizeFirst}',
-                              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text('Assigned Users: ', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
+                          Text('Assigned Users: ',
+                              style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
                           Text(
                             'unimplemented',
-                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                            style: TextStyle(color: globalAppTheme.mainColorOption()),
                           ),
                           SizedBox(height: 15.0),
                         ]),
@@ -762,17 +803,20 @@ class BoardScreenState extends State<BoardScreen> {
       setState(() {
         switch (currentReorderOption) {
           case 0:
-            configState.databaseHelper.insertReorderTask(oldTask, oldTaskIndex, newTaskIndex, boardIndex, oldHeaderIndex, newHeaderIndex);
+            configState.databaseHelper
+                .insertReorderTask(oldTask, oldTaskIndex, newTaskIndex, boardIndex, oldHeaderIndex, newHeaderIndex);
             configState.databaseHelper.sortHeadersAndTasks();
             configState.databaseHelper.redefineTasksHeaders();
             configState.printTasks();
             break;
           case 1:
             // orderIdBuffer saves the orderIndex of the task that's being moved
-            int orderIdBuffer = configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].orderIndex;
+            int orderIdBuffer =
+                configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].orderIndex;
 
             // headerIdBuffer saves the headerId of the task that's being moved
-            int headerIdBuffer = configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].headerId;
+            int headerIdBuffer =
+                configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].headerId;
 
             // Sets the orderIndex of the task that's being moved to the orderIndex of the taget
             configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].orderIndex =
@@ -781,9 +825,11 @@ class BoardScreenState extends State<BoardScreen> {
             configState.databaseHelper.boards[boardIndex].headers[oldHeaderIndex].tasks[oldTaskIndex].headerId =
                 configState.databaseHelper.boards[boardIndex].headers[newHeaderIndex].tasks[newTaskIndex].headerId;
             // Sets the target's orderIndex to the task that's being moved's orderIndex
-            configState.databaseHelper.boards[boardIndex].headers[newHeaderIndex].tasks[newTaskIndex].orderIndex = orderIdBuffer;
+            configState.databaseHelper.boards[boardIndex].headers[newHeaderIndex].tasks[newTaskIndex].orderIndex =
+                orderIdBuffer;
             // Sets the target's headerId to the task that's being moved's headerId
-            configState.databaseHelper.boards[boardIndex].headers[newHeaderIndex].tasks[newTaskIndex].headerId = headerIdBuffer;
+            configState.databaseHelper.boards[boardIndex].headers[newHeaderIndex].tasks[newTaskIndex].headerId =
+                headerIdBuffer;
 
             configState.databaseHelper.sortHeadersAndTasks();
             configState.databaseHelper.redefineTasksHeaders();
@@ -804,14 +850,18 @@ class BoardScreenState extends State<BoardScreen> {
             break;
           case 1:
             // orderIdBuffer saves the orderIndex of the task that's being moved
-            int orderIdBuffer = configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[oldHeaderIndex].orderIndex;
+            int orderIdBuffer = configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)]
+                .headers[oldHeaderIndex].orderIndex;
 
             // Sets the orderIndex of the task that's being moved to the orderIndex of the taget
-            configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[oldHeaderIndex].orderIndex =
-                configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[newHeaderIndex].orderIndex;
+            configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[oldHeaderIndex]
+                    .orderIndex =
+                configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[newHeaderIndex]
+                    .orderIndex;
 
             // Sets the target's orderIndex to the task that's being moved's orderIndex
-            configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[newHeaderIndex].orderIndex = orderIdBuffer;
+            configState.databaseHelper.boards[configState.findBoardIndexByID(board.boardId)].headers[newHeaderIndex]
+                .orderIndex = orderIdBuffer;
 
             configState.databaseHelper.sortHeadersAndTasks();
             configState.databaseHelper.redefineTasksHeaders();
@@ -824,7 +874,8 @@ class BoardScreenState extends State<BoardScreen> {
 
     void headerChoiceAction(String choice, Header header) {
       if (choice == Constants.delete) {
-        print('Removing header ${configState.databaseHelper.headers[configState.findHeaderIndexByID(header.headerId)].name}');
+        print(
+            'Removing header ${configState.databaseHelper.headers[configState.findHeaderIndexByID(header.headerId)].name}');
         _displayHeaderDeletionConfirmationDialog(context, header);
       } else if (choice == Constants.rename) {
         _displayHeaderRenameDialog(context, header.headerId);
@@ -837,8 +888,6 @@ class BoardScreenState extends State<BoardScreen> {
       if (choice == Constants.delete) {
         print('Removing task ${task.name}');
         _displayTaskDeletionConfirmationDialog(context, task);
-      } else if (choice == Constants.rename) {
-        _displayTaskRenameDialog(context, task);
       }
     }
 
@@ -864,13 +913,14 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(50.0)),
         ),
         foregroundColor: Theme.of(context).colorScheme.surface,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: globalAppTheme.mainColorOption(),
         onPressed: () {
           _displayHeaderInputDialog(context);
         },
@@ -893,7 +943,8 @@ class BoardScreenState extends State<BoardScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 13.0),
                         child: Text(
-                          configState.databaseHelper.boards[configState.findBoardIndexByID(widget.board.boardId)].name.capitalizeFirst!,
+                          configState.databaseHelper.boards[configState.findBoardIndexByID(widget.board.boardId)].name
+                              .capitalizeFirst!,
                           style: TextStyle(fontSize: 22),
                         ),
                       ),
@@ -929,7 +980,8 @@ class BoardScreenState extends State<BoardScreen> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                decoration: BoxDecoration(border: Border(top: BorderSide(width: 1.5, color: Theme.of(context).colorScheme.primary))),
+                decoration: BoxDecoration(
+                    border: Border(top: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!))),
                 child: Row(
                   children: [
                     SizedBox(
@@ -943,8 +995,9 @@ class BoardScreenState extends State<BoardScreen> {
                           children: [
                             for (var header in widget.board.headers)
                               DragAndDropList(
-                                contentsWhenEmpty:
-                                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Empty header', style: TextStyle(fontSize: 10))]),
+                                contentsWhenEmpty: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text('Empty header', style: TextStyle(fontSize: 10))]),
                                 header: Padding(
                                   padding: const EdgeInsets.only(right: 45.0),
                                   child: Row(
@@ -969,7 +1022,7 @@ class BoardScreenState extends State<BoardScreen> {
                                         flex: 1,
                                         child: Divider(
                                           thickness: 1.5,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: globalAppTheme.mainColorOption(),
                                         ),
                                       ),
                                       Padding(
@@ -982,7 +1035,7 @@ class BoardScreenState extends State<BoardScreen> {
                                         flex: 1,
                                         child: Divider(
                                           thickness: 1.5,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: globalAppTheme.mainColorOption(),
                                         ),
                                       ),
                                     ],
@@ -997,9 +1050,7 @@ class BoardScreenState extends State<BoardScreen> {
                                           Container(
                                             margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                                             alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                                border: Border.all(width: 1.5, color: Theme.of(context).colorScheme.primary)),
+                                            decoration: currentTaskShape,
                                             child: TextButton(
                                               onPressed: () {
                                                 setState(() {
@@ -1015,11 +1066,14 @@ class BoardScreenState extends State<BoardScreen> {
                                                     child: Padding(
                                                       padding: const EdgeInsets.all(10.0),
                                                       child: Text(
-                                                        "${configState.databaseHelper.tasks[configState.findTaskIndexByID(task.taskId)].name}",
+                                                        configState.databaseHelper
+                                                            .tasks[configState.findTaskIndexByID(task.taskId)].name,
                                                         softWrap: true,
                                                         maxLines: 3,
                                                         overflow: TextOverflow.ellipsis,
-                                                        style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.inverseSurface),
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Theme.of(context).colorScheme.inverseSurface),
                                                       ),
                                                     ),
                                                   ),
@@ -1027,17 +1081,14 @@ class BoardScreenState extends State<BoardScreen> {
                                                     shape: RoundedRectangleBorder(
                                                       borderRadius: BorderRadius.all(Radius.circular(5)),
                                                     ),
-                                                    icon: Icon(Icons.arrow_drop_down_sharp, color: Theme.of(context).colorScheme.primary),
+                                                    icon:
+                                                        Icon(Icons.more_vert, color: globalAppTheme.mainColorOption()),
                                                     itemBuilder: (BuildContext context) {
                                                       return Constants.taskChoices.map((String choice) {
                                                         return PopupMenuItem<String>(
                                                             value: choice,
                                                             child: Text(choice),
-                                                            onTap: () => {
-                                                                  setState(() {
-                                                                    taskChoiceAction(choice, task);
-                                                                  })
-                                                                });
+                                                            onTap: () => taskChoiceAction(choice, task));
                                                       }).toList();
                                                     },
                                                   ),
