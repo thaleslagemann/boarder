@@ -30,11 +30,9 @@ abstract class LoginPageControllerBase with Store {
     }
   }
 
-  Future<User?> _signInWithEmailAndPassword(
-      String email, String password) async {
+  Future<User?> _signInWithEmailAndPassword(String email, String password) async {
     try {
-      final UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -48,17 +46,14 @@ abstract class LoginPageControllerBase with Store {
 
   Future<User?> _signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
+        final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleSignInAuthentication.accessToken,
           idToken: googleSignInAuthentication.idToken,
         );
-        final UserCredential authResult =
-            await _auth.signInWithCredential(credential);
+        final UserCredential authResult = await _auth.signInWithCredential(credential);
         final User? authenticatedUser = authResult.user;
         return authenticatedUser;
       }
@@ -80,11 +75,12 @@ abstract class LoginPageControllerBase with Store {
   }
 
   Future<User?> callSignIn(String email, String password) async {
-    User? user = await _signInWithEmailAndPassword(email, password);
+    final trimmedEmail = email.trim();
+    User? user = await _signInWithEmailAndPassword(trimmedEmail, password);
     if (user != null) {
       return user;
     } else {
-      // Ocorreu um erro durante o login.
+      return null;
     }
   }
 

@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 import '../../../../main.dart';
 import '../../../modules/user/user_controller.dart';
@@ -40,7 +42,12 @@ Color _randomColorPicker() {
 
 class BoarderDrawerState extends State<BoarderDrawer> {
   final themeController = ThemeController();
-  final userController = UserController();
+  final userController = Modular.get<UserController>();
+
+  void callLogout() async {
+    await userController.logout();
+    Modular.to.navigate('/login');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,85 +55,103 @@ class BoarderDrawerState extends State<BoarderDrawer> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            padding: EdgeInsets.all(10.0),
-            margin: EdgeInsets.zero,
-            decoration: BoxDecoration(color: themeController.getCurrentTheme().colorScheme.primary),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          Stack(
+            children: [
+              DrawerHeader(
+                padding: EdgeInsets.all(10.0),
+                margin: EdgeInsets.zero,
+                decoration: BoxDecoration(color: themeController.getCurrentTheme().colorScheme.primary),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.white,
-                      child: userController.getCurrentUserPicture(),
-                    ),
-                    SizedBox(width: 10),
-                    Observer(
-                      builder: (_) => Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          userController.user?.displayName != null && userController.user?.displayName != ''
-                              ? AutoSizeText(
-                                  "${userController.user?.displayName}",
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                                )
-                              : Text(
-                                  "Guest",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                                ),
-                          userController.team?.displayName != null && userController.team?.displayName != ''
-                              ? AutoSizeText(
-                                  "${userController.team?.displayName}",
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface),
-                                )
-                              : Text(
-                                  "Teamless",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface),
-                                ),
-                        ],
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.white,
+                          child: userController.getCurrentUserPicture(),
+                        ),
+                        SizedBox(width: 10),
+                        Observer(
+                          builder: (_) => Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              userController.user?.name != null && userController.user?.name != ''
+                                  ? AutoSizeText(
+                                      "${userController.user?.name}",
+                                      maxLines: 1,
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                                    )
+                                  : Text(
+                                      "Guest",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                                    ),
+                              userController.team?.displayName != null && userController.team?.displayName != ''
+                                  ? AutoSizeText(
+                                      "${userController.team?.displayName}",
+                                      maxLines: 1,
+                                      style: TextStyle(fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface),
+                                    )
+                                  : Text(
+                                      "Teamless",
+                                      style: TextStyle(fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurface),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                right: 10,
+                top: 60,
+                child: IconButton(
+                  onPressed: () => setState(() {
+                    showAboutDialog(context: context);
+                  }),
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ],
           ),
           ListTile(
-            leading: Icon(Icons.home),
+            leading: Icon(Icons.home_outlined),
             title: Text('Home'),
-            onTap: () => {navigatorKey.currentState!.pushReplacementNamed('/home')},
+            onTap: () => {Modular.to.navigate('/home')},
           ),
           ListTile(
             leading: Icon(Icons.space_dashboard_outlined),
             title: Text('Boards'),
-            onTap: () => {navigatorKey.currentState!.pushReplacementNamed('/boards')},
+            onTap: () => {Modular.to.navigate('/boards')},
           ),
           ListTile(
-            leading: Icon(Icons.person),
+            leading: Icon(Icons.person_outline),
             title: Text('Profile'),
-            onTap: () => {navigatorKey.currentState!.pushReplacementNamed('/profile')},
+            onTap: () => {Modular.to.navigate('/profile')},
           ),
           ListTile(
-            leading: Icon(Icons.people),
+            leading: Icon(Icons.people_outline),
             title: Text('Teams'),
-            onTap: () => {navigatorKey.currentState!.pushReplacementNamed('/teams')},
+            onTap: () => {Modular.to.navigate('/teams')},
           ),
           ListTile(
-            leading: Icon(Icons.settings),
+            leading: Icon(Icons.settings_outlined),
             title: Text('Settings'),
-            onTap: () => {navigatorKey.currentState!.pushReplacementNamed('/settings')},
+            onTap: () => {Modular.to.navigate('/settings')},
           ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            onTap: () => callLogout(),
+          )
         ],
       ),
     );

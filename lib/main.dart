@@ -1,4 +1,6 @@
+import 'package:boarder/app_module.dart';
 import 'package:boarder/app_settings/settings_page.dart';
+import 'package:boarder/app_widget.dart';
 import 'package:boarder/core/modules/board/boards_page.dart';
 import 'package:boarder/core/modules/login_page/login_page.dart';
 import 'package:boarder/core/modules/register_page/register_page.dart';
@@ -9,6 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:boarder/app_settings/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/auth_gate.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/app_settings/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,38 +88,9 @@ class AppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ConfigState(),
-      child: MaterialApp(
-        initialRoute: '/',
-        navigatorKey: navigatorKey,
-        title: 'Boarder',
-        theme: themeController.getCurrentTheme(),
-        themeMode: themeController.getThemeMode(),
-        home: userLoggedIn ? HomePage() : LoginPage(),
-        onGenerateRoute: (settings) {
-          switch (settings.name) {
-            case '/':
-              return MaterialPageRoute(builder: (_) => LoginPage());
-            case '/login':
-              return MaterialPageRoute(builder: (_) => LoginPage());
-            case '/register':
-              return MaterialPageRoute(builder: (_) => RegisterPage());
-            case '/boards':
-              return MaterialPageRoute(builder: (_) => BoardsPage());
-            case '/home':
-              return MaterialPageRoute(builder: (_) => HomePage());
-            case '/profile':
-              return MaterialPageRoute(builder: (_) => ProfilePage());
-            case '/teams':
-              return MaterialPageRoute(builder: (_) => TeamsPage());
-            case '/settings':
-              return MaterialPageRoute(builder: (_) => SettingsPage());
-            default:
-              return MaterialPageRoute(builder: (_) => HomePage());
-          }
-        },
-      ),
+    return ModularApp(
+      module: AppModule(),
+      child: AppWidget(),
     );
   }
 }

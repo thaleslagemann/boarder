@@ -1,10 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:boarder/core/modules/user/user_controller.dart';
 import 'package:boarder/main.dart';
 import 'package:boarder/core/themes/theme_controller.dart';
 import 'package:boarder/core/widgets/ui/shared/boarder_text_field.dart';
 import 'package:boarder/core/modules/home_page/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:path/path.dart';
 import '../register_page/register_page.dart';
 import 'login_page_controller.dart';
@@ -18,7 +21,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final themeController = ThemeController();
-  User? _user;
+  final userController = Modular.get<UserController>();
 
   FocusNode emailFocusNode = FocusNode();
   FocusNode passwordFocusNode = FocusNode();
@@ -46,11 +49,12 @@ class _LoginPageState extends State<LoginPage> {
 
   loadUser() async {
     try {
-      _user = FirebaseAuth.instance.currentUser;
+      final user = FirebaseAuth.instance.currentUser;
+      userController.fetchUser(user);
     } catch (e) {
       print(e);
     }
-    if (_user != null) {
+    if (FirebaseAuth.instance.currentUser != null) {
       navigateHome();
     } else {
       loginController.loading = false;
@@ -58,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   navigateHome() {
-    navigatorKey.currentState?.pushReplacementNamed('/home');
+    Modular.to.navigate('/home');
   }
 
   callLogin(BuildContext context) async {
@@ -69,10 +73,11 @@ class _LoginPageState extends State<LoginPage> {
     await Future.delayed(
       const Duration(seconds: 4),
     );
-    _user = await loginController.callSignIn(
+    final user = await loginController.callSignIn(
       _emailController.text,
       _passwordController.text,
     );
+    userController.fetchUser(user);
     if (loginController.isUserLoggedIn()) {
       navigateHome();
     } else {
@@ -127,8 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                                     "assets/images/boar.png",
                                   ),
                                   fit: BoxFit.contain,
-                                  colorFilter: ColorFilter.mode(
-                                      themeController.getCurrentTheme().colorScheme.onBackground, BlendMode.srcATop),
+                                  colorFilter: ColorFilter.mode(themeController.getCurrentTheme().colorScheme.onBackground, BlendMode.srcATop),
                                 ),
                               )),
                         ),
@@ -156,8 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: BoxDecoration(
                               color: themeController.getCurrentTheme().colorScheme.surface,
                               border: Border.all(
-                                color:
-                                    loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
+                                color: loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.all(
@@ -170,9 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Icon(
                                     Icons.person_outline,
-                                    color: loginError
-                                        ? themeController.getCurrentTheme().colorScheme.error
-                                        : themeController.getCurrentTheme().colorScheme.onBackground,
+                                    color: loginError ? themeController.getCurrentTheme().colorScheme.error : themeController.getCurrentTheme().colorScheme.onBackground,
                                     size: 26,
                                   ),
                                 ),
@@ -223,9 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: BoxDecoration(
                                 color: themeController.getCurrentTheme().colorScheme.surface,
                                 border: Border.all(
-                                  color: loading
-                                      ? Colors.grey
-                                      : themeController.getCurrentTheme().colorScheme.onBackground,
+                                  color: loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.all(
@@ -238,9 +237,7 @@ class _LoginPageState extends State<LoginPage> {
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Icon(
                                       Icons.lock_outline,
-                                      color: loginError
-                                          ? themeController.getCurrentTheme().colorScheme.error
-                                          : themeController.getCurrentTheme().colorScheme.onBackground,
+                                      color: loginError ? themeController.getCurrentTheme().colorScheme.error : themeController.getCurrentTheme().colorScheme.onBackground,
                                       size: 26,
                                     ),
                                   ),
@@ -280,9 +277,7 @@ class _LoginPageState extends State<LoginPage> {
                                           padding: const EdgeInsets.only(right: 12.0),
                                           child: Icon(
                                             hidePass ? Icons.remove_red_eye_outlined : Icons.remove_red_eye,
-                                            color: loading
-                                                ? Colors.grey
-                                                : themeController.getCurrentTheme().colorScheme.onBackground,
+                                            color: loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
                                           ),
                                         )
                                       : IconButton(
@@ -290,15 +285,11 @@ class _LoginPageState extends State<LoginPage> {
                                           icon: hidePass
                                               ? Icon(
                                                   Icons.remove_red_eye_outlined,
-                                                  color: loading
-                                                      ? Colors.grey
-                                                      : themeController.getCurrentTheme().colorScheme.onBackground,
+                                                  color: loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
                                                 )
                                               : Icon(
                                                   Icons.remove_red_eye,
-                                                  color: loading
-                                                      ? Colors.grey
-                                                      : themeController.getCurrentTheme().colorScheme.onBackground,
+                                                  color: loading ? Colors.grey : themeController.getCurrentTheme().colorScheme.onBackground,
                                                 ),
                                         ),
                                 ],
@@ -384,7 +375,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      navigatorKey.currentState?.pushNamed('/register');
+                                      Modular.to.pushNamed('/register');
                                     },
                                   ),
                                 ),

@@ -9,6 +9,26 @@ part of 'theme_controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ThemeController on ThemeControllerBase, Store {
+  late final _$themeAtom =
+      Atom(name: 'ThemeControllerBase.theme', context: context);
+
+  @override
+  ThemeData get theme {
+    _$themeAtom.reportRead();
+    return super.theme;
+  }
+
+  bool _themeIsInitialized = false;
+
+  @override
+  set theme(ThemeData value) {
+    _$themeAtom.reportWrite(value, _themeIsInitialized ? super.theme : null,
+        () {
+      super.theme = value;
+      _themeIsInitialized = true;
+    });
+  }
+
   late final _$themeModeAtom =
       Atom(name: 'ThemeControllerBase.themeMode', context: context);
 
@@ -107,6 +127,7 @@ mixin _$ThemeController on ThemeControllerBase, Store {
   @override
   String toString() {
     return '''
+theme: ${theme},
 themeMode: ${themeMode},
 themeColor: ${themeColor},
 themeBrightness: ${themeBrightness}

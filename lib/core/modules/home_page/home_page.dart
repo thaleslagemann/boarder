@@ -1,9 +1,11 @@
 import 'package:boarder/core/themes/theme_controller.dart';
+import 'package:boarder/core/widgets/ui/shared/boarder_appbar.dart';
 import 'package:boarder/core/widgets/ui/shared/boarder_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:boarder/app_settings/config.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/main.dart';
 
@@ -18,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final themeController = ThemeController();
-  final userController = UserController();
+  final userController = Modular.get<UserController>();
 
   bool loading = false;
 
@@ -93,36 +95,14 @@ class HomePageState extends State<HomePage> {
           )
         : Scaffold(
             drawer: BoarderDrawer(),
+            appBar: BoarderAppbar(
+              'Home',
+              titleColor: themeController.getCurrentTheme().colorScheme.onSurface,
+              backgroundColor: themeController.getCurrentTheme().colorScheme.primary,
+            ),
             backgroundColor: themeController.getCurrentTheme().colorScheme.background,
             body: SafeArea(
-                child: Stack(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.home_sharp,
-                            size: 24,
-                          ),
-                          Text(
-                            ' Home',
-                            style: TextStyle(fontSize: 24),
-                            softWrap: true,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -193,7 +173,7 @@ class HomePageState extends State<HomePage> {
                   )
                 ],
               ),
-            ])),
+            ),
           );
   }
 }

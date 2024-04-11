@@ -32,6 +32,8 @@ class BoarderTextField extends StatefulWidget {
     this.enabled = true,
     this.selectionColor,
     this.selectionHandleColor,
+    this.textAlign,
+    this.keyboardType,
   });
 
   final String text;
@@ -60,9 +62,10 @@ class BoarderTextField extends StatefulWidget {
   Function(String)? onChange;
   Function()? onEditingComplete;
   Function(String)? onFieldSubmitted;
+  TextAlign? textAlign;
+  TextInputType? keyboardType;
 
-  RegExp pattern = RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+  RegExp pattern = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
   final TextEditingController controller;
   UndoHistoryController? undoController;
 
@@ -90,7 +93,6 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: widget.cursorColor,
             selectionColor: widget.selectionColor,
-            selectionHandleColor: widget.selectionHandleColor,
           ),
         ),
         child: TextFormField(
@@ -100,6 +102,7 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
           obscureText: widget.obscureText,
           obscuringCharacter: widget.obscuringCharacter,
           enabled: widget.enabled,
+          textAlign: widget.textAlign ?? TextAlign.start,
           decoration: widget.inputDecoration ??
               InputDecoration(
                 hintText: widget.hintText,
@@ -109,6 +112,7 @@ class _BoarderTextFieldState extends State<BoarderTextField> {
                 errorBorder: InputBorder.none,
                 border: InputBorder.none,
               ),
+          keyboardType: widget.keyboardType,
           enableInteractiveSelection: true,
           magnifierConfiguration: TextMagnifierConfiguration(
             shouldDisplayHandlesInMagnifier: false,

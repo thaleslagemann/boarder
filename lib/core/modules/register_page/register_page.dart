@@ -3,6 +3,7 @@ import 'package:boarder/core/widgets/ui/shared/boarder_text_field.dart';
 import 'package:boarder/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -22,13 +23,12 @@ class _MyWidgetState extends State<RegisterPage> {
   bool hideRepeatPass = true;
 
   void pushHome() {
-    navigatorKey.currentState?.pushNamed('/home');
+    Modular.to.navigate('/home');
   }
 
   Future<void> registerUser() async {
     try {
-      await registerController.register(
-          _emailController.text, _passwordController.text);
+      await registerController.register(_emailController.text, _passwordController.text);
     } catch (e) {
       Exception(e);
     }
@@ -74,15 +74,9 @@ class _MyWidgetState extends State<RegisterPage> {
                         height: 50,
                         width: MediaQuery.of(context).size.width * 0.8,
                         decoration: BoxDecoration(
-                          color: themeController
-                              .getCurrentTheme()
-                              .colorScheme
-                              .surface,
+                          color: themeController.getCurrentTheme().colorScheme.surface,
                           border: Border.all(
-                            color: themeController
-                                .getCurrentTheme()
-                                .colorScheme
-                                .onBackground,
+                            color: themeController.getCurrentTheme().colorScheme.onBackground,
                             width: 2,
                           ),
                           borderRadius: BorderRadius.all(
@@ -95,10 +89,7 @@ class _MyWidgetState extends State<RegisterPage> {
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Icon(
                                 Icons.person_outline,
-                                color: themeController
-                                    .getCurrentTheme()
-                                    .colorScheme
-                                    .onBackground,
+                                color: themeController.getCurrentTheme().colorScheme.onBackground,
                                 size: 26,
                               ),
                             ),
@@ -110,22 +101,13 @@ class _MyWidgetState extends State<RegisterPage> {
                                 ),
                                 child: BoarderTextField(
                                   "Email",
-                                  color: themeController
-                                      .getCurrentTheme()
-                                      .colorScheme
-                                      .onBackground,
+                                  color: themeController.getCurrentTheme().colorScheme.onBackground,
                                   controller: _emailController,
                                   textStyle: TextStyle(
-                                    color: themeController
-                                        .getCurrentTheme()
-                                        .colorScheme
-                                        .onBackground,
+                                    color: themeController.getCurrentTheme().colorScheme.onBackground,
                                     fontSize: 16,
                                   ),
-                                  cursorColor: themeController
-                                      .getCurrentTheme()
-                                      .colorScheme
-                                      .onBackground,
+                                  cursorColor: themeController.getCurrentTheme().colorScheme.onBackground,
                                   hintText: "email",
                                 ),
                               ),
@@ -144,15 +126,9 @@ class _MyWidgetState extends State<RegisterPage> {
                             height: 50,
                             width: MediaQuery.of(context).size.width * 0.8,
                             decoration: BoxDecoration(
-                              color: themeController
-                                  .getCurrentTheme()
-                                  .colorScheme
-                                  .surface,
+                              color: themeController.getCurrentTheme().colorScheme.surface,
                               border: Border.all(
-                                color: themeController
-                                    .getCurrentTheme()
-                                    .colorScheme
-                                    .onBackground,
+                                color: themeController.getCurrentTheme().colorScheme.onBackground,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.all(
@@ -165,10 +141,7 @@ class _MyWidgetState extends State<RegisterPage> {
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Icon(
                                     Icons.lock_outline,
-                                    color: themeController
-                                        .getCurrentTheme()
-                                        .colorScheme
-                                        .onBackground,
+                                    color: themeController.getCurrentTheme().colorScheme.onBackground,
                                     size: 26,
                                   ),
                                 ),
@@ -181,22 +154,13 @@ class _MyWidgetState extends State<RegisterPage> {
                                     child: BoarderTextField(
                                       "Password",
                                       obscureText: hidePass,
-                                      color: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      color: themeController.getCurrentTheme().colorScheme.onBackground,
                                       controller: _passwordController,
                                       textStyle: TextStyle(
-                                        color: themeController
-                                            .getCurrentTheme()
-                                            .colorScheme
-                                            .onBackground,
+                                        color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         fontSize: 16,
                                       ),
-                                      cursorColor: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      cursorColor: themeController.getCurrentTheme().colorScheme.onBackground,
                                       hintText: "password",
                                       onEditingComplete: () {
                                         registerUser();
@@ -205,22 +169,15 @@ class _MyWidgetState extends State<RegisterPage> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () =>
-                                      setState(() => hidePass = !hidePass),
+                                  onPressed: () => setState(() => hidePass = !hidePass),
                                   icon: hidePass
                                       ? Icon(
                                           Icons.remove_red_eye_outlined,
-                                          color: themeController
-                                              .getCurrentTheme()
-                                              .colorScheme
-                                              .onBackground,
+                                          color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         )
                                       : Icon(
                                           Icons.remove_red_eye,
-                                          color: themeController
-                                              .getCurrentTheme()
-                                              .colorScheme
-                                              .onBackground,
+                                          color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         ),
                                 ),
                               ],
@@ -239,15 +196,9 @@ class _MyWidgetState extends State<RegisterPage> {
                             height: 50,
                             width: MediaQuery.of(context).size.width * 0.8,
                             decoration: BoxDecoration(
-                              color: themeController
-                                  .getCurrentTheme()
-                                  .colorScheme
-                                  .surface,
+                              color: themeController.getCurrentTheme().colorScheme.surface,
                               border: Border.all(
-                                color: themeController
-                                    .getCurrentTheme()
-                                    .colorScheme
-                                    .onBackground,
+                                color: themeController.getCurrentTheme().colorScheme.onBackground,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.all(
@@ -260,10 +211,7 @@ class _MyWidgetState extends State<RegisterPage> {
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Icon(
                                     Icons.lock_outline,
-                                    color: themeController
-                                        .getCurrentTheme()
-                                        .colorScheme
-                                        .onBackground,
+                                    color: themeController.getCurrentTheme().colorScheme.onBackground,
                                     size: 26,
                                   ),
                                 ),
@@ -276,22 +224,13 @@ class _MyWidgetState extends State<RegisterPage> {
                                     child: BoarderTextField(
                                       "Password",
                                       obscureText: hideRepeatPass,
-                                      color: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      color: themeController.getCurrentTheme().colorScheme.onBackground,
                                       controller: _repeatPasswordController,
                                       textStyle: TextStyle(
-                                        color: themeController
-                                            .getCurrentTheme()
-                                            .colorScheme
-                                            .onBackground,
+                                        color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         fontSize: 16,
                                       ),
-                                      cursorColor: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      cursorColor: themeController.getCurrentTheme().colorScheme.onBackground,
                                       hintText: "repeat password",
                                       onEditingComplete: () {
                                         setState(() {
@@ -302,22 +241,15 @@ class _MyWidgetState extends State<RegisterPage> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () => setState(
-                                      () => hideRepeatPass = !hideRepeatPass),
+                                  onPressed: () => setState(() => hideRepeatPass = !hideRepeatPass),
                                   icon: hideRepeatPass
                                       ? Icon(
                                           Icons.remove_red_eye_outlined,
-                                          color: themeController
-                                              .getCurrentTheme()
-                                              .colorScheme
-                                              .onBackground,
+                                          color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         )
                                       : Icon(
                                           Icons.remove_red_eye,
-                                          color: themeController
-                                              .getCurrentTheme()
-                                              .colorScheme
-                                              .onBackground,
+                                          color: themeController.getCurrentTheme().colorScheme.onBackground,
                                         ),
                                 ),
                               ],
@@ -333,10 +265,7 @@ class _MyWidgetState extends State<RegisterPage> {
                         child: loading
                             ? Center(
                                 child: CircularProgressIndicator(
-                                  color: themeController
-                                      .getCurrentTheme()
-                                      .colorScheme
-                                      .onBackground,
+                                  color: themeController.getCurrentTheme().colorScheme.onBackground,
                                 ),
                               )
                             : Center(
@@ -344,31 +273,19 @@ class _MyWidgetState extends State<RegisterPage> {
                                   label: Text(
                                     "Create Account",
                                     style: TextStyle(
-                                      color: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      color: themeController.getCurrentTheme().colorScheme.onBackground,
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
                                       width: 2.0,
-                                      color: themeController
-                                          .getCurrentTheme()
-                                          .colorScheme
-                                          .onBackground,
+                                      color: themeController.getCurrentTheme().colorScheme.onBackground,
                                     ),
-                                    backgroundColor: themeController
-                                        .getCurrentTheme()
-                                        .colorScheme
-                                        .surface,
+                                    backgroundColor: themeController.getCurrentTheme().colorScheme.surface,
                                   ),
                                   icon: Icon(
                                     Icons.person_add_alt,
-                                    color: themeController
-                                        .getCurrentTheme()
-                                        .colorScheme
-                                        .onBackground,
+                                    color: themeController.getCurrentTheme().colorScheme.onBackground,
                                   ),
                                   onPressed: () async {
                                     setState(() {
@@ -385,14 +302,10 @@ class _MyWidgetState extends State<RegisterPage> {
                       ),
                       Center(
                         child: TextButton(
-                          onPressed: () => {navigatorKey.currentState!.pop()},
+                          onPressed: () => {Modular.to.pop()},
                           child: Text(
                             'Back',
-                            style: TextStyle(
-                                color: themeController
-                                    .getCurrentTheme()
-                                    .colorScheme
-                                    .onBackground),
+                            style: TextStyle(color: themeController.getCurrentTheme().colorScheme.onBackground),
                           ),
                         ),
                       ),

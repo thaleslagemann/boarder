@@ -3,9 +3,9 @@ import 'package:uuid/uuid.dart';
 class TeamDTO {
   TeamDTO({
     required this.displayName,
-    required this.uuid,
+    required this.id,
   });
 
-  final String displayName;
-  final Uuid uuid;
+  final String? displayName;
+  final int? id;
 }

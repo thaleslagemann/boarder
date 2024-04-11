@@ -9,6 +9,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:boarder/app_settings/config.dart';
 
+import '../../themes/theme_controller.dart';
+import '../../widgets/ui/shared/boarder_appbar.dart';
 import '../../widgets/ui/shared/boarder_drawer.dart';
 
 class BoardsPage extends StatefulWidget {
@@ -19,6 +21,8 @@ class BoardsPage extends StatefulWidget {
 }
 
 class BoardsPageState extends State<BoardsPage> {
+  final themeController = ThemeController();
+
   final TextEditingController _boardNameInputController = TextEditingController();
   final TextEditingController _boardDescInputController = TextEditingController();
   final TextEditingController _boardNameEditFieldController = TextEditingController();
@@ -35,8 +39,8 @@ class BoardsPageState extends State<BoardsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var configState = context.watch<ConfigState>();
-    List<Board> boards = configState.databaseHelper.boards;
+    // var configState = context.watch<ConfigState>();
+    // List<Board> boards = configState.databaseHelper.boards;
 
     Future<void> _displayBoardDeletionConfirmationDialog(BuildContext context, Board board) async {
       return showDialog(
@@ -63,7 +67,7 @@ class BoardsPageState extends State<BoardsPage> {
                   child: const Text('delete'),
                   onPressed: () {
                     setState(() {
-                      configState.databaseHelper.deleteBoard(board);
+                      // configState.databaseHelper.deleteBoard(board);
                       Navigator.pop(context);
                     });
                   },
@@ -91,9 +95,7 @@ class BoardsPageState extends State<BoardsPage> {
                       Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: globalAppTheme.mainColorOption()!),
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -116,13 +118,10 @@ class BoardsPageState extends State<BoardsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Description',
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: globalAppTheme.mainColorOption()!),
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -131,10 +130,7 @@ class BoardsPageState extends State<BoardsPage> {
                           },
                           autofocus: true,
                           controller: _boardDescInputController,
-                          decoration: InputDecoration(
-                              hintText: "Board description",
-                              hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
-                              border: InputBorder.none),
+                          decoration: InputDecoration(hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
                           maxLines: 8,
                           minLines: 1,
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -199,7 +195,7 @@ class BoardsPageState extends State<BoardsPage> {
                     onPressed: () {
                       if (_boardNameInputController.text.isNotEmpty) {
                         var newBoard = Board(
-                          boardId: configState.databaseHelper.boards.length,
+                          boardId: 1, //configState.databaseHelper.boards.length,
                           userUid: FirebaseAuth.instance.currentUser!.uid,
                           name: _boardNameInputController.text,
                           description: _boardDescInputController.text,
@@ -209,13 +205,13 @@ class BoardsPageState extends State<BoardsPage> {
                         _boardNameInputController.clear();
                         _boardDescInputController.clear();
                         setState(() {
-                          configState.addBoard(newBoard);
-                          configState.databaseHelper.insertBoard(newBoard);
-                          if (selectedPreset == 'Kanban') {
-                            configState.addKanbanPresetHeadersToBoard(
-                                configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
-                          }
-                          boards = configState.databaseHelper.boards;
+                          // configState.addBoard(newBoard);
+                          // configState.databaseHelper.insertBoard(newBoard);
+                          // if (selectedPreset == 'Kanban') {
+                          //   configState.addKanbanPresetHeadersToBoard(
+                          //       configState.databaseHelper.boards[configState.findBoardIndexByID(newBoard.boardId)]);
+                          // }
+                          // boards = configState.databaseHelper.boards;
                           Navigator.pop(context);
                         });
                       } else {
@@ -252,9 +248,7 @@ class BoardsPageState extends State<BoardsPage> {
                       Text('Name', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: globalAppTheme.mainColorOption()!),
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -276,13 +270,10 @@ class BoardsPageState extends State<BoardsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Description',
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+                      Text('Description', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: globalAppTheme.mainColorOption()!),
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        decoration: BoxDecoration(border: Border.all(color: globalAppTheme.mainColorOption()!), borderRadius: BorderRadius.all(Radius.circular(5))),
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -291,10 +282,7 @@ class BoardsPageState extends State<BoardsPage> {
                           },
                           autofocus: true,
                           controller: _boardDescEditFieldController,
-                          decoration: InputDecoration(
-                              hintText: "Board description",
-                              hintStyle: TextStyle(color: globalAppTheme.mainColorOption()),
-                              border: InputBorder.none),
+                          decoration: InputDecoration(hintText: "Board description", hintStyle: TextStyle(color: globalAppTheme.mainColorOption()), border: InputBorder.none),
                           maxLines: 8,
                           minLines: 1,
                           cursorColor: globalAppTheme.mainColorOption(),
@@ -323,13 +311,13 @@ class BoardsPageState extends State<BoardsPage> {
                       boardNewDesc = _boardDescEditFieldController.text;
                       print(boardNewName);
                       print(boardNewDesc);
-                      configState.databaseHelper.updateBoard(Board(
-                          boardId: board.boardId,
-                          userUid: board.userUid,
-                          name: boardNewName,
-                          description: boardNewDesc,
-                          creationDate: board.creationDate,
-                          lastUpdate: DateTime.now()));
+                      // configState.databaseHelper.updateBoard(Board(
+                      //     boardId: board.boardId,
+                      //     userUid: board.userUid,
+                      //     name: boardNewName,
+                      //     description: boardNewDesc,
+                      //     creationDate: board.creationDate,
+                      //     lastUpdate: DateTime.now()));
                       Navigator.pop(context);
                       boardNewName = '';
                       boardNewDesc = '';
@@ -344,29 +332,29 @@ class BoardsPageState extends State<BoardsPage> {
     }
 
     toggleBookmark(int boardID) {
-      int boardIndex = configState.findBoardIndexByID(boardID);
-      if (configState.databaseHelper.boards[boardIndex].bookmark == true) {
-        print('Removing bookmark $boardID');
-        configState.databaseHelper.boards[boardIndex].bookmark = false;
-        configState.databaseHelper.updateBoardBookmark(boardID, false);
-      } else {
-        print('Adding bookmark $boardID');
-        configState.databaseHelper.boards[boardIndex].bookmark = true;
-        configState.databaseHelper.updateBoardBookmark(boardID, true);
-      }
+      // int boardIndex = configState.findBoardIndexByID(boardID);
+      // if (configState.databaseHelper.boards[boardIndex].bookmark == true) {
+      //   print('Removing bookmark $boardID');
+      //   configState.databaseHelper.boards[boardIndex].bookmark = false;
+      //   configState.databaseHelper.updateBoardBookmark(boardID, false);
+      // } else {
+      //   print('Adding bookmark $boardID');
+      //   configState.databaseHelper.boards[boardIndex].bookmark = true;
+      //   configState.databaseHelper.updateBoardBookmark(boardID, true);
+      // }
     }
 
-    IconData bookmarkIconSwitch(boardId) {
-      int boardIndex = configState.findBoardIndexByID(boardId);
-      switch (configState.databaseHelper.boards[boardIndex].bookmark) {
-        case true:
-          return Icons.bookmark_remove_rounded;
-        case false:
-          return Icons.bookmark_add_outlined;
-        default:
-          return Icons.bookmark_sharp;
-      }
-    }
+    // IconData bookmarkIconSwitch(boardId) {
+    //   int boardIndex = configState.findBoardIndexByID(boardId);
+    //   switch (configState.databaseHelper.boards[boardIndex].bookmark) {
+    //     case true:
+    //       return Icons.bookmark_remove_rounded;
+    //     case false:
+    //       return Icons.bookmark_add_outlined;
+    //     default:
+    //       return Icons.bookmark_sharp;
+    //   }
+    // }
 
     IconData choiceIcon(String choice, int boardID) {
       if (choice == 'Delete') {
@@ -374,7 +362,7 @@ class BoardsPageState extends State<BoardsPage> {
       } else if (choice == 'Edit') {
         return Icons.edit_outlined;
       } else if (choice == 'Bookmark') {
-        return bookmarkIconSwitch(boardID);
+        // return bookmarkIconSwitch(boardID);
       } else if (choice == 'Details') {
         return Icons.info_sharp;
       }
@@ -403,90 +391,103 @@ class BoardsPageState extends State<BoardsPage> {
       }
     }
 
-    if (configState.loadingDB) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LoadingAnimationWidget.threeArchedCircle(
-                color: globalAppTheme.mainColorOption()!,
-                size: 50,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Loading',
-                style: TextStyle(color: globalAppTheme.mainColorOption()),
-              )
-            ],
-          ),
-        ),
-      );
-    } else if (configState.databaseHelper.boards.isEmpty) {
-      return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Stack(
-          children: [
-            SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('You have no boards yet.'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Try adding a new board by pressing the ['),
-                        Icon(Icons.add_circle_outline_sharp, size: 14, color: globalAppTheme.mainColorOption()),
-                        Text.rich(
-                          TextSpan(
-                            text: ' add button',
-                            style: TextStyle(color: globalAppTheme.mainColorOption()),
-                            children: [
-                              TextSpan(
-                                text: '].',
-                                style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(50.0)),
-          ),
-          foregroundColor: Theme.of(context).colorScheme.surface,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          onPressed: () {
-            _displayBoardInputDialog(context);
-          },
-          child: Icon(Icons.add),
-        ),
-      );
-    }
+    // if (configState.loadingDB) {
+    //   return Scaffold(
+    //     backgroundColor: Theme.of(context).colorScheme.surface,
+    //     body: Center(
+    //       child: Column(
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           LoadingAnimationWidget.threeArchedCircle(
+    //             color: globalAppTheme.mainColorOption()!,
+    //             size: 50,
+    //           ),
+    //           SizedBox(
+    //             height: 10,
+    //           ),
+    //           Text(
+    //             'Loading',
+    //             style: TextStyle(color: globalAppTheme.mainColorOption()),
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //   );
+    // } else if (configState.databaseHelper.boards.isEmpty) {
+    //   return Scaffold(
+    //     resizeToAvoidBottomInset: false,
+    //     backgroundColor: Theme.of(context).colorScheme.surface,
+    //     body: Stack(
+    //       children: [
+    //         SafeArea(
+    //           child: Center(
+    //             child: Column(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 Text('You have no boards yet.'),
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Text('Try adding a new board by pressing the ['),
+    //                     Icon(Icons.add_circle_outline_sharp, size: 14, color: globalAppTheme.mainColorOption()),
+    //                     Text.rich(
+    //                       TextSpan(
+    //                         text: ' add button',
+    //                         style: TextStyle(color: globalAppTheme.mainColorOption()),
+    //                         children: [
+    //                           TextSpan(
+    //                             text: '].',
+    //                             style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+    //                           )
+    //                         ],
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 )
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //     floatingActionButton: FloatingActionButton(
+    //       shape: RoundedRectangleBorder(
+    //         borderRadius: BorderRadius.all(Radius.circular(50.0)),
+    //       ),
+    //       foregroundColor: Theme.of(context).colorScheme.surface,
+    //       backgroundColor: Theme.of(context).colorScheme.primary,
+    //       onPressed: () {
+    //         _displayBoardInputDialog(context);
+    //       },
+    //       child: Icon(Icons.add),
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
       drawer: BoarderDrawer(),
+      appBar: BoarderAppbar(
+        'Boards',
+        titleColor: themeController.getCurrentTheme().colorScheme.onSurface,
+        backgroundColor: themeController.getCurrentTheme().colorScheme.primary,
+        actions: [
+          IconButton(
+              onPressed: () {
+                _displayBoardInputDialog(context);
+              },
+              icon: Icon(Icons.add))
+        ],
+      ),
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Stack(children: [
-          ListView(
-            shrinkWrap: true,
-            children: [
-              SizedBox(height: 20),
-              if (configState.containsAnyBookmark())
+        child: Stack(
+          children: [
+            ListView(
+              shrinkWrap: true,
+              children: [
+                SizedBox(height: 20),
+                // if (configState.containsAnyBookmark())
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
                   child: Row(
@@ -499,116 +500,110 @@ class BoardsPageState extends State<BoardsPage> {
                     ],
                   ),
                 ),
-              for (var board in configState.databaseHelper.boards)
-                if (board.bookmark == true)
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: ListTile(
-                      tileColor: Theme.of(context).colorScheme.surface,
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
-                          borderRadius: BorderRadius.circular(10)),
-                      onTap: () => setState(() {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BoardScreen(
-                                    board: board,
-                                  )),
-                        );
-                      }),
-                      trailing: PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert_sharp),
-                        itemBuilder: (BuildContext context) {
-                          return Constants.boardListChoices.map((String choice) {
-                            return PopupMenuItem<String>(
-                                value: choice,
-                                child: Row(
-                                  children: [
-                                    Icon(choiceIcon(choice, board.boardId)),
-                                    Text(' $choice'),
-                                  ],
-                                ),
-                                onTap: () => setState(() {
-                                      boardChoiceAction(choice, board);
-                                    }));
-                          }).toList();
-                        },
-                      ),
-                      title: Text(board.name),
-                      selectedColor: Theme.of(context).colorScheme.surfaceVariant,
-                    ),
-                  ),
-              if (configState.containsAnyBookmark())
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.space_dashboard,
-                      size: 15.0,
-                    ),
-                    Text(' Boards'),
-                  ],
-                ),
-              ),
-              for (var board in boards)
-                if (!board.bookmark)
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: ListTile(
-                      tileColor: Theme.of(context).colorScheme.surface,
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
-                          borderRadius: BorderRadius.circular(10)),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BoardScreen(
-                                    board: board,
-                                  )),
-                        );
-                      },
-                      trailing: PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert_sharp),
-                        itemBuilder: (BuildContext context) {
-                          return Constants.boardListChoices.map((String choice) {
-                            return PopupMenuItem<String>(
-                                value: choice,
-                                child: Row(
-                                  children: [
-                                    Icon(choiceIcon(choice, board.boardId)),
-                                    Text(' $choice'),
-                                  ],
-                                ),
-                                onTap: () => setState(() {
-                                      boardChoiceAction(choice, board);
-                                    }));
-                          }).toList();
-                        },
-                      ),
-                      title: Text(board.name),
-                      selectedColor: Theme.of(context).colorScheme.surfaceVariant,
-                    ),
-                  ),
-            ],
-          ),
-        ]),
-      ),
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(50.0)),
+              ],
+            ),
+          ],
         ),
-        foregroundColor: Theme.of(context).colorScheme.surface,
-        backgroundColor: globalAppTheme.mainColorOption(),
-        onPressed: () {
-          _displayBoardInputDialog(context);
-        },
-        child: Icon(Icons.add),
+        //         for (var board in configState.databaseHelper.boards)
+        //           if (board.bookmark == true)
+        //             Padding(
+        //               padding: const EdgeInsets.all(5.0),
+        //               child: ListTile(
+        //                 tileColor: Theme.of(context).colorScheme.surface,
+        //                 shape: RoundedRectangleBorder(
+        //                     side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
+        //                     borderRadius: BorderRadius.circular(10)),
+        //                 onTap: () => setState(() {
+        //                   Navigator.push(
+        //                     context,
+        //                     MaterialPageRoute(
+        //                         builder: (context) => BoardScreen(
+        //                               board: board,
+        //                             )),
+        //                   );
+        //                 }),
+        //                 trailing: PopupMenuButton<String>(
+        //                   icon: Icon(Icons.more_vert_sharp),
+        //                   itemBuilder: (BuildContext context) {
+        //                     return Constants.boardListChoices.map((String choice) {
+        //                       return PopupMenuItem<String>(
+        //                           value: choice,
+        //                           child: Row(
+        //                             children: [
+        //                               Icon(choiceIcon(choice, board.boardId)),
+        //                               Text(' $choice'),
+        //                             ],
+        //                           ),
+        //                           onTap: () => setState(() {
+        //                                 boardChoiceAction(choice, board);
+        //                               }));
+        //                     }).toList();
+        //                   },
+        //                 ),
+        //                 title: Text(board.name),
+        //                 selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+        //               ),
+        //             ),
+        //         if (configState.containsAnyBookmark())
+        //           Padding(
+        //             padding: const EdgeInsets.only(bottom: 10.0),
+        //           ),
+        //         Padding(
+        //           padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+        //           child: Row(
+        //             children: [
+        //               Icon(
+        //                 Icons.space_dashboard,
+        //                 size: 15.0,
+        //               ),
+        //               Text(' Boards'),
+        //             ],
+        //           ),
+        //         ),
+        //         for (var board in boards)
+        //           if (!board.bookmark)
+        //             Padding(
+        //               padding: const EdgeInsets.all(5.0),
+        //               child: ListTile(
+        //                 tileColor: Theme.of(context).colorScheme.surface,
+        //                 shape: RoundedRectangleBorder(
+        //                     side: BorderSide(width: 1.5, color: globalAppTheme.mainColorOption()!),
+        //                     borderRadius: BorderRadius.circular(10)),
+        //                 onTap: () {
+        //                   Navigator.push(
+        //                     context,
+        //                     MaterialPageRoute(
+        //                         builder: (context) => BoardScreen(
+        //                               board: board,
+        //                             )),
+        //                   );
+        //                 },
+        //                 trailing: PopupMenuButton<String>(
+        //                   icon: Icon(Icons.more_vert_sharp),
+        //                   itemBuilder: (BuildContext context) {
+        //                     return Constants.boardListChoices.map((String choice) {
+        //                       return PopupMenuItem<String>(
+        //                           value: choice,
+        //                           child: Row(
+        //                             children: [
+        //                               Icon(choiceIcon(choice, board.boardId)),
+        //                               Text(' $choice'),
+        //                             ],
+        //                           ),
+        //                           onTap: () => setState(() {
+        //                                 boardChoiceAction(choice, board);
+        //                               }));
+        //                     }).toList();
+        //                   },
+        //                 ),
+        //                 title: Text(board.name),
+        //                 selectedColor: Theme.of(context).colorScheme.surfaceVariant,
+        //               ),
+        //             ),
+        //       ],
+        //     ),
+        //   ]),
+        // ),
       ),
     );
   }

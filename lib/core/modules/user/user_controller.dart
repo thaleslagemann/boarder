@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../models/user_model.dart';
 import '../team/teamDTO.dart';
 
 part 'user_controller.g.dart';
@@ -16,21 +17,29 @@ abstract class UserControllerBase with Store {
     this.user,
   });
 
-  List<TeamDTO> teams = [TeamDTO(displayName: 'Boarder', uuid: Uuid())];
+  List<TeamDTO> teams = [TeamDTO(displayName: 'Boarder', id: 1)];
 
   @observable
-  User? user;
+  UserModel? user;
 
   @observable
   bool isUserLoggedIn = false;
 
   @observable
-  TeamDTO? team = TeamDTO(displayName: 'Boarder', uuid: Uuid());
+  TeamDTO? team = TeamDTO(displayName: 'Boarder', id: 1);
 
   @action
-  User? fetchUser() {
+  UserModel? fetchUser(User? userAux) {
+    print(userAux.toString());
     try {
-      user = FirebaseAuth.instance.currentUser;
+      user = UserModel(
+        id: userAux?.uid ?? '',
+        name: userAux?.displayName ?? '',
+        email: userAux?.email ?? '',
+        phone: userAux?.phoneNumber,
+        photoUrl: userAux?.photoURL,
+        boards: [],
+      );
       isUserLoggedIn = true;
     } catch (e) {
       print(e);
@@ -50,7 +59,7 @@ abstract class UserControllerBase with Store {
 
   @action
   getCurrentUserPicture() {
-    if (isUserLoggedIn) {
+    if (isUserLoggedIn && user!.photoUrl != null) {
       return Observer(
         builder: (_) => Stack(
           children: [
@@ -64,7 +73,7 @@ abstract class UserControllerBase with Store {
                   child: CircleAvatar(
                     radius: 100,
                     backgroundColor: Colors.transparent,
-                    backgroundImage: NetworkImage(user!.photoURL!),
+                    backgroundImage: NetworkImage(user!.photoUrl!),
                   ),
                 ),
               ],
@@ -82,5 +91,24 @@ abstract class UserControllerBase with Store {
           ),
           child: Image(image: AssetImage('assets/images/boar.png')));
     }
+  }
+
+  @action
+  void updateUser(String? name, PhoneAuthCredential? phone, String? photoUrl) {
+    if (name != null && name != '') {
+      FirebaseAuth.instance.currentUser?.updateDisplayName(name);
+    }
+    if (phone != null) {
+      FirebaseAuth.instance.currentUser?.updatePhoneNumber(phone);
+    }
+    if (photoUrl != null && photoUrl != '') {
+      FirebaseAuth.instance.currentUser?.updatePhotoURL(photoUrl);
+    }
+  }
+
+  @action
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
+    user = null;
   }
 }

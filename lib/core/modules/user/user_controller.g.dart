@@ -13,13 +13,13 @@ mixin _$UserController on UserControllerBase, Store {
       Atom(name: 'UserControllerBase.user', context: context);
 
   @override
-  User? get user {
+  UserModel? get user {
     _$userAtom.reportRead();
     return super.user;
   }
 
   @override
-  set user(User? value) {
+  set user(UserModel? value) {
     _$userAtom.reportWrite(value, super.user, () {
       super.user = value;
     });
@@ -57,15 +57,23 @@ mixin _$UserController on UserControllerBase, Store {
     });
   }
 
+  late final _$logoutAsyncAction =
+      AsyncAction('UserControllerBase.logout', context: context);
+
+  @override
+  Future<void> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
+  }
+
   late final _$UserControllerBaseActionController =
       ActionController(name: 'UserControllerBase', context: context);
 
   @override
-  User? fetchUser() {
+  UserModel? fetchUser(User? userAux) {
     final _$actionInfo = _$UserControllerBaseActionController.startAction(
         name: 'UserControllerBase.fetchUser');
     try {
-      return super.fetchUser();
+      return super.fetchUser(userAux);
     } finally {
       _$UserControllerBaseActionController.endAction(_$actionInfo);
     }
@@ -77,6 +85,28 @@ mixin _$UserController on UserControllerBase, Store {
         name: 'UserControllerBase.fetchTeam');
     try {
       return super.fetchTeam();
+    } finally {
+      _$UserControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  dynamic getCurrentUserPicture() {
+    final _$actionInfo = _$UserControllerBaseActionController.startAction(
+        name: 'UserControllerBase.getCurrentUserPicture');
+    try {
+      return super.getCurrentUserPicture();
+    } finally {
+      _$UserControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateUser(String? name, PhoneAuthCredential? phone, String? photoUrl) {
+    final _$actionInfo = _$UserControllerBaseActionController.startAction(
+        name: 'UserControllerBase.updateUser');
+    try {
+      return super.updateUser(name, phone, photoUrl);
     } finally {
       _$UserControllerBaseActionController.endAction(_$actionInfo);
     }

@@ -98,7 +98,7 @@ abstract class ThemeControllerBase with Store {
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: themeBrightness == Brightness.dark ? HexColor('#ffffff') : HexColor('#000000'),
         selectionColor: themeBrightness == Brightness.dark ? HexColor('#80ffffff') : HexColor('#80000000'),
-        selectionHandleColor: themeBrightness == Brightness.dark ? HexColor('#ffffff') : HexColor('#000000'),
+        selectionHandleColor: Colors.transparent,
       ),
       colorScheme: ColorScheme(
         brightness: themeBrightness,

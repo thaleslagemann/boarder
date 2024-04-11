@@ -37,11 +37,10 @@ dependencies:
   flutter_mobx: ^2.2.0+2
   mobx_codegen: ^2.6.0+1
   build_runner: ^2.4.8
-  flutter_modular: ^6.0.4+1
   hexcolor: ^3.0.1
   auto_size_text: ^3.0.0
   uuid: ^4.3.3
-
+  flutter_modular: ^6.0.4+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
