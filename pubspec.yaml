@@ -1,0 +1,57 @@
+name: boarder
+description: A Kanban Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 0.1.1+1
+
+environment:
+  sdk: '>=2.19.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite_common_ffi: any
+  sqlite3_flutter_libs:
+  
+  get:
+  dropdown_button2: ^2.3.8
+  drag_and_drop_lists:
+  loading_animation_widget:
+  kanban_board:
+  appflowy_board:
+  english_words: ^4.0.0
+  provider: ^6.0.0
+  settings_ui: ^2.0.2
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  firebase_core: ^2.16.0
+  firebase_auth: ^4.10.0
+  firebase_ui_auth: ^1.4.0
+  url_launcher: ^6.1.11
+  google_sign_in: ^6.1.5
+  firebase_ui_oauth_google: ^1.2.13
+  intl: ^0.18.1
+  shared_preferences: 2.2.2
+  mobx: ^2.3.0+1
+  flutter_mobx: ^2.2.0+2
+  mobx_codegen: ^2.6.0+1
+  build_runner: ^2.4.8
+  hexcolor: ^3.0.1
+  auto_size_text: ^3.0.0
+  uuid: ^4.3.3
+  flutter_modular: ^6.0.4+1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  change_app_package_name: ^1.1.0
+
+
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+  - assets/images/boar.png
+  - assets/images/logo.png
